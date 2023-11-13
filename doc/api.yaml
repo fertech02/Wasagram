@@ -1,10 +1,32 @@
+"""
+  API:
+  • doLogin (see simplified login)
+  • setMyUserName ok
+  • uploadPhoto
+  • followUser
+  • unfollowUser
+  • banUser
+  • unbanUser
+  • getUserProfile
+  • getMyStream
+  • likePhoto
+  • unlikePhoto
+  • commentPhoto
+  • uncommentPhoto
+  • deletePhoto
+"""
+
+
 openapi: 3.0.0
 servers:
   - url: "http://localhost:3000"
+
 info:
-  title: Fantastic Coffee (decaffeinated)
-  description: Fantastic Coffee (decaffeinated), the skeleton project for Web and Software architecture course
+  title: WASAPhoto
+  description: Keep in touch with your friends by sharing photos of special moments, thanks to WASAPhoto! You can
+              upload your photos directly from your PC, and they will be visible to everyone following you.
   version: 1.0.0
+
 paths:
   /status:
     parameters:
@@ -42,6 +64,7 @@ paths:
           description: Successful
         "400": { $ref: "#/components/responses/BadRequest" }
         "500": { $ref: "#/components/responses/InternalServerError" }
+
   /context:
     parameters:
       - $ref: "#/components/parameters/XAppBuild"
@@ -62,6 +85,7 @@ paths:
               description: Access token for authenticated requests
               schema: { type: string }
         "500": { $ref: "#/components/responses/InternalServerError" }
+
   /authenticated:
     parameters:
       - $ref: "#/components/parameters/XAppBuild"
@@ -81,35 +105,147 @@ paths:
         "200":
           description: Logout successful
         "500": { $ref: "#/components/responses/InternalServerError" }
+  
 
-  /pictures/{cat}:
-    parameters:
-      - $ref: "#/components/parameters/XAppBuild"
-      - $ref: "#/components/parameters/XAppVersion"
-      - $ref: "#/components/parameters/XAppLanguage"
-      - $ref: "#/components/parameters/XAppPlatform"
-      - $ref: "#/components/parameters/cat"
-    get:
-      tags: ["Cat pictures"]
-      operationId: getCatFromPicture
-      summary: Example of a parameter in URL
-      description: |-
-        Example of a parameter in URL
-      security:
-        - LegacyAuth: []
-      responses:
-        "200":
-          description: Student picture found
-          content:
-            image/png:
-              schema:
-                type: string
-                format: binary
-              example: Picture binary file
-        "404":
-          description: Student picture not found
-        "500": { $ref: "#/components/responses/InternalServerError" }
+  /pictures:
 
+    
+
+    /{id}:
+      parameters:
+        - $ref: "#/components/parameters/XAppBuild"
+        - $ref: "#/components/parameters/XAppVersion"
+        - $ref: "#/components/parameters/XAppLanguage"
+        - $ref: "#/components/parameters/XAppPlatform"
+        - $ref: "#/components/parameters/cat"
+      get:
+        tags: ["Posts"]
+        operationId: getPictureFromId
+        summary: Get the post given a specific id
+        description: |-
+          Retrieve the post with the given id
+        security:
+          - LegacyAuth: []
+        responses:
+          "200":
+            description: User picture found
+            content:
+              image/png:
+                schema:
+                  type: string
+                  format: binary
+                example: Picture binary file
+          "404":
+            description: User picture not found
+          "500": { $ref: "#/components/responses/InternalServerError" }
+
+  /users:
+
+    /{id}:
+      /username:
+        parameters:
+          - name: id
+            in: path
+            required: true
+            description: Unique ID for the User
+            schema:
+              type: string
+        
+        put:
+          tags: ["Users"]
+          operationId: setMyUserName
+          summary: Update my username
+          description: Allows to set the username
+          requestBody:
+            description: JSON Object with my username
+            required: true
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties: 
+                    username: 
+                      type: string
+                      description: "The new username"
+                      example: "new_username"
+          responses:
+            "200": 
+              description: Username updated sucessfully
+              content:
+                application/json:
+                  schema:
+                    $ ref: "#/components/schemas/User"
+            "400":
+              description: Bad Request
+            "404":
+              description: User Not Found
+            "500": { $ref: "#/components/responses/InternalServerError"} 
+        
+      /followers:
+        parameters:
+          - name: id
+            in: path
+            required: true
+            description: Unique ID of the user
+            schema:
+              type: string
+        
+        get:
+          tags: ["Users"]
+          operationId: getFollowers
+          summary: Retrieve the list of followers of a specific user
+          description: Retrieve the followers of an user given its id
+          responses:
+            "200":
+              description: Followers successfully retrieved
+              content:
+                application/json:
+                  schema:
+                    type: array
+                    items: 
+                      $ref: "#/components/schemas/User"
+            "404":
+              description: "User Not Found"
+            "500":
+              description:
+
+      /followees:
+        parameters:
+          - name: id
+            in: path
+            required: true
+            description: Unique Id of the User
+            schema:
+              type: string
+        
+        get:
+          tags: ["Users"]
+          operationId: getFollowees
+          summary: Retrieve the list of users that the user follow
+          description: Users followed by a specific user
+          responses:
+            "200":
+              description: Followees successfully retrieved
+              content:
+                application/json:
+                  schema:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/User"
+            "404":
+              description: User Not Found
+            "500": { $ref: "#/components/responses/InternalServerError"}
+
+
+
+
+
+
+            
+
+
+
+        
 
   /autofeeder/{cat}:
     parameters:
@@ -185,7 +321,6 @@ paths:
               description: Error message
               schema: { type: string }
         "500": { $ref: "#/components/responses/InternalServerError" }
-
 
 components:
   schemas:
