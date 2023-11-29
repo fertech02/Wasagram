@@ -33,17 +33,17 @@ paths:
                   minLength: 3
                   maxLength: 16
         required: true
-      responses:
-        "201":
-          description: User login action successful
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  identifiers:
-                    type: string
-                    example: abcdef012345
+    responses:
+      "201":
+        description: User login action successful
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                identifiers:
+                  type: string
+                  example: abcdef012345
 
   /status:
     parameters:
@@ -123,19 +123,15 @@ paths:
           description: Logout successful
         "500": { $ref: "#/components/responses/InternalServerError" }
   
-  /photos:
+
+  /pictures:
     /{PhotoId}:
       parameters:
         - $ref: "#/components/parameters/XAppBuild"
         - $ref: "#/components/parameters/XAppVersion"
         - $ref: "#/components/parameters/XAppLanguage"
         - $ref: "#/components/parameters/XAppPlatform"
-      get:
-        parameters:
-          - name: PhotoId
-            in: path
-            schema:
-              - $ref: '#/components/schemas/Photo/properties/PhotoId'
+        - $ref: "#/components/parameters/cat"
       post:
         tags: ["Pictures"]
         operationId: uploadPhoto
@@ -182,7 +178,7 @@ paths:
               in: path
               required: true
               schema:
-                $ref: '#/components/schemas/Like'
+                type: string
           responses:
             "204":
               description: Photo Unliked
@@ -239,11 +235,11 @@ paths:
       get:
         operationId: getUserProfile
         parameters:
-          - name: UserId
+          - name: id
             in: path
             required: true
             schema:
-              $ref: '#/components/schemas/User/properties/UserId'
+              type: string
         responses:
           "200":
             description: User Profile
@@ -324,7 +320,7 @@ paths:
               description: User unfollowed
             "404":
               description: User not found
-  
+
         /follows:
           get:
             summary: Get follows for a user
@@ -337,7 +333,7 @@ paths:
                       items:
                         $ref: '#/components/schemas/Follow'
         
-  
+
       /ban:
         put:
           operationId: banUser
@@ -353,7 +349,10 @@ paths:
             content:
               application/json:
                 schema:
-                  $ref: "#/components/schemas/Ban"
+                  type: object
+                  properties:
+                    reason:
+                      type: string
           responses:
             "200":
               description: User Banned
@@ -373,8 +372,7 @@ paths:
             summary: User Unbanned
           "404":
             summary: User Not Banned
-    
-   
+     
   /stream:
     get:
       security:
@@ -399,10 +397,7 @@ paths:
         "200":
           description: Photo stream
           headers:
-            Cache-Control:
-              schema:
-                type: string
-                enum: ["max-age=60"]
+            Cache-Control: public, max-age=60
           content:
             application/json:
               schema:
@@ -418,6 +413,36 @@ paths:
                   "name": "John Doe"
                 }]
       
+  /autofeeder/{cat}:
+    parameters:
+      - $ref: "#/components/parameters/XAppBuild"
+      - $ref: "#/components/parameters/XAppVersion"
+      - $ref: "#/components/parameters/XAppLanguage"
+      - $ref: "#/components/parameters/XAppPlatform"
+      - $ref: "#/components/parameters/cat"
+    put:
+      tags: ["Autofeeder"]
+      operationId: createCatAutofeeder
+      summary: Example of PUT operation
+      security:
+        - LegacyAuth: []
+      responses:
+        "200":
+          description: Auto feed enabled
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+    delete:
+      tags: ["Autofeeder"]
+      operationId: deleteCatAutofeeder
+      summary: Example of DELETE operation
+      security:
+        - LegacyAuth: []
+      responses:
+        "200":
+          description: Auto feed disabled
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+
   /session/login:
     parameters:
       - $ref: "#/components/parameters/XAppBuild"
@@ -475,6 +500,7 @@ components:
             - info
             - warning
             - critical
+            - ""
         title: { type: string }
         message: { type: string }
         url: { type: string }
@@ -483,6 +509,8 @@ components:
       description: Photo
       properties:
         PhotoId: 
+          type: string
+        url:
           type: string
         owner:
           $ref: '#/components/schemas/User'
@@ -526,13 +554,10 @@ components:
       properties:
         message:
           type: string
-        Userid:
+        userid:
           type: string
           format: uuid
           description: ID of the commenting User
-        PhotoId:
-          type: string
-          description: ID of the commented Photo
     Ban:
       type: object
       properties:
@@ -574,14 +599,6 @@ components:
     bearerAuth:
       type: http
       scheme: bearer
-    AppToken:
-      type: oauth2
-      flows:
-        implicit:
-          authorizationUrl: /oauth/authorize
-          scopes:
-            read: "Grant read access"
-            write: "Grant write access"
 
   parameters:
     XAppVersion:
@@ -622,21 +639,14 @@ components:
       required: true
       description: An operating system / platform
       allowEmptyValue: false
-    UserId:
-      name: UserId
-      in: path
-      required: true
+    cat:
       schema:
         type: string
-        format: uuid
-        description: UUID of an user
-    PhotoId:
-      name: PhotoId
+        pattern: '^[a-zA-Z]+$'
+        minLength: 3
+        maxLength: 10
+      name: cat
       in: path
       required: true
-      schema: 
-        type: string
-        format: uuid
-        description: UUID of a photo
-    
-
+      description: Cat
+      allowEmptyValue: false
