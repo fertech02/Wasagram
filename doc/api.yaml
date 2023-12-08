@@ -124,152 +124,122 @@ paths:
         "500": { $ref: "#/components/responses/InternalServerError" }
   
 
-  /photos/{userId}/{photoId}:
-      parameters:
-        - $ref: "#/components/parameters/XAppBuild"
-        - $ref: "#/components/parameters/XAppVersion"
-        - $ref: "#/components/parameters/XAppLanguage"
-        - $ref: "#/components/parameters/XAppPlatform"
-        - $ref: "#/components/parameters/UserId"
-        - $ref: "#/components/parameters/PhotoId"
+  
+  /pictures/{PhotoId}:
+    parameters:
+      - $ref: "#/components/parameters/XAppBuild"
+      - $ref: "#/components/parameters/XAppVersion"
+      - $ref: "#/components/parameters/XAppLanguage"
+      - $ref: "#/components/parameters/XAppPlatform"
+      - $ref: "#/components/parameters/PhotoId"
+    post:
+      tags: ["Pictures"]
+      operationId: uploadPhoto
+      summary: upload photo with a specific id
+      description: |-
+        Upload photo
+      security:
+        - LegacyAuth: []
+      responses:
+        "201":
+          description: Picture successfully added
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+              example: Picture binary file
+        "400":
+          description: Bad Request
+        "500": { $ref: "#/components/responses/InternalServerError"}
+      
+  /pictures/{PhotoId}/likes:
       post:
-        tags: ["Photos"]
-        operationId: uploadPhoto
-        summary: upload photo with a specific id
-        description: |-
-          Upload photo
-        security:
-          - LegacyAuth: []
+        tags: ["Likes"]
+        operationId: likePhoto
+        summary: Like a Photo
+        parameters:
+          - name: PhotoId
+            in: path
+            required: true
+            schema:
+              type: string
         responses:
-          "201":
-            description: Picture successfully added
-            content:
-              image/png:
-                schema:
-                  type: string
-                  format: binary
-                example: Picture binary file
-          "400":
-            description: Bad Request
-          "500": { $ref: "#/components/responses/InternalServerError"}
-      delete:
-        operationId: deletePhoto
-        summary: delete a specific photo
-        responses:
-          "204":
-            description: Photo Deleted
+          "200":
+            description: Photo Liked
           "404":
             description: Photo Not Found
-          
-  /photos/{userId}/{photoId}/likes:
-    parameters:
-      - $ref: "#/components/parameters/UserId"
-    post:
-      tags: ["Likes"]
-      operationId: likePhoto
-      summary: Like a Photo
-      parameters:
-        - name: photoId
-          in: path
+      delete:
+        tags: ["Likes"]
+        operationId: unlikePhoto
+        summary: Unlike a Photo
+        parameters:
+          - name: PhotoId
+            in: path
+            required: true
+            schema:
+              type: string
+        responses:
+          "204":
+            description: Photo Unliked
+          "404":
+            description: Photo Not Found
+         
+  /pictures/{PhotoId}/comments:  
+      post:
+        tags: ["Comments"]
+        operationId: commentPhoto
+        summary: Add a comment to a picture
+        parameters:
+          - name: PhotoId
+            in: path
+            required: true
+            schema:
+              type: string
+        requestBody:
+          description: JSON object with the comment
           required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          description: Photo Liked
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Like'
-        "404":
-          description: Photo Not Found
-    delete:
-      tags: ["Likes"]
-      operationId: unlikePhoto
-      summary: Unlike a Photo
-      parameters:
-        - name: photoId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        "204":
-          description: Photo Unliked
-        "404":
-          description: Photo Not Found
-     
-  /photos/{userId}/{photoId}/comments:  
-    parameters:
-      - $ref: '#/components/parameters/UserId'
-    post:
-      tags: ["Comments"]
-      operationId: commentPhoto
-      summary: Add a comment to a picture
-      description: Add a comment to a picture with a specific Id
-      parameters:
-        - name: photoId
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        description: JSON object with the comment
-        required: true
-        content:
-          application/json:
+                type: object
+                description: The comment
+                example: "This is a Comment"
+        responses:
+            "201":
+              description: Comment was successfully added
+              content:
+                application/json:
+                  schema:
+                    $ref: "#/components/schemas/Comment"
+            "400":
+              description: Bad request, e.g., invalid comment
+            "404":
+              description: Picture not found
+            "500": { $ref: "#/components/responses/InternalServerError" }
+      delete:
+        summary: Uncomment a Photo
+        tags: ["Comments"]
+        operationId: uncommentPhoto
+        parameters:
+          - name: PhotoId
+            in: path
+            required: true
             schema:
-              type: object
-              description: The comment
-              example: "This is a Comment"
-      responses:
-          "201":
-            description: Comment was successfully added
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/Comment"
-          "400":
-            description: Bad request, e.g., invalid comment
+              type: string
+        responses:
+          "204":
+            description: Photo Uncommented
           "404":
-            description: Picture not found
-          "500": { $ref: "#/components/responses/InternalServerError" }
-    delete:
-      summary: Uncomment a Photo
-      tags: ["Comments"]
-      operationId: uncommentPhoto
-      parameters:
-        - name: photoId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        "204":
-          description: Photo Uncommented
-        "404":
-          description: Photo Not Found
+            description: Photo Not Found
 
-  /users:
-    post:
-      operationId: createUser
-      summary: Create a new User
-      requestBody:
-        content:
-          application/json:
-            schema: { $ref: '#/components/schemas/User' }
-      responses:
-        "201":
-          description: User created successfully
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/User'}
-          
-  /users/{userId}:
+
+
+  /users/{UserId}:
     get:
       operationId: getUserProfile
       parameters:
-        - name: userId
+        - name: UserId
           in: path
           required: true
           schema:
@@ -284,51 +254,50 @@ paths:
         "404":
           description: User not found
           
-  /users/{userId}/username:
-    parameters:
-      - name: userId
-        in: path
-        required: true
-        description: Unique ID for the User
-        schema:
-          type: string
-    
-    put:
-      tags: ["Users"]
-      operationId: setMyUserName
-      summary: Update my username
-      description: Allows to set the username
-      requestBody:
-        description: JSON Object with my username
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties: 
-                username: 
-                  type: string
-                  description: "The new username"
-                  example: "new_username"
-      responses:
-        "200": 
-          description: Username updated sucessfully
+  /user/{UserId}/username:
+      parameters:
+        - name: UserId
+          in: path
+          required: true
+          description: Unique ID for the User
+          schema:
+            type: string
+      put:
+        tags: ["Users"]
+        operationId: setMyUserName
+        summary: Update my username
+        description: Allows to set the username
+        requestBody:
+          description: JSON Object with my username
+          required: true
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
-        "400":
-          description: Bad Request
-        "404":
-          description: User Not Found
-        "500": { $ref: "#/components/responses/InternalServerError"} 
-    
-  /users/{userId}/follow:
+                type: object
+                properties: 
+                  username: 
+                    type: string
+                    description: "The new username"
+                    example: "new_username"
+        responses:
+          "200": 
+            description: Username updated sucessfully
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/User"
+          "400":
+            description: Bad Request
+          "404":
+            description: User Not Found
+          "500": { $ref: "#/components/responses/InternalServerError"} 
+  
+  /user/{UserId}/follow:
     post:
       operationId: followUser
       summary: Follow a User
       parameters:
-        - name: userId
+        - name: UserId
           in: path
           required: true
           schema:
@@ -345,7 +314,7 @@ paths:
       operationId: unfollowUser
       summary: Unfollow an User
       parameters:
-        - name: userId
+        - name: UserId
           in: path
           required: true
           schema:
@@ -356,12 +325,12 @@ paths:
         "404":
           description: User not found
 
-  /users/{userId}/ban:
+  /user/{UserId}/ban:
     put:
       operationId: banUser
       summary: Ban an User
       parameters:
-        - name: userId
+        - name: UserId
           in: path
           required: true
           schema:
@@ -377,28 +346,24 @@ paths:
                   type: string
       responses:
         "200":
-          description: User Unbanned
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Ban'
+          description: User Banned
         "404":
           description: User Not Found
     delete:
       operationId: unbanUser
       summary: Unban an User
       parameters:
-        - name: userId
+        - name: UserId
           in: path
           required: true
           schema:
             type: string
       responses:
         "204":
-          description: User Unbanned
+          description: User Unbanned Successfully
         "404":
-          description: User Not Found
-   
+          description: User Not Banned
+     
   /stream:
     get:
       security:
@@ -423,9 +388,9 @@ paths:
         "200":
           description: Photo stream
           headers:
-            Cache-Control: 
+            Cache-Control:
               schema:
-                $ref: '#/components/schemas/CacheControl'
+                $ref: "#/components/schemas/Cache-Control"
           content:
             application/json:
               schema:
@@ -537,7 +502,7 @@ components:
       description: Photo
       properties:
         PhotoId: 
-          type: string
+          $ref: '#/components/parameters/PhotoId'
         url:
           type: string
         owner:
@@ -546,7 +511,7 @@ components:
       type: object
       properties:
         UserId:
-          type: string
+          $ref: '#/components/parameters/UserId'
         username:
           type: string
         profileImage:
@@ -557,6 +522,7 @@ components:
           type: string
       required:
         - UserId
+        - username
     Like:
       type: object
       properties:
@@ -589,9 +555,14 @@ components:
           type: string
         message:
           type: string
-    CacheControl:
+    Error:
+      type: object
+      properties: 
+        message:
+          type: string
+    Cache-Control:
       type: string
-      enum: ["public","max-age=60"]
+      enum: [public, max-age=60]
 
   responses:
     Unauthorized:
@@ -614,8 +585,9 @@ components:
       scheme: bearer
     AppToken:
       type: apiKey
-      name: Authorization
+      name: authorization
       in: header
+
   parameters:
     XAppVersion:
       schema:
@@ -666,19 +638,19 @@ components:
       required: true
       description: Cat
       allowEmptyValue: false
+    PhotoId:
+        schema:
+          type: string
+          format: uuid
+        name: PhotoId
+        in: path
+        required: true
+        allowEmptyValue: false
     UserId:
       schema:
         type: string
-      name: userId
+        format: uuid
+      name: UserId
       in: path
       required: true
-      description: Identifier of an User
-      allowEmptyValue: false
-    PhotoId:
-      schema:
-        type: string
-      name: photoId
-      in: path
-      required: true
-      description: Identifier of a Photo
       allowEmptyValue: false
