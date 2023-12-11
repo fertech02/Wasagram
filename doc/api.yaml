@@ -167,6 +167,10 @@ paths:
         responses:
           "200":
             description: Photo Liked
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/Like"
           "404":
             description: Photo Not Found
       delete:
@@ -347,6 +351,9 @@ paths:
       responses:
         "200":
           description: User Banned
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Ban" }
         "404":
           description: User Not Found
     delete:
@@ -515,14 +522,21 @@ components:
         username:
           type: string
         profileImage:
-          type: string
+          type: object
         followers:
-          type: string
+          type: array
+          items:
+            type: string
         followees:
-          type: string
+          type: array
+          items:
+            type: string
+        banned:
+          type: array
+          items:
+            type: string
       required:
         - UserId
-        - username
     Like:
       type: object
       properties:
@@ -535,10 +549,14 @@ components:
       properties:
         message:
           type: string
-        userid:
+        Userid:
           type: string
           format: uuid
           description: ID of the commenting User
+        PhotoId:
+          type: string
+          format: uuid
+          description: ID of the commented Photo
     Ban:
       type: object
       properties:
