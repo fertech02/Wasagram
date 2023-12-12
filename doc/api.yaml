@@ -510,10 +510,16 @@ components:
       properties:
         PhotoId: 
           $ref: '#/components/parameters/PhotoId'
-        url:
-          type: string
         owner:
           $ref: '#/components/schemas/User'
+        likes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Like'
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
     User:
       type: object
       properties:
@@ -571,11 +577,6 @@ components:
           type: string
         followingId:
           type: string
-        message:
-          type: string
-    Error:
-      type: object
-      properties: 
         message:
           type: string
     Cache-Control:
