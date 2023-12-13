@@ -45,6 +45,51 @@ paths:
                     type: string
                     example: abcdef012345
 
+  /session/login:
+    parameters:
+      - $ref: "#/components/parameters/XAppBuild"
+      - $ref: "#/components/parameters/XAppVersion"
+      - $ref: "#/components/parameters/XAppLanguage"
+      - $ref: "#/components/parameters/XAppPlatform"
+    post:
+      tags: ["Session management"]
+      operationId: login
+      summary: Log-in into system
+      description: |-
+        Perform a log-in action using username and password credentials.
+        Returns a token which can be used in authenticated requests.
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                userid:
+                  type: string
+                  pattern: '^[a-zA-Z0-9]+$'
+                  minLength: 3
+                  maxLength: 255
+                password:
+                  type: string
+                  pattern: '^.*?$'
+                  minLength: 8
+                  maxLength: 255
+      responses:
+        "200":
+          description: Login successful
+          headers:
+            X-Access-Token:
+              description: Access token for authenticated requests
+              schema: { type: string }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "403":
+          description: Login failed
+          headers:
+            X-Message:
+              description: Error message
+              schema: { type: string }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+
   /status:
     parameters:
       - $ref: "#/components/parameters/XAppBuild"
@@ -67,40 +112,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/StatusInfo"
         "400": { $ref: "#/components/responses/BadRequest" }
-        "500": { $ref: "#/components/responses/InternalServerError" }
-
-  /:
-    get:
-      tags: ["Group 1"]
-      operationId: index
-      summary: Get an index
-      description: |-
-        This is an example of an index API description
-      responses:
-        "200":
-          description: Successful
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "500": { $ref: "#/components/responses/InternalServerError" }
-
-  /context:
-    parameters:
-      - $ref: "#/components/parameters/XAppBuild"
-      - $ref: "#/components/parameters/XAppVersion"
-      - $ref: "#/components/parameters/XAppLanguage"
-      - $ref: "#/components/parameters/XAppPlatform"
-    post:
-      tags: ["Group 1"]
-      operationId: getContext
-      summary: Another API example
-      description: |-
-        Example description 2
-      responses:
-        "200":
-          description: Request ok
-          headers:
-            X-Access-Token:
-              description: Access token for authenticated requests
-              schema: { type: string }
         "500": { $ref: "#/components/responses/InternalServerError" }
 
   /authenticated:
@@ -344,16 +355,14 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                reason:
-                  type: string
+              type: string
       responses:
         "200":
           description: User Banned
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Ban" }
+              schema:
+                type: string
         "404":
           description: User Not Found
     delete:
@@ -377,14 +386,7 @@ paths:
         - bearerAuth: []
       summary: Get photo stream from followed Users
       parameters:
-        - name: page
-          in: query
-          description: Page number
-          schema:
-            type: integer
-            minimum: 1
-            default: 1
-        - name: followees
+        - name: followees photos
           in: query
           explode: true
           schema:
@@ -410,7 +412,8 @@ paths:
                   "url":"photo1.png"
                   "owner": {
                   "id": "user1",
-                  "name": "John Doe"
+                  "username": "user1"
+                  }
                 }]
       
   /autofeeder/{cat}:
@@ -443,51 +446,6 @@ paths:
         "400": { $ref: "#/components/responses/BadRequest" }
         "500": { $ref: "#/components/responses/InternalServerError" }
 
-  /session/login:
-    parameters:
-      - $ref: "#/components/parameters/XAppBuild"
-      - $ref: "#/components/parameters/XAppVersion"
-      - $ref: "#/components/parameters/XAppLanguage"
-      - $ref: "#/components/parameters/XAppPlatform"
-    post:
-      tags: ["Session management"]
-      operationId: login
-      summary: Log-in into system
-      description: |-
-        Perform a log-in action using username and password credentials.
-        Returns a token which can be used in authenticated requests.
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              type: object
-              properties:
-                userid:
-                  type: string
-                  pattern: '^[a-zA-Z0-9]+$'
-                  minLength: 3
-                  maxLength: 255
-                password:
-                  type: string
-                  pattern: '^.*?$'
-                  minLength: 8
-                  maxLength: 255
-      responses:
-        "200":
-          description: Login successful
-          headers:
-            X-Access-Token:
-              description: Access token for authenticated requests
-              schema: { type: string }
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "403":
-          description: Login failed
-          headers:
-            X-Message:
-              description: Error message
-              schema: { type: string }
-        "500": { $ref: "#/components/responses/InternalServerError" }
-
 components:
   schemas:
     StatusInfo:
@@ -509,9 +467,11 @@ components:
       description: Photo
       properties:
         PhotoId: 
-          $ref: '#/components/parameters/PhotoId'
+          type: string
+          format: uuid
         owner:
-          $ref: '#/components/schemas/User'
+          type: string
+          format: uuid
         likes:
           type: array
           items:
@@ -522,13 +482,13 @@ components:
             $ref: '#/components/schemas/Comment'
     User:
       type: object
+      description: User
       properties:
         UserId:
-          $ref: '#/components/parameters/UserId'
+          type: string
+          format: uuid
         username:
           type: string
-        profileImage:
-          type: object
         followers:
           type: array
           items:
@@ -545,13 +505,17 @@ components:
         - UserId
     Like:
       type: object
+      description: Like
       properties:
         PhotoId:
           type: string
+          format: uuid
         UserId:
           type: string
+          format: uuid
     Comment:
       type: object
+      description: Comment
       properties:
         message:
           type: string
@@ -563,24 +527,21 @@ components:
           type: string
           format: uuid
           description: ID of the commented Photo
-    Ban:
-      type: object
-      properties:
-        UserId:
-          type: string
-        reason:
-          type: string
     FollowResponse:
       type: object
+      description: Follow Response
       properties:
         followerId:
           type: string
+          format: uuid
         followingId:
           type: string
+          format: uuid
         message:
           type: string
     Cache-Control:
       type: string
+      description: Cache-Control
       enum: [public, max-age=60]
 
   responses:

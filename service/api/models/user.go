@@ -1,16 +1,11 @@
 package models
 
-import (
-	"image"
-)
-
 type User struct {
-	UserId       string
-	username     string
-	profileImage image.Image
-	followers    []string
-	followees    []string
-	banned       []string
+	UserId    string
+	username  string
+	followers []string
+	followees []string
+	banned    []string
 }
 
 // Get User by ID
