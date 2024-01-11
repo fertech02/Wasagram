@@ -19,6 +19,8 @@ paths:
         is returned. 
         If the user exists, the user identifier is returned.
       operationId: doLogin
+      security:
+        - bearerAuth: []
       requestBody:
         description: User details
         content:
@@ -47,10 +49,6 @@ paths:
 
   /pictures/{pid}:
     parameters:
-      - $ref: "#/components/parameters/XAppBuild"
-      - $ref: "#/components/parameters/XAppVersion"
-      - $ref: "#/components/parameters/XAppLanguage"
-      - $ref: "#/components/parameters/XAppPlatform"
       - $ref: "#/components/parameters/PhotoId"
     post:
       tags: ["Pictures"]
@@ -58,8 +56,6 @@ paths:
       summary: upload photo with a specific id
       description: |-
         Upload photo
-      security:
-        - LegacyAuth: []
       responses:
         "201":
           description: Picture successfully added
@@ -71,8 +67,10 @@ paths:
           description: Bad Request
         "500": 
           description: Internal Server Error
-          schema:
-            $ref: "#/components/responses/InternalServerError"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/responses/InternalServerError"
       
   /pictures/{pid}/likes:
       post:
@@ -249,6 +247,10 @@ paths:
       responses:
         "204":
           description: User unfollowed
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/FollowResponse"
         "404":
           description: User not found
 
@@ -320,20 +322,6 @@ paths:
   
 components:
   schemas:
-    StatusInfo:
-      title: Status Info
-      type: object
-      properties:
-        status:
-          type: string
-          enum:
-            - info
-            - warning
-            - critical
-            - ""
-        title: { type: string }
-        message: { type: string }
-        url: { type: string }
     Photo:
       type: object
       description: Photo
@@ -409,8 +397,6 @@ components:
         followingId:
           type: string
           format: uuid
-        message:
-          type: string
 
   responses:
     Unauthorized:
@@ -421,60 +407,11 @@ components:
       description: The server encountered an internal error. Further info in server logs
 
   securitySchemes:
-    LegacyAuth:
-      type: apiKey
-      in: header
-      name: X-App-Token
-      description: |-
-        App session token value. This value is sent by the server in the login
-        and session refresh APIs.
     bearerAuth:
       type: http
       scheme: bearer
-    AppToken:
-      type: apiKey
-      name: authorization
-      in: header
-
+      
   parameters:
-    XAppVersion:
-      schema:
-        type: string
-        pattern: '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$'
-        minLength: 1
-        maxLength: 10
-      name: X-App-Version
-      in: header
-      required: true
-      description: App human readable version ("semantic version" format)
-      allowEmptyValue: false
-    XAppBuild:
-      schema: { type: integer }
-      name: X-App-Build
-      in: header
-      required: true
-      description: App build number
-      allowEmptyValue: false
-    XAppLanguage:
-      schema:
-        type: string
-        pattern: '^[a-z]{2}([-_][A-Z]{2})?$'
-        minLength: 2
-        maxLength: 5
-      name: X-App-Language
-      in: header
-      required: true
-      description: App language in ISO 639-1 format
-      allowEmptyValue: false
-    XAppPlatform:
-      schema:
-        type: string
-        enum: [ios, android]
-      name: X-App-Platform
-      in: header
-      required: true
-      description: An operating system / platform
-      allowEmptyValue: false
     PhotoId:
         schema:
           type: string
