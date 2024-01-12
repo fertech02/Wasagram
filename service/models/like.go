@@ -1,6 +1,6 @@
 package models
 
 type Like struct {
-	userId  string
-	photoId string
+	uid  string
+	pid string
 }

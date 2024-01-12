@@ -1,6 +1,7 @@
 package models
 
 type Comment struct {
-	owner string
-	text  string
+	uid string
+	pid string
+	message string
 }

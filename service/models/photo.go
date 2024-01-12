@@ -1,8 +1,8 @@
 package models
 
 type Photo struct {
-	PhotoId  string
-	owner    string
+	pid  string
+	uid  string
 	likes    []Like
 	comments []Comment
 }
