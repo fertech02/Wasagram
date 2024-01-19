@@ -1,11 +1,17 @@
-package models
+package database;
 
 type User struct {
-	uid	      string
-	username  string
-	followers []string
-	followees []string
-	banned    []string
+	uid	      string  `json:"uid"`
+	username  string	`json:"username"`
+	followers []string	`json:"followers"`
+	followees []string	`json:"followees"`
+	banned    []string	`json:"banned"`
+}
+
+
+// Create a new User
+func CreateUser(username string) (*User, error) {
+	return db.CreateUser(username);
 }
 
 // Get User by ID
