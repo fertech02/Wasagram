@@ -38,9 +38,6 @@ import (
 
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
-	GetName() (string, error)
-	SetName(name string) error
-
 	Ping() error
 }
 
@@ -73,4 +70,18 @@ func New(db *sql.DB) (AppDatabase, error) {
 
 func (db *appdbimpl) Ping() error {
 	return db.c.Ping()
+}
+
+// Start Database
+func StartDB() error {
+	logger.Println("initializing database support")
+	db, err := sql.Open("sqlite3", "./foo.db")
+	if err != nil {
+		logger.WithError(err).Error("error opening SQLite DB")
+		return fmt.Errorf("opening SQLite: %w", err)
+	}
+	defer StartDB() {
+		logger.Debug("database stopping")
+		_ = db.Close()
+	}()
 }

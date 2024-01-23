@@ -46,10 +46,16 @@ paths:
                   identifiers:
                     type: string
                     example: abcdef012345
+                    pattern: '^.*?$'
+                    minLength: 12
+                    maxLength: 12
 
   /pictures/{pid}:
     parameters:
-      - $ref: "#/components/parameters/PhotoId"
+      name: pid
+      in: path
+      required: true
+      description: The id of the picture
     post:
       tags: ["Pictures"]
       operationId: uploadPhoto
@@ -71,18 +77,32 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/responses/InternalServerError"
+    delete:
+      tags: ["Pictures"]
+      operationId: deletePhoto
+      summary: Delete a Photo
+      responses:
+        "204":
+          description: Photo Deleted
+        "404":
+          description: Photo Not Found
+        "500": 
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/responses/InternalServerError"
       
   /pictures/{pid}/likes:
+      parameters:
+        name: pid
+        in: path
+        required: true
+        description: The id of the picture
       post:
         tags: ["Likes"]
         operationId: likePhoto
         summary: Like a Photo
-        parameters:
-          - name: pid
-            in: path
-            required: true
-            schema:
-              type: string
         responses:
           "200":
             description: Photo Liked
@@ -96,29 +116,22 @@ paths:
         tags: ["Likes"]
         operationId: unlikePhoto
         summary: Unlike a Photo
-        parameters:
-          - name: pid
-            in: path
-            required: true
-            schema:
-              type: string
         responses:
           "204":
             description: Photo Unliked
           "404":
             description: Photo Not Found
          
-  /pictures/{pid}/comments:  
+  /pictures/{pid}/comments:
+      parameters:
+        name: pid
+        in: path
+        required: true
+        description: The id of the picture
       post:
         tags: ["Comments"]
         operationId: commentPhoto
         summary: Add a comment to a picture
-        parameters:
-          - name: pid
-            in: path
-            required: true
-            schema:
-              type: string
         requestBody:
           description: JSON object with the comment
           required: true
@@ -144,12 +157,6 @@ paths:
         summary: Uncomment a Photo
         tags: ["Comments"]
         operationId: uncommentPhoto
-        parameters:
-          - name: pid
-            in: path
-            required: true
-            schema:
-              type: string
         responses:
           "204":
             description: Photo Uncommented
@@ -157,15 +164,14 @@ paths:
             description: Photo Not Found
 
   /users/{uid}:
+    parameters:
+      name: uid
+      in: path
+      required: true
+      description: The id of the user
     get:
       operationId: getUserProfile
       tags: ["Users"]
-      parameters:
-        - name: uid
-          in: path
-          required: true
-          schema:
-            type: string
       responses:
         "200":
           description: User Profile
@@ -178,12 +184,10 @@ paths:
           
   /user/{uid}/username:
       parameters:
-        - name: uid
-          in: path
-          required: true
-          description: Unique ID for the User
-          schema:
-            type: string
+        name: uid
+        in: path
+        required: true
+        description: The id of the user
       put:
         tags: ["Users"]
         operationId: setMyUserName
@@ -215,16 +219,15 @@ paths:
           "500": { $ref: "#/components/responses/InternalServerError"} 
   
   /user/{uid}/follow:
+    parameters:
+      name: uid
+      in: path
+      required: true
+      description: The id of the user
     post:
       operationId: followUser
       tags: ["Users"]
       summary: Follow a User
-      parameters:
-        - name: uid
-          in: path
-          required: true
-          schema:
-            type: string
       responses:
         "200":
           description: User followed
@@ -238,12 +241,6 @@ paths:
       operationId: unfollowUser
       tags: ["Users"]
       summary: Unfollow an User
-      parameters:
-        - name: uid
-          in: path
-          required: true
-          schema:
-            type: string
       responses:
         "204":
           description: User unfollowed
@@ -255,16 +252,15 @@ paths:
           description: User not found
 
   /user/{uid}/ban:
+    parameters:
+      name: uid
+      in: path
+      required: true
+      description: The id of the user
     put:
       operationId: banUser
       tags: ["Users"]
       summary: Ban an User
-      parameters:
-        - name: uid
-          in: path
-          required: true
-          schema:
-            type: string
       requestBody:
         required: true
         content:
@@ -284,12 +280,6 @@ paths:
       operationId: unbanUser
       tags: ["Users"]
       summary: Unban an User
-      parameters:
-        - name: uid
-          in: path
-          required: true
-          schema:
-            type: string
       responses:
         "204":
           description: User Unbanned Successfully
@@ -302,6 +292,7 @@ paths:
         - bearerAuth: []
       summary: Get photo stream from followed Users
       tags: ["Stream"]
+      operationId: getPhotoStream
       parameters:
         - name: followees photos
           in: query
