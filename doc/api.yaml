@@ -132,22 +132,13 @@ paths:
         tags: ["Comments"]
         operationId: commentPhoto
         summary: Add a comment to a picture
-        requestBody:
-          description: JSON object with the comment
-          required: true
-          content:
-            application/json:
-              schema:
-                type: object
-                description: The comment
-                example: "This is a Comment"
         responses:
             "201":
               description: Comment was successfully added
               content:
                 application/json:
                   schema:
-                    $ref: "#/components/schemas/Comment"
+                    - $ref: "#/components/schemas/Comment"
             "400":
               description: Bad request, e.g., invalid comment
             "404":
@@ -162,7 +153,7 @@ paths:
             description: Photo Uncommented
           "404":
             description: Photo Not Found
-
+    
   /users/{uid}:
     parameters:
       name: uid
@@ -178,10 +169,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                - $ref: '#/components/schemas/User'
         "404":
           description: User not found
-          
+
   /user/{uid}/username:
       parameters:
         name: uid
@@ -211,7 +202,7 @@ paths:
             content:
               application/json:
                 schema:
-                  $ref: "#/components/schemas/User"
+                  - $ref: "#/components/schemas/User"
           "400":
             description: Bad Request
           "404":
@@ -224,7 +215,22 @@ paths:
       in: path
       required: true
       description: The id of the user
-    post:
+    get:
+      operationId: getFollowees
+      tags: ["Users"]
+      summary: Get the list of followees
+      responses:
+        "200":
+          description: List of followees
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        "404":
+          description: User not found
+    put:
       operationId: followUser
       tags: ["Users"]
       summary: Follow a User
@@ -234,7 +240,7 @@ paths:
           content:
             application/json:
               schema: 
-                $ref: "#/components/schemas/FollowResponse"
+                - $ref: "#/components/schemas/FollowResponse"
       security:
         - bearerAuth: []
     delete:
@@ -247,7 +253,7 @@ paths:
           content:
             application/json:
               schema: 
-                $ref: "#/components/schemas/FollowResponse"
+                - $ref: "#/components/schemas/FollowResponse"
         "404":
           description: User not found
 
@@ -273,7 +279,7 @@ paths:
           content:
             application/json:
               schema:
-                type: string
+                - $ref: "#/components/schemas/Ban"
         "404":
           description: User Not Found
     delete:
@@ -283,9 +289,13 @@ paths:
       responses:
         "204":
           description: User Unbanned Successfully
+          content:
+            application/json:
+              schema:
+                - $ref: "#/components/schemas/Ban"
         "404":
           description: User Not Banned
-     
+    
   /stream:
     get:
       security:
@@ -378,6 +388,7 @@ components:
           type: string
           format: uuid
           description: ID of the commented Photo
+        
     FollowResponse:
       type: object
       description: Follow Response
@@ -385,10 +396,20 @@ components:
         followerId:
           type: string
           format: uuid
-        followingId:
+        followeeId:
           type: string
           format: uuid
-
+    Ban:
+      type: object
+      description: Ban User
+      properties:
+        bannerId:
+          type: string
+          format: uuid
+        bannedId:
+          type: string
+          format: uuid
+  
   responses:
     Unauthorized:
       description: The access token is missing or it's expired

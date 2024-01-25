@@ -84,4 +84,5 @@ func StartDB() error {
 		logger.Debug("database stopping")
 		_ = db.Close()
 	}()
+	
 }
