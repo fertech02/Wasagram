@@ -1,6 +1,6 @@
 package models;
 
 type Ban struct {
-	bannerId int
-	bannedId int
+	bannerId string
+	bannedId string
 }

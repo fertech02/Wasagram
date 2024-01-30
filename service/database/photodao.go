@@ -7,8 +7,8 @@ func (u *User) PostPhoto(p *Photo) error {
 	if err != nil {
 		panic(err)
 	}
-	query := "INSERT INTO Photos (uid, pid) VALUES ($1, $2)"
-	_, err = db.QueryRow(query, u.uid, p.pid)
+	query := "INSERT INTO Photos (uid, pid, url) VALUES (?, ?, ?)"
+	_, err = db.QueryRow(query, u.uid, p.pid, p.url)
 	if err != nil {
 		panic(err)
 	}

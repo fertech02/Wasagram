@@ -12,15 +12,13 @@ paths:
 
   /session:
     post:
-      tags: ["Session management"]
+      tags: ["Login"]
       summary: Logs in the user
       description: |-
-        If the user does not exists, it will be created, and an identifier 
-        is returned. 
+        If the user does not exists, it will be created,
+        and an identifier is returned.
         If the user exists, the user identifier is returned.
-      operationId: doLogin
-      security:
-        - bearerAuth: []
+      operationId: dologin
       requestBody:
         description: User details
         content:
@@ -30,26 +28,23 @@ paths:
               properties:
                 name:
                   type: string
-                  example: Martin
+                  example: Maria
                   pattern: '^.*?$'
                   minLength: 3
                   maxLength: 16
         required: true
       responses:
-        "201":
-          description: User login action successful
+        '201':
+          description: User log-in action successful
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  identifiers:
+                  identifier:
                     type: string
-                    example: abcdef012345
-                    pattern: '^.*?$'
-                    minLength: 12
-                    maxLength: 12
-
+                    example: "abcdef012345"
+                    
   /pictures/{pid}:
     parameters:
       name: pid
@@ -143,7 +138,9 @@ paths:
               description: Bad request, e.g., invalid comment
             "404":
               description: Picture not found
-            "500": { $ref: "#/components/responses/InternalServerError" }
+            "500": 
+              schema:
+                $ref: "#/components/responses/InternalServerError" 
       delete:
         summary: Uncomment a Photo
         tags: ["Comments"]
@@ -199,15 +196,10 @@ paths:
         responses:
           "200": 
             description: Username updated sucessfully
-            content:
-              application/json:
-                schema:
-                  - $ref: "#/components/schemas/User"
           "400":
             description: Bad Request
           "404":
             description: User Not Found
-          "500": { $ref: "#/components/responses/InternalServerError"} 
   
   /user/{uid}/follow:
     parameters:
@@ -329,51 +321,34 @@ components:
       properties:
         PhotoId: 
           type: string
-          format: uuid
         owner:
           type: string
-          format: uuid
-        likes:
-          type: array
-          items:
-            $ref: '#/components/schemas/Like'
-        comments:
-          type: array
-          items:
-            $ref: '#/components/schemas/Comment'
+        url:
+          type: string
+        
     User:
       type: object
       description: User
       properties:
         UserId:
           type: string
-          format: uuid
         username:
           type: string
-        followers:
-          type: array
-          items:
-            type: string
-        followees:
-          type: array
-          items:
-            type: string
-        banned:
-          type: array
-          items:
-            type: string
       required:
         - UserId
+    
     Like:
       type: object
       description: Like
       properties:
         PhotoId:
           type: string
-          format: uuid
         UserId:
           type: string
-          format: uuid
+      required:
+        - PhotoId
+        - UserId
+    
     Comment:
       type: object
       description: Comment
@@ -382,33 +357,28 @@ components:
           type: string
         Userid:
           type: string
-          format: uuid
           description: ID of the commenting User
         PhotoId:
           type: string
-          format: uuid
           description: ID of the commented Photo
-        
+
     FollowResponse:
       type: object
       description: Follow Response
       properties:
         followerId:
           type: string
-          format: uuid
         followeeId:
           type: string
-          format: uuid
+
     Ban:
       type: object
       description: Ban User
       properties:
         bannerId:
           type: string
-          format: uuid
         bannedId:
           type: string
-          format: uuid
   
   responses:
     Unauthorized:
@@ -427,7 +397,6 @@ components:
     PhotoId:
         schema:
           type: string
-          format: uuid
         name: pid
         in: path
         required: true
@@ -435,7 +404,6 @@ components:
     UserId:
       schema:
         type: string
-        format: uuid
       name: uid
       in: path
       required: true

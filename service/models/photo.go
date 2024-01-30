@@ -1,7 +1,8 @@
 package models;
 
 type Photo struct {
-	pid  int	`json:"pid"`
-	uid  int	`json:"uid"`
+	pid  string	`json:"pid"`
+	uid  string	`json:"uid"`
+	url  string	`json:"url"`
 }
 
