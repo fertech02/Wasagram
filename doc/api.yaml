@@ -47,10 +47,7 @@ paths:
                     
   /pictures/{pid}:
     parameters:
-      name: pid
-      in: path
-      required: true
-      description: The id of the picture
+      - $ref: "#/components/parameters/PhotoId"
     post:
       tags: ["Pictures"]
       operationId: uploadPhoto
@@ -90,10 +87,7 @@ paths:
       
   /pictures/{pid}/likes:
       parameters:
-        name: pid
-        in: path
-        required: true
-        description: The id of the picture
+        - $ref: "#/components/parameters/PhotoId"
       post:
         tags: ["Likes"]
         operationId: likePhoto
@@ -119,28 +113,28 @@ paths:
          
   /pictures/{pid}/comments:
       parameters:
-        name: pid
-        in: path
-        required: true
-        description: The id of the picture
+        - $ref: "#/components/parameters/PhotoId"
       post:
         tags: ["Comments"]
         operationId: commentPhoto
         summary: Add a comment to a picture
         responses:
             "201":
-              description: Comment was successfully added
+              description: Comment added
               content:
                 application/json:
                   schema:
-                    - $ref: "#/components/schemas/Comment"
+                    $ref: "#/components/schemas/Comment"
             "400":
               description: Bad request, e.g., invalid comment
             "404":
               description: Picture not found
             "500": 
-              schema:
-                $ref: "#/components/responses/InternalServerError" 
+              description: Internal Server Error
+              content:
+                application/json:
+                  schema:
+                    $ref: "#/components/responses/InternalServerError"
       delete:
         summary: Uncomment a Photo
         tags: ["Comments"]
@@ -153,29 +147,23 @@ paths:
     
   /users/{uid}:
     parameters:
-      name: uid
-      in: path
-      required: true
-      description: The id of the user
+      - $ref: "#/components/parameters/UserId"
     get:
       operationId: getUserProfile
       tags: ["Users"]
-      responses:
+      responses: 
         "200":
           description: User Profile
           content:
             application/json:
               schema:
-                - $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/User'
         "404":
           description: User not found
 
   /user/{uid}/username:
       parameters:
-        name: uid
-        in: path
-        required: true
-        description: The id of the user
+        - $ref: "#/components/parameters/UserId"
       put:
         tags: ["Users"]
         operationId: setMyUserName
@@ -203,10 +191,7 @@ paths:
   
   /user/{uid}/follow:
     parameters:
-      name: uid
-      in: path
-      required: true
-      description: The id of the user
+      - $ref: "#/components/parameters/UserId"
     get:
       operationId: getFollowees
       tags: ["Users"]
@@ -232,7 +217,7 @@ paths:
           content:
             application/json:
               schema: 
-                - $ref: "#/components/schemas/FollowResponse"
+                $ref: "#/components/schemas/FollowResponse"
     delete:
       operationId: unfollowUser
       tags: ["Users"]
@@ -243,16 +228,13 @@ paths:
           content:
             application/json:
               schema: 
-                - $ref: "#/components/schemas/FollowResponse"
+                $ref: "#/components/schemas/FollowResponse"
         "404":
           description: User not found
 
   /user/{uid}/ban:
     parameters:
-      name: uid
-      in: path
-      required: true
-      description: The id of the user
+      - $ref: "#/components/parameters/UserId"
     put:
       operationId: banUser
       tags: ["Users"]
@@ -269,7 +251,7 @@ paths:
           content:
             application/json:
               schema:
-                - $ref: "#/components/schemas/Ban"
+                $ref: "#/components/schemas/Ban"
         "404":
           description: User Not Found
     delete:
@@ -282,7 +264,7 @@ paths:
           content:
             application/json:
               schema:
-                - $ref: "#/components/schemas/Ban"
+                $ref: "#/components/schemas/Ban"
         "404":
           description: User Not Banned
     
