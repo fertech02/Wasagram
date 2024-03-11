@@ -268,30 +268,6 @@ paths:
         "404":
           description: User Not Banned
     
-  /stream:
-    get:
-      security:
-        - bearerAuth: []
-      summary: Get photo stream from followed Users
-      tags: ["Stream"]
-      operationId: getPhotoStream
-      parameters:
-        - name: followees photos
-          in: query
-          explode: true
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/Photo'
-      responses:
-        "200":
-          description: Photo stream
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Photo"
   
 components:
   schemas:
