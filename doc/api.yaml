@@ -44,16 +44,12 @@ paths:
                   identifier:
                     type: string
                     example: "abcdef012345"
-                    
-  /pictures/{pid}:
-    parameters:
-      - $ref: "#/components/parameters/PhotoId"
+
+  /photos:
     post:
-      tags: ["Pictures"]
+      tags: ["Photos"]
+      summary: Upload a new picture
       operationId: uploadPhoto
-      summary: upload photo with a specific id
-      description: |-
-        Upload photo
       responses:
         "201":
           description: Picture successfully added
@@ -63,14 +59,35 @@ paths:
                 $ref: "#/components/schemas/Photo"
         "400":
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/responses/BadRequest"
         "500": 
           description: Internal Server Error
           content:
             application/json:
               schema:
                 $ref: "#/components/responses/InternalServerError"
+                    
+  /photos/{pid}:
+    parameters:
+      - $ref: "#/components/parameters/PhotoId"
+    get:
+      tags: ["Photos"]
+      operationId: getPhoto
+      summary: Get a Photo
+      responses:
+        "200":
+          description: Photo Retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Photo"
+        "404":
+          description: Photo Not Found
     delete:
-      tags: ["Pictures"]
+      tags: ["Photos"]
       operationId: deletePhoto
       summary: Delete a Photo
       responses:
@@ -85,9 +102,24 @@ paths:
               schema:
                 $ref: "#/components/responses/InternalServerError"
       
-  /pictures/{pid}/likes:
+  /photos/{pid}/likes:
       parameters:
         - $ref: "#/components/parameters/PhotoId"
+      get:
+        tags: ["Likes"]
+        operationId: getPhotoLikes
+        summary: Get the likes of a Photo
+        responses:
+          "200":
+            description: Photo Likes
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Like"
+          "404":
+            description: Photo Not Found
       post:
         tags: ["Likes"]
         operationId: likePhoto
@@ -111,7 +143,7 @@ paths:
           "404":
             description: Photo Not Found
          
-  /pictures/{pid}/comments:
+  /photos/{pid}/comments:
       parameters:
         - $ref: "#/components/parameters/PhotoId"
       post:
@@ -192,21 +224,6 @@ paths:
   /user/{uid}/follow:
     parameters:
       - $ref: "#/components/parameters/UserId"
-    get:
-      operationId: getFollowees
-      tags: ["Users"]
-      summary: Get the list of followees
-      responses:
-        "200":
-          description: List of followees
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/User"
-        "404":
-          description: User not found
     put:
       operationId: followUser
       tags: ["Users"]
@@ -214,10 +231,6 @@ paths:
       responses:
         "200":
           description: User followed
-          content:
-            application/json:
-              schema: 
-                $ref: "#/components/schemas/FollowResponse"
     delete:
       operationId: unfollowUser
       tags: ["Users"]
@@ -225,10 +238,6 @@ paths:
       responses:
         "204":
           description: User unfollowed
-          content:
-            application/json:
-              schema: 
-                $ref: "#/components/schemas/FollowResponse"
         "404":
           description: User not found
 
@@ -239,12 +248,6 @@ paths:
       operationId: banUser
       tags: ["Users"]
       summary: Ban an User
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: string
       responses:
         "200":
           description: User Banned
@@ -261,14 +264,9 @@ paths:
       responses:
         "204":
           description: User Unbanned Successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Ban"
         "404":
           description: User Not Banned
-    
-  
+     
 components:
   schemas:
     Photo:
@@ -277,10 +275,12 @@ components:
       properties:
         PhotoId: 
           type: string
-        owner:
+        UserId:
           type: string
         url:
           type: string
+      required:
+        - PhotoId
         
     User:
       type: object
@@ -317,15 +317,9 @@ components:
         PhotoId:
           type: string
           description: ID of the commented Photo
-
-    FollowResponse:
-      type: object
-      description: Follow Response
-      properties:
-        followerId:
-          type: string
-        followeeId:
-          type: string
+      required:
+        - Userid
+        - PhotoId
 
     Ban:
       type: object
@@ -335,6 +329,9 @@ components:
           type: string
         bannedId:
           type: string
+      required:
+        - bannerId
+        - bannedId
   
   responses:
     Unauthorized:

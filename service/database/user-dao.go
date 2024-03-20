@@ -8,7 +8,10 @@ func CreateUser(username string) (*User, error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("INSERT INTO Users (username) VALUES (?)", username)
+	// Generate a new UUID
+	uid := uuid.New().String()
+	
+	stmt, err := db.Prepare("INSERT INTO User(userid, username) values(?, ?)")
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +35,7 @@ func CreateUser(username string) (*User, error) {
 }
 
 // Get User by ID
-func GetUser(id string) (*User, error) {
+func GetUserProfile(id string) (*User, error) {
 	db, err := sql.Open("sqlite3","./foo.db")
 	if err != nil {
 		return nil, err
@@ -47,19 +50,6 @@ func GetUser(id string) (*User, error) {
 	}
 
 	return &user, nil
-}
-
-// Set New Username
-func (u *User) SetUsername(username string) {
-	// set new username
-	u.username = username
-
-	// update database
-	err := UpdateUserDataBase(u)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 // Update Username

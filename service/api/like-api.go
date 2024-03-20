@@ -31,3 +31,14 @@ func (rt *_router) Unlike(w http.ResponseWriter, r *http.Request, ps httprouter.
 	respondWithJSON(w, http.StatusCreated, nil)
 }
 
+// Get Likes handles the GET /pictures/{pid}/likes API endpoint.
+func (rt *_router) GetLikes(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	// get the pid from the URL
+	pid := ps.ByName("pid")
+	likes, err := database.likedao.GetLikes(pid)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJSON(w, http.StatusOK, likes)
+}
