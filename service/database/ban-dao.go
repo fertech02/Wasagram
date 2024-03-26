@@ -1,7 +1,12 @@
 package database;
 
+import (
+	"database/sql"
+)
+
 // Ban an User
-func (u *User) BanUser() {
+func (u *User) AddBan(bannerId, bannedId string) {
+
 	db, err := sql.Open("sqlite3", "./foo.db")
 	if err != nil {
 		return nil, err
@@ -16,7 +21,8 @@ func (u *User) BanUser() {
 }
 
 // Unban an User
-func (u *User) UnbanUser() {
+func (u *User) UnbanUser(bannerId string, bannedId string) {
+
 	db, err := sql.Open("sqlite3", "./foo.db")
 	if err != nil {
 		return nil, err
@@ -31,14 +37,15 @@ func (u *User) UnbanUser() {
 }
 
 // Get Ban List
-func (u *User) GetBanList() {
+func (u *User) GetBanList(bannerId string) {
+	
 	db, err := sql.Open("sqlite3", "./foo.db")
 	if err != nil {
 		return nil, err
 	}
 	defer db.Close()
 
-	rows, err := db.Query("SELECT bannerId, bannedId FROM Ban WHERE bannerId = ? AND bannedId = ?", bannerId, bannedId)
+	stmt, err := db.QueryRow("SELECT * FROM Ban WHERE bannerId = ?", bannerId)
 	if err != nil {
 		return nil, err
 	}

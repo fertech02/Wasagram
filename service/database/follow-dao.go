@@ -1,5 +1,9 @@
 package database;
 
+import (
+	"database/sql"
+)
+
 // Follow an User
 func (u *User) FollowUser(followeeId int, followerId int) {
 

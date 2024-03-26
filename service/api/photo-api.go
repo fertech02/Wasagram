@@ -3,22 +3,46 @@ package api;
 import (
 	"net/http"
 	"service/database"
+	"github.com/google/uuid"
 )
 
 
-func (rt *_router) DeletePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	userid := ps.ByName("id")
-	photoid := ps.ByName("photoid")
-	user, err := database.userdao.GetUser(userid)
+// Post handles the POST /photos API endpoint.
+func (rt *_router) Post(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	
+	uid = ps.ByName("uid")
+	pid = uuid.New().String()
+	photo, err := database.photo-dao.PostPhoto()
 	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	photo := &database.Photo{pid: photoid}
-	err = user.DeletePhoto(photo)
+	respondWithJSON(w, http.StatusCreated, photo)
+}
+
+// deletePhoto handles the DELETE /photos/{pid} API endpoint.
+func (rt *_router) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+
+	uid = ps.ByName("uid")
+	pid = ps.ByName("pid")
+
+	photo, err := database.photo-dao.deletePhoto(uid, pid)
 	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	w.WriteHeader(http.StatusOK)
+	respondWithJSON(w, http.StatusOK, photo)
+}
+
+// getPhotos handles the GET /photos API endpoint.
+func (rt *_router) getPhotos(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+
+	uid = ps.ByName("uid")
+
+	photos, err := database.photo-dao.getPhotos(uid)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJSON(w, http.StatusOK, photos)
 }

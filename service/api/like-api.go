@@ -5,12 +5,12 @@ import (
 	"service/database"
 )
 
-// Like handles the POST /pictures/{pid}/like API endpoint.
+// Like handles the POST /photos/{pid}/like API endpoint.
 func (rt *_router) Like(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	// get the user id from the URL
+
 	pid := ps.ByName("pid")
 	uid := ps.ByName("uid")
-	err := database.likedao.Like(pid, uid)
+	err := database.like-dao.Like(pid, uid)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -18,12 +18,12 @@ func (rt *_router) Like(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 	respondWithJSON(w, http.StatusCreated, nil)
 }
 
-// Unlike handles the DELETE /pictures/{pid}/like API endpoint.
+// Unlike handles the DELETE /photos/{pid}/like API endpoint.
 func (rt *_router) Unlike(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	// get the user id from the URL
+	
 	pid := ps.ByName("pid")
 	uid := ps.ByName("uid")
-	err := database.likedao.Unlike(pid, uid)
+	err := database.like-dao.Unlike(pid, uid)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -31,11 +31,11 @@ func (rt *_router) Unlike(w http.ResponseWriter, r *http.Request, ps httprouter.
 	respondWithJSON(w, http.StatusCreated, nil)
 }
 
-// Get Likes handles the GET /pictures/{pid}/likes API endpoint.
+// Get Likes handles the GET /photos/{pid}/likes API endpoint.
 func (rt *_router) GetLikes(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	// get the pid from the URL
+
 	pid := ps.ByName("pid")
-	likes, err := database.likedao.GetLikes(pid)
+	likes, err := database.like-dao.GetLikes(pid)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return

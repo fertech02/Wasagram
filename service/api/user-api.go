@@ -8,7 +8,7 @@ import (
 // getUser handles the GET /user/:id API endpoint.
 func (rt *_router) GetUserProfile(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	userid := ps.ByName("id")
-	user, err := database.userdao.GetUser(userid)
+	user, err := database.user-dao.GetUser(userid)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
@@ -29,8 +29,8 @@ func (rt *_router) updateUsername(w http.ResponseWriter, r *http.Request, ps htt
 		http.Error(w, "Invalid Request Body", http.StatusBadRequest)
 		return
 	}
-
-	err = database.userdao.UpdateUsername(userid, updateRequest.Username)
+	
+	err = database.user-dao.UpdateUsername(userid, updateRequest.Username)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
@@ -50,7 +50,7 @@ func (rt *_router) createUser(w http.ResponseWriter, r *http.Request, _ httprout
 		return
 	}
 
-	user, err := database.userdao.CreateUser(createRequest.Username)
+	user, err := database.user-dao.CreateUser(createRequest.Username)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
