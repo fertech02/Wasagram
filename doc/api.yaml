@@ -1,6 +1,17 @@
 openapi: 3.0.0
 servers:
   - url: "http://localhost:3000"
+tags:
+  - name: Login
+    description: Operations related to user login
+  - name: Photos
+    description: Operations related to photos
+  - name: Likes
+    description: Operations related to likes
+  - name: Comments
+    description: Operations related to comments
+  - name: Users
+    description: Operations related to users
 
 info:
   title: WASAPhoto
@@ -29,7 +40,7 @@ paths:
                 name:
                   type: string
                   example: Maria
-                  pattern: '^.*?$'
+                  pattern: 'ˆ.*?$'
                   minLength: 3
                   maxLength: 16
         required: true
@@ -79,9 +90,12 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Photo"
+                type: object
+                properties:
+                  photos:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Photo"
         "404":
           description: No Photos Found
         "500": 
@@ -93,7 +107,7 @@ paths:
                     
   /photos/{pid}:
     parameters:
-      - $ref: "#/components/parameters/PhotoId"
+      - $ref: "#/components/parameters/photo_id"
     get:
       tags: ["Photos"]
       operationId: getPhoto
@@ -125,7 +139,7 @@ paths:
       
   /photos/{pid}/likes:
       parameters:
-        - $ref: "#/components/parameters/PhotoId"
+        - $ref: "#/components/parameters/photo_id"
       get:
         tags: ["Likes"]
         operationId: getPhotoLikes
@@ -136,9 +150,12 @@ paths:
             content:
               application/json:
                 schema:
-                  type: array
-                  items:
-                    $ref: "#/components/schemas/Like"
+                  type: object
+                  properties:
+                    likes:
+                      type: array
+                      items:
+                        $ref: "#/components/schemas/Like"
           "404":
             description: Photo Not Found
       post:
@@ -166,7 +183,7 @@ paths:
          
   /photos/{pid}/comments:
       parameters:
-        - $ref: "#/components/parameters/PhotoId"
+        - $ref: "#/components/parameters/photo_id"
       post:
         tags: ["Comments"]
         operationId: commentPhoto
@@ -200,10 +217,11 @@ paths:
     
   /users/{uid}:
     parameters:
-      - $ref: "#/components/parameters/UserId"
+      - $ref: "#/components/parameters/user_id"
     get:
       operationId: getUserProfile
       tags: ["Users"]
+      summary: Get User Profile
       responses: 
         "200":
           description: User Profile
@@ -215,36 +233,36 @@ paths:
           description: User not found
 
   /user/{uid}/username:
-      parameters:
-        - $ref: "#/components/parameters/UserId"
-      put:
-        tags: ["Users"]
-        operationId: setMyUserName
-        summary: Update my username
-        description: Allows to set the username
-        requestBody:
-          description: JSON Object with my username
-          required: true
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: 
-                  username: 
-                    type: string
-                    description: "The new username"
-                    example: "new_username"
-        responses:
-          "200": 
-            description: Username updated sucessfully
-          "400":
-            description: Bad Request
-          "404":
-            description: User Not Found
+    parameters:
+      - $ref: "#/components/parameters/user_id"
+    put:
+      tags: ["Users"]
+      operationId: setMyUserName
+      summary: Update my username
+      description: Allows to set the username
+      requestBody:
+        description: JSON Object with my username
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: 
+                username: 
+                  type: string
+                  description: "The new username"
+                  example: "new_username"
+      responses:
+        "200": 
+          description: Username updated sucessfully
+        "400":
+          description: Bad Request
+        "404":
+          description: User Not Found
   
   /user/{uid}/follow:
     parameters:
-      - $ref: "#/components/parameters/UserId"
+      - $ref: "#/components/parameters/user_id"
     put:
       operationId: followUser
       tags: ["Users"]
@@ -264,7 +282,7 @@ paths:
 
   /user/{uid}/ban:
     parameters:
-      - $ref: "#/components/parameters/UserId"
+      - $ref: "#/components/parameters/user_id"
     put:
       operationId: banUser
       tags: ["Users"]
@@ -294,37 +312,40 @@ components:
       type: object
       description: Photo
       properties:
-        PhotoId: 
+        photo_id: 
           type: string
-        UserId:
+        user_id:
           type: string
         url:
           type: string
+        date:
+          type: string
+          format: date-time
       required:
-        - PhotoId
+        - photo_id
         
     User:
       type: object
       description: User
       properties:
-        UserId:
+        user_id:
           type: string
         username:
           type: string
       required:
-        - UserId
+        - user_id
     
     Like:
       type: object
       description: Like
       properties:
-        PhotoId:
+        photo_id:
           type: string
-        UserId:
+        user_id:
           type: string
       required:
-        - PhotoId
-        - UserId
+        - photo_id
+        - user_id
     
     Comment:
       type: object
@@ -332,27 +353,27 @@ components:
       properties:
         message:
           type: string
-        Userid:
+        user_id:
           type: string
           description: ID of the commenting User
-        PhotoId:
+        photo_id:
           type: string
           description: ID of the commented Photo
       required:
-        - Userid
-        - PhotoId
+        - user_id
+        - photo_id
 
     Ban:
       type: object
       description: Ban User
       properties:
-        bannerId:
+        banner_id:
           type: string
-        bannedId:
+        banned_id:
           type: string
       required:
-        - bannerId
-        - bannedId
+        - banner_id
+        - banned_id
   
   responses:
     Unauthorized:
@@ -368,14 +389,15 @@ components:
       scheme: bearer
       
   parameters:
-    PhotoId:
+    photo_id:
         schema:
           type: string
         name: pid
         in: path
         required: true
         allowEmptyValue: false
-    UserId:
+
+    user_id:
       schema:
         type: string
       name: uid

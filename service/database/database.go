@@ -80,9 +80,10 @@ func StartDB() error {
 		logger.WithError(err).Error("error opening SQLite DB")
 		return fmt.Errorf("opening SQLite: %w", err)
 	}
-	defer StartDB() {
+	defer func() {
 		logger.Debug("database stopping")
 		_ = db.Close()
 	}()
-	
+
+	return nil
 }
