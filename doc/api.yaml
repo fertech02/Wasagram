@@ -29,18 +29,20 @@ paths:
         If the user does not exists, it will be created,
         and an identifier is returned.
         If the user exists, the user identifier is returned.
-      operationId: dologin
+      operationId: do_login
       requestBody:
         description: User details
         content:
           application/json:
             schema:
               type: object
+              description: User login details.
               properties:
                 name:
                   type: string
+                  description: The user's name
                   example: Maria
-                  pattern: 'ˆ.*?$'
+                  pattern: '^.*?$'
                   minLength: 3
                   maxLength: 16
         required: true
@@ -51,16 +53,19 @@ paths:
             application/json:
               schema:
                 type: object
+                description: User identifier
                 properties:
                   identifier:
                     type: string
+                    description: The user's identifier
                     example: "abcdef012345"
 
   /photos:
     post:
       tags: ["Photos"]
       summary: Upload a new picture
-      operationId: uploadPhoto
+      operationId: create_photo
+      description: Upload a new picture
       responses:
         "201":
           description: Picture successfully added
@@ -69,49 +74,34 @@ paths:
               schema:
                 $ref: "#/components/schemas/Photo"
         "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/responses/BadRequest"
+          $ref: "#/components/responses/BadRequest"
         "500": 
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/responses/InternalServerError"
+          $ref: "#/components/responses/InternalServerError"
     get:
       tags: ["Photos"]
-      operationId: getPhotos
+      operationId: list_photos
       summary: Get all photos
+      description: Get all photos
       responses:
         "200":
           description: Photos Retrieved
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  photos:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/Photo"
+                $ref: "#/components/schemas/PhotoList"
         "404":
-          description: No Photos Found
+          $ref: "#/components/responses/NotFound"
         "500": 
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/responses/InternalServerError"
+          $ref: "#/components/responses/InternalServerError"
                     
   /photos/{pid}:
     parameters:
       - $ref: "#/components/parameters/photo_id"
     get:
       tags: ["Photos"]
-      operationId: getPhoto
+      operationId: get_photo
       summary: Get a Photo
+      description: Get a Photo
       responses:
         "200":
           description: Photo Retrieved
@@ -120,48 +110,42 @@ paths:
               schema:
                 $ref: "#/components/schemas/Photo"
         "404":
-          description: Photo Not Found
+          $ref: "#/components/responses/NotFound"
     delete:
       tags: ["Photos"]
-      operationId: deletePhoto
+      operationId: delete_photo
       summary: Delete a Photo
+      description: Delete a Photo
       responses:
         "204":
           description: Photo Deleted
         "404":
-          description: Photo Not Found
+          $ref: "#/components/responses/NotFound"
         "500": 
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/responses/InternalServerError"
+          $ref: "#/components/responses/InternalServerError"
       
   /photos/{pid}/likes:
       parameters:
         - $ref: "#/components/parameters/photo_id"
       get:
         tags: ["Likes"]
-        operationId: getPhotoLikes
+        operationId: get_photo_likes
         summary: Get the likes of a Photo
+        description: Get the likes of a Photo
         responses:
           "200":
             description: Photo Likes
             content:
               application/json:
                 schema:
-                  type: object
-                  properties:
-                    likes:
-                      type: array
-                      items:
-                        $ref: "#/components/schemas/Like"
+                  $ref: "#/components/schemas/PhotoLikesResponse"
           "404":
-            description: Photo Not Found
+            $ref: "#/components/responses/NotFound"
       post:
         tags: ["Likes"]
-        operationId: likePhoto
+        operationId: like_photo
         summary: Like a Photo
+        description: Like a Photo
         responses:
           "200":
             description: Photo Liked
@@ -170,24 +154,26 @@ paths:
                 schema:
                   $ref: "#/components/schemas/Like"
           "404":
-            description: Photo Not Found
+            $ref: "#/components/responses/NotFound"
       delete:
         tags: ["Likes"]
-        operationId: unlikePhoto
+        operationId: delete_photo_like
         summary: Unlike a Photo
+        description: Unlike a Photo
         responses:
           "204":
             description: Photo Unliked
           "404":
-            description: Photo Not Found
+            $ref: "#/components/responses/NotFound"
          
   /photos/{pid}/comments:
       parameters:
         - $ref: "#/components/parameters/photo_id"
       post:
         tags: ["Comments"]
-        operationId: commentPhoto
+        operationId: comment_photo
         summary: Add a comment to a picture
+        description: Add a comment to a picture
         responses:
             "201":
               description: Comment added
@@ -196,32 +182,44 @@ paths:
                   schema:
                     $ref: "#/components/schemas/Comment"
             "400":
-              description: Bad request, e.g., invalid comment
+              $ref: "#/components/responses/BadRequest"
             "404":
-              description: Picture not found
+              $ref: "#/components/responses/NotFound"
             "500": 
-              description: Internal Server Error
-              content:
-                application/json:
-                  schema:
-                    $ref: "#/components/responses/InternalServerError"
+              $ref: "#/components/responses/InternalServerError"
       delete:
         summary: Uncomment a Photo
         tags: ["Comments"]
-        operationId: uncommentPhoto
+        operationId: delete_comment_photo
+        description: Remove a comment from a picture
         responses:
           "204":
             description: Photo Uncommented
           "404":
-            description: Photo Not Found
+            $ref: "#/components/responses/NotFound"
+      get:
+        tags: ["Comments"]
+        operationId: get_photo_comments
+        summary: Get the comments of a Photo
+        description: Get the comments of a Photo
+        responses:
+          "200":
+            description: Photo Comments
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/PhotoCommentsResponse"
+          "404":
+            $ref: "#/components/responses/NotFound"
     
   /users/{uid}:
     parameters:
       - $ref: "#/components/parameters/user_id"
     get:
-      operationId: getUserProfile
+      operationId: get_user_profile
       tags: ["Users"]
       summary: Get User Profile
+      description: Get User Profile
       responses: 
         "200":
           description: User Profile
@@ -230,14 +228,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
         "404":
-          description: User not found
+          $ref: "#/components/responses/NotFound"
 
   /user/{uid}/username:
     parameters:
       - $ref: "#/components/parameters/user_id"
     put:
       tags: ["Users"]
-      operationId: setMyUserName
+      operationId: set_username
       summary: Update my username
       description: Allows to set the username
       requestBody:
@@ -256,24 +254,26 @@ paths:
         "200": 
           description: Username updated sucessfully
         "400":
-          description: Bad Request
+          $ref: "#/components/responses/BadRequest"
         "404":
-          description: User Not Found
+          $ref: "#/components/responses/NotFound"
   
   /user/{uid}/follow:
     parameters:
       - $ref: "#/components/parameters/user_id"
     put:
-      operationId: followUser
+      operationId: put_follow_user
       tags: ["Users"]
       summary: Follow a User
+      description: Follow a User
       responses:
         "200":
           description: User followed
     delete:
-      operationId: unfollowUser
+      operationId: delete_follow_user
       tags: ["Users"]
       summary: Unfollow an User
+      description: Unfollow an User
       responses:
         "204":
           description: User unfollowed
@@ -284,9 +284,10 @@ paths:
     parameters:
       - $ref: "#/components/parameters/user_id"
     put:
-      operationId: banUser
+      operationId: put_ban_user
       tags: ["Users"]
       summary: Ban an User
+      description: Ban an User
       responses:
         "200":
           description: User Banned
@@ -297,9 +298,10 @@ paths:
         "404":
           description: User Not Found
     delete:
-      operationId: unbanUser
+      operationId: delete_ban_user
       tags: ["Users"]
       summary: Unban an User
+      description: Unban an User
       responses:
         "204":
           description: User Unbanned Successfully
@@ -314,6 +316,8 @@ components:
       properties:
         photo_id: 
           type: string
+          description: The photo's identifier
+          example: "abcdef012345"
         user_id:
           type: string
         url:
@@ -323,7 +327,34 @@ components:
           format: date-time
       required:
         - photo_id
-        
+
+    PhotoList:
+      type: object
+      description: List of Photos
+      properties:
+        photos:
+          type: array
+          items:
+            $ref: "#/components/schemas/Photo"
+      
+    PhotoLikesResponse:
+      type: object
+      description: List of likes for a photo
+      properties:
+        likes:
+          type: array
+          items:
+            $ref: "#/components/schemas/Like"
+    
+    PhotoCommentsResponse:
+      type: object
+      description: List of comments for a photo
+      properties:
+        comments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Comment"
+
     User:
       type: object
       description: User
@@ -368,8 +399,10 @@ components:
       description: Ban User
       properties:
         banner_id:
+          description: The user who banned
           type: string
         banned_id:
+          description: The user who was banned
           type: string
       required:
         - banner_id
@@ -382,6 +415,8 @@ components:
       description: The request was not compliant with the documentation (eg. missing fields, etc)
     InternalServerError:
       description: The server encountered an internal error. Further info in server logs
+    NotFound:
+      description: The requested resource was not found
 
   securitySchemes:
     bearerAuth:
@@ -390,6 +425,7 @@ components:
       
   parameters:
     photo_id:
+        description: The photo's identifier
         schema:
           type: string
         name: pid
@@ -398,6 +434,7 @@ components:
         allowEmptyValue: false
 
     user_id:
+      description: The user's identifier
       schema:
         type: string
       name: uid
