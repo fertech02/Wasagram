@@ -1,6 +1,5 @@
-openapi: 3.0.0
-servers:
-  - url: "http://localhost:3000"
+openapi: 3.0.3
+
 tags:
   - name: Login
     description: Operations related to user login
@@ -12,6 +11,10 @@ tags:
     description: Operations related to comments
   - name: Users
     description: Operations related to users
+  - name: Bans
+    description: Operations related to bans
+  - name: Follows
+    description: Operations related to follows
 
 info:
   title: WASAPhoto
@@ -92,13 +95,12 @@ paths:
                     type: array
                     description: List of photos
                     minItems: 1
-                    maxItems: 100
+                    maxItems: 10000
                     items:
                       $ref: "#/components/schemas/Photo"
-        "404":
-          description: No Photos Found
-        "500": 
-          $ref: "#/components/responses/InternalServerError"
+        "401": { $ref: "#/components/responses/UnauthorizedError" }
+        "404": { $ref: "#/components/responses/NotFoundError" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
                     
   /photos/{pid}:
     parameters:
@@ -117,8 +119,9 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Photo"
-        "404":
-          description: Photo Not Found
+        "401": { $ref: "#/components/responses/UnauthorizedError" }
+        "404": { $ref: "#/components/responses/NotFoundError" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
     delete:
       tags: ["Photos"]
       operationId: deletePhoto
@@ -127,10 +130,9 @@ paths:
       responses:
         "204":
           description: Photo Deleted
-        "404":
-          description: Photo Not Found
-        "500": 
-          $ref: "#/components/responses/InternalServerError"
+        "401": { $ref: "#/components/responses/UnauthorizedError" }
+        "404": { $ref: "#/components/responses/NotFoundError" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
       
   /photos/{pid}/likes:
       parameters:
@@ -158,6 +160,9 @@ paths:
                       maxItems: 100
                       items:
                         $ref: "#/components/schemas/Like"
+          "400" : { $ref: "#/components/responses/BadRequest" }
+          "401" : { $ref: "#/components/responses/UnauthorizedError" }
+          "500" : { $ref: "#/components/responses/InternalServerError" }
   
   /photos/{pid}/likes/{uid}:
     parameters:
@@ -177,8 +182,9 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Like"
-        "404":
-          description: Photo Not Found
+        "400" : { $ref: "#/components/responses/BadRequest" }
+        "401" : { $ref: "#/components/responses/UnauthorizedError" }
+        "500" : { $ref: "#/components/responses/InternalServerError" }
     delete:
       tags: ["Likes"]
       operationId: unlikePhoto
@@ -189,8 +195,9 @@ paths:
       responses:
         "204":
           description: Photo Unliked
-        "404":
-          description: Photo Not Liked
+        "400" : { $ref: "#/components/responses/BadRequest" }
+        "401" : { $ref: "#/components/responses/UnauthorizedError" }
+        "500" : { $ref: "#/components/responses/InternalServerError" }
          
   /photos/{pid}/comments:
     parameters:
@@ -218,8 +225,9 @@ paths:
                     maxItems: 100
                     items:
                       $ref: "#/components/schemas/Comment"
-        "404":
-          description: Photo Not Found
+        "400" : { $ref: "#/components/responses/BadRequest" }
+        "401" : { $ref: "#/components/responses/UnauthorizedError" }
+        "500" : { $ref: "#/components/responses/InternalServerError" }
   
   /photos/{pid}/comments/{uid}:
     parameters:
@@ -233,18 +241,15 @@ paths:
       security:
         - bearerAuth: []
       responses:
-          "201":
-            description: Comment added
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/Comment"
-          "400":
-            $ref: "#/components/responses/BadRequest"
-          "404":
-            description: Photo Not Found
-          "500": 
-            $ref: "#/components/responses/InternalServerError"
+        "201":
+          description: Comment added
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Comment"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/UnauthorizedError" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
     delete:
       summary: Delete a Comment
       tags: ["Comments"]
@@ -255,10 +260,9 @@ paths:
       responses:
         "204":
           description: Comment Deleted
-        "404":
-          description: Comment Not Found
-        "500": 
-          $ref: "#/components/responses/InternalServerError"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/UnauthorizedError" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
     
   /users/{uid}/profile:
     parameters:
@@ -275,8 +279,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-        "404":
-          description: User Not Found
+        "404": { $ref: "#/components/responses/NotFoundError" }
 
   /user/{uid}/username:
     parameters:
@@ -307,17 +310,17 @@ paths:
       responses:
         "200": 
           description: Username updated sucessfully
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "404":
-          description: User Not Found
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/UnauthorizedError" }
+        "404": { $ref: "#/components/responses/NotFoundError" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
   
   /user/{uid}/follow:
     parameters:
       - $ref: "#/components/parameters/user_id"
     get:
       operationId: getFollowedUsers
-      tags: ["Users"]
+      tags: ["Follows"]
       summary: Get Followed Users
       description: Get Followed Users
       security:
@@ -337,8 +340,9 @@ paths:
                     maxItems: 100
                     items:
                       $ref: "#/components/schemas/User"
-        "404":
-          description: No Followed Users
+        "401": { $ref: "#/components/responses/UnauthorizedError" }
+        "404": { $ref: "#/components/responses/NotFoundError" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
   
   /user/{uid}/follow/{fid}:
     parameters:
@@ -346,7 +350,7 @@ paths:
       - $ref: "#/components/parameters/follow_id"
     put:
       operationId: followUser
-      tags: ["Users"]
+      tags: ["Follows"]
       summary: Follow an User
       description: Follow an User
       security:
@@ -358,11 +362,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
-        "404":
-          description: User Not Found    
+        "401": { $ref: "#/components/responses/UnauthorizedError" }
+        "404": { $ref: "#/components/responses/NotFoundError" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
     delete:
       operationId: unfollowUser
-      tags: ["Users"]
+      tags: ["Follows"]
       summary: Unfollow an User
       description: Unfollow an User
       security:
@@ -370,15 +375,16 @@ paths:
       responses:
         "204":
           description: User Unfollowed Successfully
-        "404":
-          description: User Not Followed
+        "401": { $ref: "#/components/responses/UnauthorizedError" }
+        "404": { $ref: "#/components/responses/NotFoundError" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
   
   /user/{uid}/ban:
     parameters:
       - $ref: "#/components/parameters/user_id"
     get:
       operationId: getBannedUsers
-      tags: ["Users"]
+      tags: ["Bans"]
       summary: Get Banned Users
       description: Get Banned Users
       security:
@@ -398,8 +404,9 @@ paths:
                     maxItems: 100
                     items:
                       $ref: "#/components/schemas/User"
-        "404":
-          description: No Banned Users
+        "401": { $ref: "#/components/responses/UnauthorizedError" }
+        "404": { $ref: "#/components/responses/NotFoundError" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
 
   /users/{uid}/ban/{bid}:
     parameters:
@@ -407,7 +414,7 @@ paths:
       - $ref: "#/components/parameters/banned_id"  
     put:
       operationId: banUser
-      tags: ["Users"]
+      tags: ["Bans"]
       summary: Ban an User
       description: Ban an User
       security:
@@ -419,11 +426,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Ban"
-        "404":
-          description: User Not Found    
+        "401": { $ref: "#/components/responses/UnauthorizedError" }
+        "404": { $ref: "#/components/responses/NotFoundError" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
     delete:
       operationId: unbanUser
-      tags: ["Users"]
+      tags: ["Bans"]
       summary: Unban an User
       description: Unban an User
       security:
@@ -431,8 +439,9 @@ paths:
       responses:
         "204":
           description: User Unbanned Successfully
-        "404":
-          description: User Not Banned  
+        "401": { $ref: "#/components/responses/UnauthorizedError" }
+        "404": { $ref: "#/components/responses/NotFoundError" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
   
   /user/{uid}/stream:
     parameters:
@@ -442,6 +451,8 @@ paths:
       tags: ["Users"]
       summary: Get User Stream
       description: Get User Stream
+      security:
+        - bearerAuth: []
       responses:
         "200":
           description: User Stream
@@ -457,8 +468,7 @@ paths:
                     maxItems: 100
                     items:
                       $ref: "#/components/schemas/Photo"
-        "404":
-          description: User Not Found
+        "401": { $ref: "#/components/responses/UnauthorizedError" }
         "500": { $ref: "#/components/responses/InternalServerError" }
      
 components:
@@ -541,6 +551,8 @@ components:
       description: The server encountered an internal error. Further info in server logs
     UnauthorizedError:
       description: Access token is missing or invalid
+    NotFoundError:
+      description: The requested resource was not found
 
   securitySchemes:
     bearerAuth:
