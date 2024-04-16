@@ -10,67 +10,40 @@ type Follow struct {
 }
 
 // Follow an User
-func (u *User) FollowUser(followeeId int, followerId int) error {
-
-	db, err := sql.Open("sqlite3", "./foo.db")
-	if err != nil {
-		return err
-	}
-	defer db.Close()
+func (db *appdbimpl) FollowUser(followeeId int, followerId int) error {
 
 	_, err = db.Exec("INSERT INTO Follow (followeeId, followerId) VALUES (?, ?)", followeeId, followerId)
 	if err != nil {
 		return err
 	}
-	defer db.Close()
 
 	return nil
 }
 
 // Unfollow an User
-func (u *User) UnfollowUser(followeeId int, followerId int) error {
-
-	db, err := sql.Open("sqlite3", "./foo.db")
-	if err != nil {
-		return err
-	}
-	defer db.Close()
+func (db *appdbimpl) UnfollowUser(followeeId int, followerId int) error {
 
 	_, err = db.Exec("DELETE FROM Follow WHERE followeeId = ? AND followerId = ?", followeeId, followerId)
 	if err != nil {
 		return err
 	}
-	defer db.Close()
 
 	return nil
 }
 
 // Get Followers List
-func (u *User) GetFollowers(uid int) error{
-
-	db,err := sql.Open("sqlite3", "./foo.db")
-	if err != nil {
-		return err
-	}
-	defer db.Close()
+func (db *appdbimpl) GetFollowers(uid int) error{
 
 	_, err = db.Exec("SELECT followerId FROM Follow WHERE followeeId = ?", uid)
 	if err != nil {
 		return err
 	}
-	defer db.Close()
 
 	return nil
 }
 
 // Get Followees List
-func (u *User) GetFollowees(uid int) ([]string, error) {
-
-	db,err := sql.Open("sqlite3", "./foo.db")
-	if err != nil {
-		return nil, err
-	}
-	defer db.Close()
+func (db *appdbimpl) GetFollowees(uid int) ([]string, error) {
 
 	rows, err := db.Query("SELECT followeeId FROM Follow WHERE followerId = ?", uid)
 	if err != nil {

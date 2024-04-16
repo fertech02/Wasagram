@@ -11,12 +11,7 @@ type User struct {
 }
 
 // Create a new User
-func CreateUser(username string) (*User, error) {
-	db, err := sql.Open("sqlite3", "./foo.db")
-	if err != nil {
-		return nil, err
-	}
-	defer db.Close()
+func (db *appdbimpl) CreateUser(username string) (*User, error) {
 
 	// Check if the username is already taken
 	row := db.QueryRow("SELECT uid FROM User WHERE username = ?", username)
@@ -43,17 +38,12 @@ func CreateUser(username string) (*User, error) {
 }
 
 // Get User by ID
-func GetUserProfile(uid string) (*User, error) {
+func (db *appdbimpl) GetUserProfile(uid string) (*User, error) {
 	/*
 		Dobbiamo implementare la ricerca di altri utenti.
 		Per fare ciò, dobbiamo vedere se l'utente che cerca non appartiene
 		alla lista degli utenti bannati di quello che viene cercato. 
 	**/
-	db, err := sql.Open("sqlite3","./foo.db")
-	if err != nil {
-		return nil, err
-	}
-	defer db.Close()
 
 	row := db.QueryRow("SELECT uid, username FROM User WHERE uid = ?", uid)
 	var user User
@@ -66,13 +56,7 @@ func GetUserProfile(uid string) (*User, error) {
 }
 
 // Update Username
-func UpdateUsername(userid string, username string) error {
-
-	db, err := sql.Open("sqlite3","./foo.db")
-	if err != nil {
-		return err
-	}
-	defer db.Close()
+func (db *appdbimpl) UpdateUsername(userid string, username string) error {
 
 	// Check if the username is already taken
 	row := db.QueryRow("SELECT uid FROM User WHERE username = ?", username)

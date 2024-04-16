@@ -10,12 +10,7 @@ type Like struct {
 }
 
 // Like a Photo
-func (u *User) Like(pid string, uid string) error {
-	db, err := sql.Open("sqlite3", "./foo.db")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
+func (db *appdbimpl) Like(pid string, uid string) error {
 
 	query := "INSERT INTO Likes (uid, pid) VALUES ($1, $2)"
 	_, err = db.Exec(query, uid, pid)
@@ -27,11 +22,8 @@ func (u *User) Like(pid string, uid string) error {
 }
 
 // Unlike a Photo
-func (u *User) Unlike(pid string, uid string) error {
-	db, err := sql.Open("sqlite3", "./foo.db")
-	if err != nil {
-		panic(err)
-	}
+func (db *appdbimpl) Unlike(pid string, uid string) error {
+
 	query := "DELETE FROM Likes WHERE uid = $1 AND pid = $2"
 	_, err = db.Exec(query, uid, pid)
 	if err != nil {
@@ -43,12 +35,8 @@ func (u *User) Unlike(pid string, uid string) error {
 }
 
 // Get Like by ID
-func GetLike(pid string) ([]*Like, error) {
-	// database query to Likes table
-	db, err := sql.Open("sqlite3", "./foo.db")
-	if err != nil {
-		panic(err)
-	}
+func (db *appdbimpl) GetLike(pid string) ([]*Like, error) {
+
 	query := "SELECT uid, pid FROM Likes WHERE pid = $1"
 	rows, err := db.Query(query, pid)
 	if err != nil {

@@ -11,11 +11,8 @@ type Comment struct {
 }
 
 // Comment a Photo
-func (u *User) Comment(c *Comment) error {
-    db, err := sql.Open("sqlite3", "./foo.db")
-    if err != nil {
-        panic(err)
-    }
+func (db *appdbimpl) Comment(c *Comment) error {
+
     query := "INSERT INTO Comments (uid, pid, message) VALUES ($1, $2, $3)"
     _, err = db.Exec(query, c.uid, c.pid, c.message)
     if err != nil {
@@ -27,13 +24,7 @@ func (u *User) Comment(c *Comment) error {
 }
 
 // Uncomment a Photo
-func (u *User) Uncomment(p *Photo) error {
-	
-	db, err := sql.Open("sqlite3", "./foo.db")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
+func (db *appdbimpl) Uncomment(p *Photo) error {
 
 	query := "DELETE FROM Comments WHERE uid = $1 AND pid = $2"
 	_, err = db.Exec(query, u.uid, p.pid)
@@ -45,12 +36,8 @@ func (u *User) Uncomment(p *Photo) error {
 }
 
 // Get Comments For a Photo
-func (p *Photo	) GetComments() ([]Comment, error) {
-	
-	db, err := sql.Open("sqlite3", "./foo.db")
-	if err != nil {
-		panic(err)
-	}
+func (db *appdbimpl) GetComments() ([]Comment, error) {
+
 	query := "SELECT * FROM Comments WHERE pid = $1"
 	rows, err := db.Query(query, p.pid)
 	if err != nil {

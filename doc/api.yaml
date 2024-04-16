@@ -67,15 +67,13 @@ paths:
       description: Upload a new picture
       responses:
         "201":
-          description: Picture successfully added
+          description: Photo successfully added
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Photo"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "500": 
-          $ref: "#/components/responses/InternalServerError"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
     get:
       tags: ["Photos"]
       operationId: getPhotos
@@ -160,58 +158,43 @@ paths:
                       maxItems: 100
                       items:
                         $ref: "#/components/schemas/Like"
-      post:
-        tags: ["Likes"]
-        operationId: likePhoto
-        summary: Like a Photo
-        description: Like a Photo
-        security:
-          - bearerAuth: []
-        responses:
-          "201":
-            description: Photo Liked
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/Like"
-          "404":
-            description: Photo Not Found
-      delete:
-        tags: ["Likes"]
-        operationId: unlikePhoto
-        summary: Unlike a Photo
-        description: Unlike a Photo
-        security:
-          - bearerAuth: []
-        responses:
-          "204":
-            description: Photo Unliked
-          "404":
-            description: Photo Not Liked
+  
+  /photos/{pid}/likes/{uid}:
+    parameters:
+      - $ref: "#/components/parameters/photo_id"
+      - $ref: "#/components/parameters/user_id"
+    put:
+      tags: ["Likes"]
+      operationId: likePhoto
+      summary: Like a Photo
+      description: Like a Photo
+      security:
+        - bearerAuth: []
+      responses:
+        "201":
+          description: Photo Liked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Like"
+        "404":
+          description: Photo Not Found
+    delete:
+      tags: ["Likes"]
+      operationId: unlikePhoto
+      summary: Unlike a Photo
+      description: Unlike a Photo
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: Photo Unliked
+        "404":
+          description: Photo Not Liked
          
   /photos/{pid}/comments:
     parameters:
       - $ref: "#/components/parameters/photo_id"
-    post:
-      tags: ["Comments"]
-      operationId: commentPhoto
-      summary: Add a comment to a picture
-      description: Add a comment to a picture
-      security:
-        - bearerAuth: []
-      responses:
-          "201":
-            description: Comment added
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/Comment"
-          "400":
-            $ref: "#/components/responses/BadRequest"
-          "404":
-            description: Photo Not Found
-          "500": 
-            $ref: "#/components/responses/InternalServerError"
     get:
       tags: ["Comments"]
       operationId: getComments
@@ -237,22 +220,47 @@ paths:
                       $ref: "#/components/schemas/Comment"
         "404":
           description: Photo Not Found
+  
+  /photos/{pid}/comments/{uid}:
+    parameters:
+      - $ref: "#/components/parameters/photo_id"
+      - $ref: "#/components/parameters/user_id"
+    post:
+      tags: ["Comments"]
+      operationId: commentPhoto
+      summary: Add a comment to a picture
+      description: Add a comment to a picture
+      security:
+        - bearerAuth: []
+      responses:
+          "201":
+            description: Comment added
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/Comment"
+          "400":
+            $ref: "#/components/responses/BadRequest"
+          "404":
+            description: Photo Not Found
+          "500": 
+            $ref: "#/components/responses/InternalServerError"
     delete:
-      summary: Uncomment a Photo
+      summary: Delete a Comment
       tags: ["Comments"]
       operationId: uncommentPhoto
-      description: Remove a comment from a picture
+      description: Delete a Comment
       security:
         - bearerAuth: []
       responses:
         "204":
-          description: Photo Uncommented
+          description: Comment Deleted
         "404":
           description: Comment Not Found
-      
-
+        "500": 
+          $ref: "#/components/responses/InternalServerError"
     
-  /users/{uid}:
+  /users/{uid}/profile:
     parameters:
       - $ref: "#/components/parameters/user_id"
     get:
@@ -307,28 +315,6 @@ paths:
   /user/{uid}/follow:
     parameters:
       - $ref: "#/components/parameters/user_id"
-    put:
-      operationId: followUser
-      tags: ["Users"]
-      summary: Follow a User
-      description: Follow a User
-      security:
-        - bearerAuth: []
-      responses:
-        "200":
-          description: User followed
-    delete:
-      operationId: unfollowUser
-      tags: ["Users"]
-      summary: Unfollow an User
-      description: Unfollow an User
-      security:
-        - bearerAuth: []
-      responses:
-        "204":
-          description: User unfollowed
-        "404":
-          description: User Not Followed
     get:
       operationId: getFollowedUsers
       tags: ["Users"]
@@ -353,27 +339,43 @@ paths:
                       $ref: "#/components/schemas/User"
         "404":
           description: No Followed Users
-
-
-  /user/{uid}/ban:
+  
+  /user/{uid}/follow/{fid}:
     parameters:
       - $ref: "#/components/parameters/user_id"
+      - $ref: "#/components/parameters/follow_id"
     put:
-      operationId: bamUser
+      operationId: followUser
       tags: ["Users"]
-      summary: Ban an User
-      description: Ban an User
+      summary: Follow an User
+      description: Follow an User
       security:
         - bearerAuth: []
       responses:
         "200":
-          description: User Banned
+          description: User Followed
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Ban"
+                $ref: "#/components/schemas/User"
         "404":
-          description: User Not Found
+          description: User Not Found    
+    delete:
+      operationId: unfollowUser
+      tags: ["Users"]
+      summary: Unfollow an User
+      description: Unfollow an User
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: User Unfollowed Successfully
+        "404":
+          description: User Not Followed
+  
+  /user/{uid}/ban:
+    parameters:
+      - $ref: "#/components/parameters/user_id"
     get:
       operationId: getBannedUsers
       tags: ["Users"]
@@ -395,9 +397,30 @@ paths:
                     minItems: 1
                     maxItems: 100
                     items:
-                      $ref: "#/components/schemas/Ban"
+                      $ref: "#/components/schemas/User"
         "404":
           description: No Banned Users
+
+  /users/{uid}/ban/{bid}:
+    parameters:
+      - $ref: "#/components/parameters/user_id"
+      - $ref: "#/components/parameters/banned_id"  
+    put:
+      operationId: banUser
+      tags: ["Users"]
+      summary: Ban an User
+      description: Ban an User
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: User Banned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ban"
+        "404":
+          description: User Not Found    
     delete:
       operationId: unbanUser
       tags: ["Users"]
@@ -436,8 +459,7 @@ paths:
                       $ref: "#/components/schemas/Photo"
         "404":
           description: User Not Found
-        "500": 
-          $ref: "#/components/responses/InternalServerError"
+        "500": { $ref: "#/components/responses/InternalServerError" }
      
 components:
   schemas:
@@ -517,6 +539,8 @@ components:
       description: The request was not compliant with the documentation (eg. missing fields, etc)
     InternalServerError:
       description: The server encountered an internal error. Further info in server logs
+    UnauthorizedError:
+      description: Access token is missing or invalid
 
   securitySchemes:
     bearerAuth:
@@ -547,3 +571,29 @@ components:
       in: path
       required: true
       allowEmptyValue: false
+
+    banned_id:
+      description: The user's identifier
+      schema:
+        type: string
+        pattern: '^[a-zA-Z0-9-_]+$'
+        minLength: 12
+        maxLength: 12
+      name: bid
+      in: path
+      required: true
+      allowEmptyValue: false
+    
+    follow_id:
+      description: The user's identifier
+      schema:
+        type: string
+        pattern: '^[a-zA-Z0-9-_]+$'
+        minLength: 12
+        maxLength: 12
+      name: fid
+      in: path
+      required: true
+      allowEmptyValue: false
+    
+    
