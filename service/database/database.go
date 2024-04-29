@@ -39,6 +39,8 @@ import (
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
 	Ping() error
+
+	
 }
 
 type appdbimpl struct {
