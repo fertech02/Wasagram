@@ -319,6 +319,10 @@ paths:
       responses:
         "200": 
           description: Username updated sucessfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/UnauthorizedError" }
         "404": { $ref: "#/components/responses/NotFoundError" }
@@ -341,6 +345,7 @@ paths:
             application/json:
               schema:
                 type: object
+                description: List of followed users
                 properties:
                   followed_users:
                     type: array
@@ -405,6 +410,7 @@ paths:
             application/json:
               schema:
                 type: object
+                description: List of banned users
                 properties:
                   banned_users:
                     type: array
@@ -469,6 +475,7 @@ paths:
             application/json:
               schema:
                 type: object
+                description: List of photos
                 properties:
                   stream:
                     type: array
@@ -492,10 +499,13 @@ components:
           example: "abcdef012345"
         user_id:
           type: string
+          description: The user's identifier
         url:
           type: string
+          description: The photo's URL
         date:
           type: string
+          description: The photo's date
           format: date-time
       required:
         - photo_id
@@ -506,8 +516,10 @@ components:
       properties:
         user_id:
           type: string
+          description: The user's identifier
         username:
           type: string
+          description: The user's username
       required:
         - user_id
     
@@ -517,8 +529,10 @@ components:
       properties:
         photo_id:
           type: string
+          description: The photo's identifier
         user_id:
           type: string
+          description: The user's identifier
       required:
         - photo_id
         - user_id
@@ -529,6 +543,7 @@ components:
       properties:
         message:
           type: string
+          description: The comment's message
         user_id:
           type: string
           description: ID of the commenting User
@@ -556,10 +571,13 @@ components:
   responses:
     BadRequest:
       description: The request was not compliant with the documentation (eg. missing fields, etc)
+
     InternalServerError:
       description: The server encountered an internal error. Further info in server logs
+
     UnauthorizedError:
       description: Access token is missing or invalid
+
     NotFoundError:
       description: The requested resource was not found
 

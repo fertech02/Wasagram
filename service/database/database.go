@@ -40,7 +40,21 @@ import (
 type AppDatabase interface {
 	Ping() error
 
-	
+	// User
+	CreateUser(username string) (*User, error)
+	GetUserProfile(uid string) (*User, error)
+	UpdateUsername(userid string, username string) error
+	// GetStream
+
+	// Photo
+
+	// Like
+
+	// Ban
+
+	// Follow
+
+	// Comment
 }
 
 type appdbimpl struct {

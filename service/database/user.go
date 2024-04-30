@@ -1,13 +1,15 @@
-package database;
+package database
+
 import (
 	"database/sql"
 	"errors"
+
 	"github.com/google/uuid"
 )
 
 type User struct {
-	uid	      string  		`json:"uid"`
-	username  string		`json:"username"`
+	uid      string `json:"uid"`
+	username string `json:"username"`
 }
 
 // Create a new User
@@ -23,7 +25,7 @@ func (db *appdbimpl) CreateUser(username string) (*User, error) {
 
 	// Generate a new UUID
 	uid := uuid.New().String()
-	
+
 	stmt, err := db.Prepare("INSERT INTO User(uid, username) values(?, ?)")
 	if err != nil {
 		return nil, err
@@ -39,20 +41,6 @@ func (db *appdbimpl) CreateUser(username string) (*User, error) {
 
 // Get User by ID
 func (db *appdbimpl) GetUserProfile(uid string) (*User, error) {
-	/*
-		Dobbiamo implementare la ricerca di altri utenti.
-		Per fare ciò, dobbiamo vedere se l'utente che cerca non appartiene
-		alla lista degli utenti bannati di quello che viene cercato. 
-	**/
-
-	row := db.QueryRow("SELECT uid, username FROM User WHERE uid = ?", uid)
-	var user User
-	err = row.Scan(&user.uid, &user.username)
-	if err != nil {
-		return nil, err
-	}
-
-	return &user, nil
 }
 
 // Update Username
@@ -78,3 +66,5 @@ func (db *appdbimpl) UpdateUsername(userid string, username string) error {
 
 	return nil
 }
+
+//
