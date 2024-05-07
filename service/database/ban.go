@@ -1,18 +1,9 @@
-package database;
-
-import (
-	"database/sql"
-)
-
-type Ban struct {
-	bannerId string
-	bannedId string
-}
+package database
 
 // Ban an User
-func (db *appdbimpl) AddBan(bannerId, bannedId string) error{
+func (db *appdbimpl) Ban(bannerId, bannedId string) error {
 
-	_, err = db.Exec("INSERT INTO Ban (bannerId, bannedId) VALUES (?, ?)", bannerId, bannedId)
+	_, err := db.c.Exec("INSERT INTO Ban (bannerId, bannedId) VALUES (?, ?)", bannerId, bannedId)
 	if err != nil {
 		return err
 	}
@@ -21,9 +12,9 @@ func (db *appdbimpl) AddBan(bannerId, bannedId string) error{
 }
 
 // Unban an User
-func (db *appdbimpl) UnbanUser(bannerId string, bannedId string) error {
+func (db *appdbimpl) Unban(bannerId string, bannedId string) error {
 
-	_, err = db.Exec("DELETE FROM Ban WHERE bannerId = ? AND bannedId = ?", bannerId, bannedId)
+	_, err := db.c.Exec("DELETE FROM Ban WHERE bannerId = ? AND bannedId = ?", bannerId, bannedId)
 	if err != nil {
 		return err
 	}
@@ -31,22 +22,14 @@ func (db *appdbimpl) UnbanUser(bannerId string, bannedId string) error {
 	return nil
 }
 
-// Get Ban List
-func (db *appdbimpl) GetBanList(bannerId string) ([]string, error) {
-	
-	rows, err := db.Query("SELECT bannedId FROM Ban WHERE bannerId = ?", bannerId)
+// Check if a User is Banned
+func (db *appdbimpl) CheckBan(bannerId string, bannedId string) (bool, error) {
+
+	var count int
+	err := db.c.QueryRow("SELECT COUNT(*) FROM Ban WHERE bannerId = ? AND bannedId = ?", bannerId, bannedId).Scan(&count)
 	if err != nil {
-		return nil, err
+		return false, err
 	}
 
-	var bannedUsers []string
-	for rows.Next() {
-		var bannedId string
-		if err := rows.Scan(&bannedId); err != nil {
-			return nil, err
-		}
-		bannedUsers = append(bannedUsers, bannedId)
-	}
-
-	return bannedUsers, nil
+	return count > 0, nil
 }

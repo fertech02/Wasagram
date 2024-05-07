@@ -1,65 +1,39 @@
-package database;
-
-import (
-	"database/sql"
-)
-
-type Like struct {
-	uid string	`json:"uid"`
-	pid string	`json:"pid"`
-}
+package database
 
 // Like a Photo
 func (db *appdbimpl) Like(pid string, uid string) error {
 
-	query := "INSERT INTO Likes (uid, pid) VALUES ($1, $2)"
-	_, err = db.Exec(query, uid, pid)
-	if err != nil {
-		panic(err)
-	}
-
-	return nil
+	_, err := db.c.Exec("INSERT INTO Likes (uid, pid) VALUES ($1, $2)", uid, pid)
+	return err
 }
 
 // Unlike a Photo
 func (db *appdbimpl) Unlike(pid string, uid string) error {
 
-	query := "DELETE FROM Likes WHERE uid = $1 AND pid = $2"
-	_, err = db.Exec(query, uid, pid)
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-
-	return nil
+	_, err := db.c.Exec("DELETE FROM Likes WHERE uid = $1 AND pid = $2", uid, pid)
+	return err
 }
 
-// Get Like by ID
-func (db *appdbimpl) GetLike(pid string) ([]*Like, error) {
+// Check if a User has Liked a Photo
+func (db *appdbimpl) CheckLike(pid string, uid string) (bool, error) {
 
-	query := "SELECT uid, pid FROM Likes WHERE pid = $1"
-	rows, err := db.Query(query, pid)
+	var count int
+	err := db.c.QueryRow("SELECT COUNT(*) FROM Likes WHERE uid = $1 AND pid = $2", uid, pid).Scan(&count)
 	if err != nil {
-		panic(err)
-		return nil, err
-	}
-	defer db.Close()
-	
-	likes := make([]*Like, 0)
-	for rows.Next() {
-		var l Like
-		err := rows.Scan(&l.uid, &l.pid)
-		if err != nil {
-			panic(err)
-			return nil, err
-		}
-		likes = append(likes, &l)
+		return false, err
 	}
 
-	if err = rows.Err(); err != nil {
-		panic(err)
-		return nil, err
+	return count > 0, nil
+}
+
+// Get Like Count for a Photo
+func (db *appdbimpl) GetLikeCount(pid string) (int, error) {
+
+	var count int
+	err := db.c.QueryRow("SELECT COUNT(*) FROM Likes WHERE pid = $1", pid).Scan(&count)
+	if err != nil {
+		return 0, err
 	}
 
-	return likes, nil
+	return count, nil
 }

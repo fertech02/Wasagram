@@ -1,18 +1,9 @@
-package database;
-
-import (
-	"database/sql"
-)
-
-type Follow struct {
-	followeeId string
-	followerId string
-}
+package database
 
 // Follow an User
-func (db *appdbimpl) FollowUser(followeeId int, followerId int) error {
+func (db *appdbimpl) Follow(followeeId int, followerId int) error {
 
-	_, err = db.Exec("INSERT INTO Follow (followeeId, followerId) VALUES (?, ?)", followeeId, followerId)
+	_, err := db.c.Exec("INSERT INTO Follow (followeeId, followerId) VALUES (?, ?)", followeeId, followerId)
 	if err != nil {
 		return err
 	}
@@ -21,9 +12,9 @@ func (db *appdbimpl) FollowUser(followeeId int, followerId int) error {
 }
 
 // Unfollow an User
-func (db *appdbimpl) UnfollowUser(followeeId int, followerId int) error {
+func (db *appdbimpl) Unfollow(followeeId int, followerId int) error {
 
-	_, err = db.Exec("DELETE FROM Follow WHERE followeeId = ? AND followerId = ?", followeeId, followerId)
+	_, err := db.c.Exec("DELETE FROM Follow WHERE followeeId = ? AND followerId = ?", followeeId, followerId)
 	if err != nil {
 		return err
 	}
@@ -31,39 +22,36 @@ func (db *appdbimpl) UnfollowUser(followeeId int, followerId int) error {
 	return nil
 }
 
-// Get Followers List
-func (db *appdbimpl) GetFollowers(uid int) error{
+// Check if a User is Following another User
+func (db *appdbimpl) CheckFollow(followeeId int, followerId int) (bool, error) {
 
-	_, err = db.Exec("SELECT followerId FROM Follow WHERE followeeId = ?", uid)
+	var count int
+	err := db.c.QueryRow("SELECT COUNT(*) FROM Follow WHERE followeeId = ? AND followerId = ?", followeeId, followerId).Scan(&count)
 	if err != nil {
-		return err
+		return false, err
 	}
 
-	return nil
+	return count > 0, nil
 }
 
-// Get Followees List
-func (db *appdbimpl) GetFollowees(uid int) ([]string, error) {
+// Get Followers Count
+func (db *appdbimpl) GetFollowersCount(uid int) (int, error) {
 
-	rows, err := db.Query("SELECT followeeId FROM Follow WHERE followerId = ?", uid)
+	var count int
+	err := db.c.Query("SELECT COUNT(*) FROM Follow WHERE followeeId = ?", uid).Scan(&count)
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
-	defer rows.Close()
+	return count, nil
+}
 
-	var followees []string
-	for rows.Next() {
-        var followeeId string
-        if err := rows.Scan(&followeeId); err != nil {
-            return nil, err
-        }
-        followees = append(followees, followeeId)
-    }
+// Get Followees Count
+func (db *appdbimpl) GetFolloweesCount(uid int) (int, error) {
 
-    if err := rows.Err(); err != nil {
-        return nil, err
-    }
-
-    return followees, nil
-
+	var count int
+	err := db.c.Query("SELECT COUNT(*) FROM Follow WHERE followerId = ?", uid).Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
 }
