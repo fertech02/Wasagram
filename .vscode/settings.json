@@ -1,0 +1,10 @@
+{
+    "[go]": {
+        "editor.formatOnSave": false,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+        },
+        "editor.formatOnSaveMode": "file",
+        "editor.formatOnType": false
+    }
+}
