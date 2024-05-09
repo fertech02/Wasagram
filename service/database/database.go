@@ -118,7 +118,7 @@ type AppDatabase interface {
 
 	// Comment
 	Comment(c *Comment) error
-	Uncomment(c *Comment) error
+	Uncomment(pid string, uid string) error
 	GetComments(photoId string) ([]Comment, error)
 }
 

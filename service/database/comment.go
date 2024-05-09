@@ -14,10 +14,10 @@ func (db *appdbimpl) Comment(c *Comment) error {
 }
 
 // Uncomment a Photo
-func (db *appdbimpl) Uncomment(c *Comment) error {
+func (db *appdbimpl) Uncomment(pid string, uid string) error {
 
 	query := "DELETE FROM Comments WHERE uid = $1 AND pid = $2"
-	_, err = db.c.Exec(query, c.uid, c.pid)
+	_, err = db.c.Exec(query, uid, pid)
 	if err != nil {
 		return err
 	}
