@@ -3,80 +3,94 @@ package api
 import (
 	"net/http"
 
-	"github.com/fertech02/Wasa-repository/service/reqcontext"
+	"github.com/fertech02/Wasa-repository/service/api/reqcontext"
 	"github.com/julienschmidt/httprouter"
 )
 
 func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	
-	followeeId, err := ps.ByName("followeeId")
-	if err != nil {
-		ctx.RespondWithError(w, http.StatusBadRequest, "missing followeeId")
+	followeeId:= ps.ByName("followeeId")
+	if followeeId == "" {
+		w.WriteHeader(http.StatusBadRequest);
 		return
 	}
 
-	followerId, err := ps.ByName("followerId")
-	if err != nil {
-		ctx.RespondWithError(w, http.StatusBadRequest, "missing followerId")
+	followerId := ps.ByName("followerId")
+	if followerId == "" {
+		w.WriteHeader(http.StatusBadRequest);
 		return
 	}
 
 	// Check if followerId is authorized to follow followeeId
-	if !ctx.IsAuthorized(followerId) {
-		ctx.RespondWithError(w, http.StatusUnauthorized, "unauthorized")
+	unauthorized, err := CheckAuthorizedId(r, followerId)
+	if err != nil {
+		ctx.Logger.WithField("error", err).Error("Failed to check authorization")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if unauthorized {
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
+
 	// Follow the user
-	err = rt.db.FollowUser(followeeId, followerId)
+	err = rt.db.Follow(followeeId, followerId)
 	if err != nil {
-		ctx.RespondWithError(w, http.StatusInternalServerError, "error following user")
+		w.WriteHeader(http.StatusInternalServerError);
 		return
 	}
 }
 
 func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	followeeId, err := ps.ByName("followeeId")
-	if err != nil {
-		ctx.RespondWithError(w, http.StatusBadRequest, "missing followeeId")
+	followeeId := ps.ByName("followeeId")
+	if followeeId == "" {
+		w.WriteHeader(http.StatusBadRequest);
 		return
 	}
 
-	followerId, err := ps.ByName("followerId")
-	if err != nil {
-		ctx.RespondWithError(w, http.StatusBadRequest, "missing followerId")
+	followerId := ps.ByName("followerId")
+	if followerId == "" {
+		w.WriteHeader(http.StatusBadRequest);
 		return
 	}
 
 	// Check if followerId is authorized to unfollow followeeId
-	if !ctx.IsAuthorized(followerId) {
-		ctx.RespondWithError(w, http.StatusUnauthorized, "unauthorized")
+	unauthorized, err := CheckAuthorizedId(r, followerId)
+	if err != nil {
+		ctx.Logger.WithField("error", err).Error("Failed to check authorization")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if unauthorized {
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
+
 	// Unfollow the user
-	err = rt.db.UnfollowUser(followeeId, followerId)
+	err = rt.db.Unfollow(followeeId, followerId)
 	if err != nil {
-		ctx.RespondWithError(w, http.StatusInternalServerError, "error unfollowing user")
+		w.WriteHeader(http.StatusInternalServerError);
 		return
 	}
 }
 
 func (rt *_router) getFollowers(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	uid, err := ps.ByName("uid")
-	if err != nil {
-		ctx.RespondWithError(w, http.StatusBadRequest, "missing uid")
+	uid := ps.ByName("uid")
+	if uid == "" {
+		w.WriteHeader(http.StatusBadRequest);
 		return
 	}
 
 	// Get the followers from the db
+	// -- DA VEDERE 
 	followers, err := rt.db.GetFollowers(uid)
 	if err != nil {
-		ctx.RespondWithError(w, http.StatusInternalServerError, "error getting followers")
+		w.WriteHeader(http.StatusInternalServerError);
 		return
 	}
 
-	ctx.Respond(w, http.StatusOK, followers)
 }

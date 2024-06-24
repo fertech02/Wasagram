@@ -60,8 +60,8 @@ type Photo struct {
 }
 
 type Follow struct {
-	followeeId string
-	followerId string
+	followeeId string `json:"followeeId"`
+	followerId string `json:"followerId"`
 }
 
 type Comment struct {
@@ -76,8 +76,8 @@ type Like struct {
 }
 
 type Ban struct {
-	bannerId string
-	bannedId string
+	bannerId string `json:"bannerId"`
+	bannedId string `json:"bannedId"`
 }
 
 // AppDatabase is the high level interface for the DB
@@ -145,7 +145,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 	var tableName string
 
 	tableName = "Photos"
-	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name = ?;`, tableName).Scan(&tableName)
+	err = db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name = ?;`, tableName).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
 		sqlStmt := `CREATE TABLE Photos (
 

@@ -10,95 +10,118 @@ import (
 func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	// Parse the photo id from the request
-	pid, err := ps.ByName("pid")
-	if err != nil {
-		ctx.RespondWithError(w, http.StatusBadRequest, "missing photo id")
+	pid := ps.ByName("pid")
+	if pid == "" {
+		ctx.Logger.Error("Failed to parse photo id")
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-
+	
 	// Parse the user id from the request
-	uid, err := ps.ByName("uid")
-	if err != nil {
-		ctx.RespondWithError(w, http.StatusBadRequest, "missing user id")
+	uid := ps.ByName("uid")
+	if uid == "" {
+		ctx.Logger.Error("Failed to parse user id")
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	// Check if user authorized
-	if !ctx.IsAuthorized(uid) {
-		ctx.RespondWithError(w, http.StatusUnauthorized, "unauthorized")
+	unauthorized, err := CheckAuthorizedId(r, uid)
+	if err != nil {
+		ctx.Logger.WithField("error", err).Error("Failed to check authorization")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if unauthorized {
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
 	// Like the photo
-	err = rt.db.LikePhoto(uid, pid)
+	err = rt.db.Like(uid, pid)
 	if err != nil {
-		ctx.RespondWithError(w, http.StatusInternalServerError, "error liking photo")
+		ctx.Logger.WithField("error", err).Error("Failed to like photo")
+		w.WriteHeader(http.StatusInternalServerError);
 		return
 	}
 
-	ctx.RespondWithJSON(w, http.StatusOK, nil)
 }
 
 func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	// Parse the photo id from the request
-	pid, err := ps.ByName("pid")
-	if err != nil {
-		ctx.RespondWithError(w, http.StatusBadRequest, "missing photo id")
+	pid := ps.ByName("pid")
+	if pid != "" {
+		w.WriteHeader(http.StatusBadRequest);
 		return
 	}
 
 	// Parse the user id from the request
-	uid, err := ps.ByName("uid")
-	if err != nil {
-		ctx.RespondWithError(w, http.StatusBadRequest, "missing user id")
+	uid := ps.ByName("uid")
+	if uid != "" {
+		w.WriteHeader(http.StatusBadRequest);
 		return
 	}
 
 	// Check if user authorized
-	if !ctx.IsAuthorized(uid) {
-		ctx.RespondWithError(w, http.StatusUnauthorized, "unauthorized")
+	unauthorized, err := CheckAuthorizedId(r, uid)
+	if err != nil {
+		ctx.Logger.WithField("error", err).Error("Failed to check authorization")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if unauthorized {
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
 	// Unlike the photo
-	err = rt.db.UnlikePhoto(pid, uid)
+	err = rt.db.Unlike(pid, uid)
 	if err != nil {
-		ctx.RespondWithError(w, http.StatusInternalServerError, "error unliking photo")
+		w.WriteHeader(http.StatusInternalServerError);
 		return
 	}
 
-	ctx.RespondWithJSON(w, http.StatusOK, nil)
 }
 
 func (rt *_router) checkLike(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	// Parse the photo id from the request
-	pid, err := ps.ByName("pid")
-	if err != nil {
-		ctx.RespondWithError(w, http.StatusBadRequest, "missing photo id")
+	pid := ps.ByName("pid")
+	if pid != "" {
+		w.WriteHeader(http.StatusBadRequest);
 		return
 	}
 
 	// Parse the user id from the request
-	uid, err := ps.ByName("uid")
-	if err != nil {
-		ctx.RespondWithError(w, http.StatusBadRequest, "missing user id")
+	uid := ps.ByName("uid")
+	if uid != "" {
+		w.WriteHeader(http.StatusBadRequest);
 		return
 	}
 
 	// Check if user authorized
-	if !ctx.IsAuthorized(uid) {
-		ctx.RespondWithError(w, http.StatusUnauthorized, "unauthorized")
+	unauthorized, err := CheckAuthorizedId(r, uid)
+	if err != nil {
+		ctx.Logger.WithField("error", err).Error("Failed to check authorization")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if unauthorized {
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
 	// Check if user liked the photo
-	liked, err := rt.db.CheckLike(pid, uid)
+	// -- DA VEDERE
+	_, err = rt.db.CheckLike(pid, uid)
 	if err != nil {
-		ctx.RespondWithError(w, http.StatusInternalServerError, "error checking like")
+		ctx.Logger.WithField("error", err).Error("Failed to check if user liked the photo")
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	ctx.RespondWithJSON(w, http.StatusOK, liked)
 }
+
+
+// Get Likes

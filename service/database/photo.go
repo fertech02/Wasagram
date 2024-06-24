@@ -1,10 +1,10 @@
 package database
 
 // Post a Photo
-func (db *appdbimpl) PostPhoto(p Photo) (*Photo, error) {
+func (db *appdbimpl) PostPhoto(p *Photo) (*Photo, error) {
 
 	query := "INSERT INTO Photos (pid, uid, file, date) VALUES (?, ?, ?, ?)"
-	_, err = db.c.Exec(query, p.pid, p.uid, p.file, p.date)
+	_, err := db.c.Exec(query, p.pid, p.uid, p.file, p.date)
 	if err != nil {
 		return p, err
 	}

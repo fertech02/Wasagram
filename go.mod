@@ -4,7 +4,9 @@ go 1.17
 
 require (
 	github.com/ardanlabs/conf v1.5.0
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gofrs/uuid v4.4.0+incompatible
+	github.com/google/uuid v1.6.0
 	github.com/gorilla/handlers v1.5.1
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/mattn/go-sqlite3 v1.14.17
@@ -13,15 +15,8 @@ require (
 )
 
 require (
-	github.com/DATA-DOG/go-sqlmock v1.5.2 // indirect
-	github.com/google/uuid v1.6.0 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
-)
-
-require (
 	github.com/felixge/httpsnoop v1.0.3 // indirect
 	github.com/google/go-cmp v0.5.8 // indirect
-	github.com/gorilla/mux v1.8.1
 	github.com/kr/pretty v0.1.0 // indirect
 	golang.org/x/sys v0.11.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect

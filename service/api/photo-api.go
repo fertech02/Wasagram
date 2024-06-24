@@ -1,46 +1,46 @@
 package api
 
 import (
-	"net/http"
-	"errors"
-	"time"
 	"io"
+	"net/http"
+	"os"
+	"time"
 
 	"github.com/fertech02/Wasa-repository/service/api/reqcontext"
 	"github.com/fertech02/Wasa-repository/service/database"
-	"github.com/julienschmidt/httprouter"
 	"github.com/google/uuid"
+	"github.com/julienschmidt/httprouter"
 )
 
 // Photo path
 const directory = "/tmp/photos"
 
-func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx *reqcontext.RequestContext) {
 
 	// Get the Authorization header
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {
-		ctx.Error(w, http.StatusUnauthorized, "missing Authorization header")
+		w.WriteHeader(http.StatusUnauthorized);
 		return
 	}
 
 	// Validate the Authorization header
-	uid, err := rt.db.ValidateToken(authHeader)
+	uid, err := validateToken(authHeader)
 	if err != nil {
-		ctx.Error(w, http.StatusUnauthorized, "invalid token")
+		w.WriteHeader(http.StatusUnauthorized);
 		return
 	}
 
 	// Get the file from the request
-	file, _, err := io.ReadAll(r.Body)
+	file, err := io.ReadAll(r.Body)
 	if err != nil {
-		ctx.Error(w, http.StatusBadRequest, "invalid request")
+		w.WriteHeader(http.StatusBadRequest);
 		return
 	}
 
 	// Check if the file is empty
 	if len(file) == 0 {
-		ctx.Error(w, http.StatusBadRequest, "empty file")
+		w.WriteHeader(http.StatusBadRequest);
 		return
 	}
 
@@ -48,21 +48,21 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	photo := database.Photo{
 		pid:  uuid.New().String(),
 		uid:  uid,
-		file: file,
-		date: time.Now().Format(time.RFC3339),
+		file: []byte,
+		date: time.Now(),
 	}
 
 	// Post the photo
-	_, err = rt.db.PostPhoto(photo)
+	_, err = rt.db.PostPhoto(&photo)
 	if err != nil {
-		ctx.Error(w, http.StatusInternalServerError, "error posting photo")
+		w.WriteHeader(http.StatusInternalServerError);
 		return
 	}
 
 	// Save Photo
 	err = rt.savePhoto(file, photo.pid)
 	if err != nil {
-		ctx.Error(w, http.StatusInternalServerError, "error saving photo")
+		w.WriteHeader(http.StatusInternalServerError);
 		return
 	}
 
@@ -93,86 +93,83 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	// Get the Authorization header
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {
-		ctx.Error(w, http.StatusUnauthorized, "missing Authorization header")
+		w.WriteHeader(http.StatusUnauthorized);
 		return
 	}
 
 	// Validate the Authorization header
-	uid, err := rt.db.ValidateToken(authHeader)
+	uid, err := validateToken(authHeader)
 	if err != nil {
-		ctx.Error(w, http.StatusUnauthorized, "invalid token")
+		w.WriteHeader(http.StatusUnauthorized);
 		return
 	}
 
 	// Get the photo ID
 	pid := ps.ByName("pid")
 	if pid == "" {
-		ctx.Error(w, http.StatusBadRequest, "photo ID is required")
+		w.WriteHeader(http.StatusBadRequest);
 		return
 	}
 
 	// Get the photo
 	photo, err := rt.db.GetPhoto(pid)
 	if err != nil {
-		ctx.Error(w, http.StatusInternalServerError, "error getting photo")
+		w.WriteHeader(http.StatusInternalServerError);
 		return
 	}
 
 	// Check if the photo exists
 	if photo == nil {
-		ctx.Error(w, http.StatusNotFound, "photo not found")
+		w.WriteHeader(http.StatusNotFound);
 		return
 	}
 
 	// Check if the user is the owner of the photo
 	if photo.uid != uid {
-		ctx.Error(w, http.StatusForbidden, "forbidden")
+		w.WriteHeader(http.StatusForbidden);
 		return
 	}
 
 	// Delete the photo
 	err = rt.db.DeletePhoto(pid)
 	if err != nil {
-		ctx.Error(w, http.StatusInternalServerError, "error deleting photo")
+		w.WriteHeader(http.StatusInternalServerError);
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 }
 
-fun (rt *_router) getPhotos(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) getPhotos(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	// Get the Authorization header	
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {
-		ctx.Error(w, http.StatusUnauthorized, "missing Authorization header")
+		w.WriteHeader(http.StatusUnauthorized);
 		return
 	}
 
 	// Validate the Authorization header
-	uid, err := rt.db.ValidateToken(authHeader)
+	_, err := validateToken(authHeader)
 	if err != nil {
-		ctx.Error(w, http.StatusUnauthorized, "invalid token")
+		w.WriteHeader(http.StatusUnauthorized);
 		return
 	}
 
 	// Get the user ID
-	uid := ps.ByName("uid")
-	if uid == "" {
-		ctx.Error(w, http.StatusBadRequest, "user ID is required")
+	userID := ps.ByName("uid")
+	if userID == "" {
+		w.WriteHeader(http.StatusBadRequest);
 		return
 	}
 
 	// Get the user's photos
-	photos, err := rt.db.GetPhotos(uid)
+	photos, err := rt.db.GetPhotos(userID)
 	if err != nil {
-		ctx.Error(w, http.StatusInternalServerError, "error getting photos")
+		w.WriteHeader(http.StatusInternalServerError);
 		return
 	}
 
 	// get photo from filesystem
-	for _, photo := range photos {
-		
-
 
 }

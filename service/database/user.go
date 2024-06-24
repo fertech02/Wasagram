@@ -61,7 +61,7 @@ func (db *appdbimpl) GetMyStream(uid string) ([]*Photo, error) {
 }
 
 // Get User Id
-func (db *appdbimpl) GetUser(username string) (string, error) {
+func (db *appdbimpl) GetUserId(username string) (string, error) {
 
 	var uid string
 	err := db.c.QueryRow("SELECT uid FROM User WHERE username=?", username).Scan(&uid)

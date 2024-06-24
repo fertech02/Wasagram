@@ -13,24 +13,21 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	var comment db.Comment
 	err := json.NewDecoder(r.Body).Decode(&comment)
 	if err != nil {
-		logger.WithError(err).Error("error decoding request body")
-		ctx.Respond(w, http.StatusBadRequest, "error decoding request body")
+		w.WriteHeader(http.StatusBadRequest);
 		return
 	}
 
 	// get the photo id from the request params
 	pid := ps.ByName("pid")
 	if pid == "" {
-		logger.Error("missing photo id")
-		ctx.Respond(w, http.StatusBadRequest, "missing photo id")
+		w.WriteHeader(http.StatusBadRequest);
 		return
 	}
 
 	// get the user id from the request params
 	uid := ps.ByName("uid")
 	if uid == "" {
-		logger.Error("missing user id")
-		ctx.Respond(w, http.StatusBadRequest, "missing user id")
+		w.WriteHeader(http.StatusBadRequest);
 		return
 	}
 
@@ -44,18 +41,16 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 
 	err = json.NewDecoder(r.Body).Decode(&message)
 	if err != nil {
-		logger.WithError(err).Error("error decoding request body")
-		ctx.Respond(w, http.StatusBadRequest, "error decoding request body")
+		w.WriteHeader(http.StatusBadRequest);
 		return
 	}
 
 	comment.message = message.Message
 
 	// Add the comment in the db
-	err = rt.db.AddComment(comment)
+	err = rt.db.Comment(comment)
 	if err != nil {
-		logger.WithError(err).Error("error adding comment")
-		ctx.Respond(w, http.StatusInternalServerError, "error adding comment")
+		w.WriteHeader(http.StatusInternalServerError);
 		return
 	}
 }
@@ -65,30 +60,34 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 	// get the photo id from the request params
 	pid := ps.ByName("pid")
 	if pid == "" {
-		logger.Error("missing photo id")
-		ctx.Respond(w, http.StatusBadRequest, "missing photo id")
+		w.WriteHeader(http.StatusBadRequest);
 		return
 	}
 
 	// get the user id from the request params
 	uid := ps.ByName("uid")
 	if uid == "" {
-		logger.Error("missing user id")
-		ctx.Respond(w, http.StatusBadRequest, "missing user id")
+		w.WriteHeader(http.StatusBadRequest);
 		return
 	}
 
 	// Check if uid is authorized to delete the comment
-	if !ctx.IsAuthorized(uid) {
-		ctx.RespondWithError(w, http.StatusUnauthorized, "unauthorized")
+	unauthorized, err := CheckAuthorizedId(r, uid)
+	if err != nil {
+		ctx.Logger.WithField("error", err).Error("Failed to check authorization")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if unauthorized {
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
+
 	// Delete the comment from the db
-	err := rt.db.DeleteComment(pid, uid)
+	err = rt.db.Uncomment(pid, uid)
 	if err != nil {
-		logger.WithError(err).Error("error deleting comment")
-		ctx.Respond(w, http.StatusInternalServerError, "error deleting comment")
+		w.WriteHeader(http.StatusInternalServerError);
 		return
 	}
 }
@@ -98,18 +97,14 @@ func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httpro
 	// get the photo id from the request params
 	pid := ps.ByName("pid")
 	if pid == "" {
-		logger.Error("missing photo id")
-		ctx.Respond(w, http.StatusBadRequest, "missing photo id")
+		w.WriteHeader(http.StatusBadRequest);
 		return
 	}
 
 	// Get the comments from the db
 	comments, err := rt.db.GetComments(pid)
 	if err != nil {
-		logger.WithError(err).Error("error getting comments")
-		ctx.Respond(w, http.StatusInternalServerError, "error getting comments")
+		w.WriteHeader(http.StatusInternalServerError);
 		return
 	}
-
-	ctx.Respond(w, http.StatusOK, comments)
 }

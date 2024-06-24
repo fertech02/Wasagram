@@ -4,11 +4,10 @@ package database
 func (db *appdbimpl) Comment(c *Comment) error {
 
 	query := "INSERT INTO Comments (uid, pid, message) VALUES ($1, $2, $3)"
-	_, err = db.c.Exec(query, c.uid, c.pid, c.message)
+	_, err := db.c.Exec(query, c.uid, c.pid, c.message)
 	if err != nil {
 		return err
 	}
-	defer db.Close()
 
 	return nil
 }
@@ -17,26 +16,25 @@ func (db *appdbimpl) Comment(c *Comment) error {
 func (db *appdbimpl) Uncomment(pid string, uid string) error {
 
 	query := "DELETE FROM Comments WHERE uid = $1 AND pid = $2"
-	_, err = db.c.Exec(query, uid, pid)
+	_, err := db.c.Exec(query, uid, pid)
 	if err != nil {
 		return err
 	}
-	defer db.Close()
 
 	return nil
 
 }
 
 // Get Comments For a Photo
-func (db *appdbimpl) GetComments(photoId string) ([]Comment, error) {
+func (db *appdbimpl) GetComments(pid string) ([]Comment, error) {
 
 	query := "SELECT * FROM Comments WHERE pid = $1"
-	rows, err := db.c.Query(query, photoId)
+	rows, err := db.c.Query(query, pid)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-
+	
 	var comments []Comment
 	for rows.Next() {
 		var c Comment

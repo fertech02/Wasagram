@@ -2,9 +2,12 @@ package api
 
 import (
 	"fmt"
+	"net/http"
+	"strings"
 
 	"github.com/dgrijalva/jwt-go"
 )
+
 
 var mySigningKey = []byte("your-secret-key")
 
@@ -25,4 +28,26 @@ func validateToken(tokenString string) (bool, error) {
 	} else {
 		return false, nil
 	}
+}
+
+// IsAuthorized checks if the user is authorized
+func CheckAuthorizedId(r *http.Request, id string) (bool, error) {
+
+	// Get the Authorization header
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		return false, nil
+	}
+
+	authHeaderParts := strings.Fields(authHeader)
+	if len(authHeaderParts) != 2 || strings.ToLower(authHeaderParts[0]) != "bearer" {
+		return false, nil
+	}
+
+	token := authHeaderParts[1]
+	if token != id {
+		return false, nil
+	}
+
+	return true, nil
 }
