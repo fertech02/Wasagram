@@ -37,47 +37,44 @@ import (
 )
 
 type User struct {
-	uid      string `json:"uid"`
-	username string `json:"username"`
+	Uid      string `json:"uid"`
+	Username string `json:"username"`
 }
 
-/*
-	type Profile struct {
-		uid         string `json:"uid"`
-		username    string `json:"username"`
-		followers   int    `json:"followersCount"`
-		followees   int    `json:"followeesCount"`
-		photosCount int    `json:"photosCount"`
-	}
+type Profile struct {
+	Uid         string `json:"uid"`
+	Username    string `json:"username"`
+	Followers   int    `json:"followersCount"`
+	Followees   int    `json:"followeesCount"`
+	PhotosCount int    `json:"photosCount"`
+}
 
-*
-*/
 type Photo struct {
-	pid  string `json:"pid"`
-	uid  string `json:"uid"`
-	file []byte `json:"file"`
-	date string `json:"date"`
+	Pid  string `json:"pid"`
+	Uid  string `json:"uid"`
+	File []byte `json:"file"`
+	Date string `json:"date"`
 }
 
 type Follow struct {
-	followeeId string `json:"followeeId"`
-	followerId string `json:"followerId"`
+	FolloweeId string `json:"followeeId"`
+	FollowerId string `json:"followerId"`
 }
 
 type Comment struct {
-	uid     string `json:"uid"`
-	pid     string `json:"pid"`
-	message string `json:"message"`
+	Uid     string `json:"uid"`
+	Pid     string `json:"pid"`
+	Message string `json:"message"`
 }
 
 type Like struct {
-	uid string `json:"uid"`
-	pid string `json:"pid"`
+	Uid string `json:"uid"`
+	Pid string `json:"pid"`
 }
 
 type Ban struct {
-	bannerId string `json:"bannerId"`
-	bannedId string `json:"bannedId"`
+	BannerId string `json:"bannerId"`
+	BannedId string `json:"bannedId"`
 }
 
 // AppDatabase is the high level interface for the DB
@@ -88,14 +85,17 @@ type AppDatabase interface {
 	CreateUser(username string) (*User, error)
 	GetUserId(username string) (string, error)
 	GetUsername(uid string) (string, error)
-	UpdateUsername(userid string, username string) (*User, error)
+	UpdateUsername(userid string, username string) error
 	GetMyStream(uid string) ([]*Photo, error)
-	// GetUserProfile(uid string) (*Profile, error)
+
+	// Profile
+	GetUserProfile(uid string) (*Profile, error)
 
 	// Photo
 	PostPhoto(p *Photo) (*Photo, error)
 	DeletePhoto(pid string) error
 	GetPhotos(uid string) ([]*Photo, error)
+	GetPhoto(pid string) (*Photo, error)
 	GetPhotoCount(uid string) (int, error)
 
 	// Like
@@ -103,11 +103,13 @@ type AppDatabase interface {
 	Unlike(pid string, uid string) error
 	CheckLike(pid string, uid string) (bool, error)
 	GetLikeCount(pid string) (int, error)
+	GetLikes(pid string) ([]Like, error)
 
 	// Ban
 	Ban(bannerId string, bannedId string) error
 	Unban(bannerId string, bannedId string) error
 	CheckBan(bannerId string, bannedId string) (bool, error)
+	GetBannedUsers(bannerId string) ([]string, error)
 
 	// Follow
 	Follow(followeeId string, followerId string) error
@@ -115,6 +117,8 @@ type AppDatabase interface {
 	CheckFollow(followeeId string, followerId string) (bool, error)
 	GetFollowersCount(uid string) (int, error)
 	GetFolloweesCount(uid string) (int, error)
+	GetFollowers(uid string) ([]string, error)
+	GetFollowees(uid string) ([]string, error)
 
 	// Comment
 	Comment(c *Comment) error

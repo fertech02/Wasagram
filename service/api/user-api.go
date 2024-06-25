@@ -28,7 +28,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 	username := requestData.Username
 
 	// check if the user exists
-	uid, err := rt.db.GetUserByUsername(username)
+	uid, err := rt.db.GetUserId(username)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError);
 		return
@@ -46,14 +46,14 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
-	nuid, err := rt.db.CreateUser(username)
+	nu, err := rt.db.CreateUser(username)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError);
 		return
 
 	}
 
-	response := map[string]string{"uid": nuid}
+	response := map[string]string{"uid": nu.Uid}
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(response)
 	if err != nil {
@@ -73,7 +73,7 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 	}
 
 	// Validate the token
-	isValid, err := rt.auth.validateToken(authHeader)
+	isValid, err := validateToken(authHeader)
 	if err != nil || !isValid {
 		w.WriteHeader(http.StatusUnauthorized);
 		return
@@ -83,7 +83,7 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 		Username string `json:"username"`
 	}
 
-	err := json.NewDecoder(r.Body).Decode(&requestData)
+	err = json.NewDecoder(r.Body).Decode(&requestData)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest);
 		return
@@ -95,14 +95,12 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 	}
 
 	username := requestData.Username
-
-	err = rt.db.SetUserName(ctx.UID(), username)
+	userId := ps.ByName("uid")
+	err = rt.db.UpdateUsername(userId, username)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError);
 		return
 	}
-
-	w.WriteHeader(http.StatusOK)
 
 }
 
@@ -116,9 +114,8 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	// Validate the token
-	isValid, err := rt.auth.validateToken(authHeader)
+	isValid, err := validateToken(authHeader)
 	if err != nil || !isValid {
-		ctx.Error(w, http.StatusUnauthorized, "invalid token")
 		w.WriteHeader(http.StatusUnauthorized);
 		return
 	}
@@ -139,7 +136,6 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
 }
 
 func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -152,13 +148,14 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	// Validate the token
-	isValid, err := rt.auth.validateToken(authHeader)
+	isValid, err := validateToken(authHeader)
 	if err != nil || !isValid {
 		w.WriteHeader(http.StatusUnauthorized);
 		return
 	}
 
-	photos, err := rt.db.GetMyStream(ctx.UID())
+	userId := ps.ByName("uid")
+	photos, err := rt.db.GetMyStream(userId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError);
 		return
@@ -171,5 +168,4 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
 }

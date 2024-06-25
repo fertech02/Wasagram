@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"io"
 	"net/http"
 	"os"
@@ -15,7 +16,7 @@ import (
 // Photo path
 const directory = "/tmp/photos"
 
-func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx *reqcontext.RequestContext) {
+func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	// Get the Authorization header
 	authHeader := r.Header.Get("Authorization")
@@ -25,31 +26,31 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	// Validate the Authorization header
-	uid, err := validateToken(authHeader)
+	_, err := validateToken(authHeader)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized);
 		return
 	}
 
-	// Get the file from the request
+	// Get the file path from the request
 	file, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest);
 		return
 	}
 
-	// Check if the file is empty
 	if len(file) == 0 {
 		w.WriteHeader(http.StatusBadRequest);
 		return
 	}
 
 	// Create a new photo
+	uid := ps.ByName("uid")
 	photo := database.Photo{
-		pid:  uuid.New().String(),
-		uid:  uid,
-		file: []byte,
-		date: time.Now(),
+		Pid:  uuid.New().String(),
+		Uid:  uid,
+		File: file,
+		Date: time.Now().Format("2006-01-02 15:04:05"),
 	}
 
 	// Post the photo
@@ -60,7 +61,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	// Save Photo
-	err = rt.savePhoto(file, photo.pid)
+	err = rt.savePhoto(file, photo.Pid)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError);
 		return
@@ -98,7 +99,7 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	// Validate the Authorization header
-	uid, err := validateToken(authHeader)
+	_, err := validateToken(authHeader)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized);
 		return
@@ -125,7 +126,8 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	// Check if the user is the owner of the photo
-	if photo.uid != uid {
+	uid := ps.ByName("uid")
+	if photo.Uid != uid {
 		w.WriteHeader(http.StatusForbidden);
 		return
 	}
@@ -170,6 +172,11 @@ func (rt *_router) getPhotos(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 
-	// get photo from filesystem
+	// Return the photos
+	err = json.NewEncoder(w).Encode(photos)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError);
+		return
+	}
 
 }

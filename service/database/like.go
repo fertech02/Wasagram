@@ -3,14 +3,14 @@ package database
 // Like a Photo
 func (db *appdbimpl) Like(pid string, uid string) error {
 
-	_, err := db.c.Exec("INSERT INTO Likes (uid, pid) VALUES ($1, $2)", uid, pid)
+	_, err := db.c.Exec("INSERT INTO Likes (Uid, Pid) VALUES ($1, $2)", uid, pid)
 	return err
 }
 
 // Unlike a Photo
 func (db *appdbimpl) Unlike(pid string, uid string) error {
 
-	_, err := db.c.Exec("DELETE FROM Likes WHERE uid = $1 AND pid = $2", uid, pid)
+	_, err := db.c.Exec("DELETE FROM Likes WHERE Uid = $1 AND Pid = $2", uid, pid)
 	return err
 }
 
@@ -18,7 +18,7 @@ func (db *appdbimpl) Unlike(pid string, uid string) error {
 func (db *appdbimpl) CheckLike(pid string, uid string) (bool, error) {
 
 	var count int
-	err := db.c.QueryRow("SELECT COUNT(*) FROM Likes WHERE uid = $1 AND pid = $2", uid, pid).Scan(&count)
+	err := db.c.QueryRow("SELECT COUNT(*) FROM Likes WHERE Uid = $1 AND Pid = $2", uid, pid).Scan(&count)
 	if err != nil {
 		return false, err
 	}
@@ -36,4 +36,26 @@ func (db *appdbimpl) GetLikeCount(pid string) (int, error) {
 	}
 
 	return count, nil
+}
+
+// Get Likes
+func (db *appdbimpl) GetLikes(pid string) ([]Like, error) {
+
+	rows, err := db.c.Query("SELECT Uid FROM Likes WHERE Pid = $1", pid)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	likes := []Like{}
+	for rows.Next() {
+		var like Like
+		err := rows.Scan(&like.Uid)
+		if err != nil {
+			return nil, err
+		}
+		likes = append(likes, like)
+	}
+
+	return likes, nil
 }

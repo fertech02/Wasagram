@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/fertech02/Wasa-repository/service/api/reqcontext"
@@ -85,4 +86,41 @@ func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprout
 }
 
 
-// Get Ban
+// Get Banned users
+func (rt *_router) getBannedUsers(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+
+	// Get the bannerId
+	bannerId := ps.ByName("bannerId")
+	if bannerId == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// Get the Authorization header
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	// Validate the token
+	isValid, err := validateToken(authHeader)
+	if err != nil || !isValid {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	// Get the banned users
+	bannedUsers, err := rt.db.GetBannedUsers(bannerId)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	// Return the banned users
+	err = json.NewEncoder(w).Encode(bannedUsers)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
