@@ -153,12 +153,12 @@ func New(db *sql.DB) (AppDatabase, error) {
 	if errors.Is(err, sql.ErrNoRows) {
 		sqlStmt := `CREATE TABLE Photos (
 
-				pid TEXT PRIMARY KEY,
-				uid TEXT NOT NULL,
-				file BLOB NOT NULL,
-				date TEXT NOT NULL
+				Pid TEXT PRIMARY KEY,
+				Uid TEXT NOT NULL,
+				File BLOB NOT NULL,
+				Date TEXT NOT NULL
 
-				FOREIGN KEY (uid) REFERENCES Users(uid) ON DELETE CASCADE
+				FOREIGN KEY (Uid) REFERENCES Users(Uid) ON DELETE CASCADE
 					
 		); `
 		_, err = db.Exec(sqlStmt)
@@ -172,8 +172,8 @@ func New(db *sql.DB) (AppDatabase, error) {
 	if errors.Is(err, sql.ErrNoRows) {
 		sqlStmt := `CREATE TABLE Users (
 
-				uid TEXT PRIMARY KEY,
-				username TEXT NOT NULL
+				Uid TEXT PRIMARY KEY,
+				Username TEXT NOT NULL
 
 		); `
 		_, err = db.Exec(sqlStmt)
@@ -187,13 +187,13 @@ func New(db *sql.DB) (AppDatabase, error) {
 	if errors.Is(err, sql.ErrNoRows) {
 		sqlStmt := `CREATE TABLE Comments (
 
-				pid TEXT NOT NULL,
-				uid TEXT NOT NULL,
-				message TEXT NOT NULL
+				Pid TEXT NOT NULL,
+				Uid TEXT NOT NULL,
+				Message TEXT NOT NULL
 
-				PRIMARY KEY (pid, uid)
-				FOREIGN KEY (pid) REFERENCES Photos(pid) ON DELETE CASCADE
-				FOREIGN KEY (uid) REFERENCES Users(uid) ON DELETE CASCADE
+				PRIMARY KEY (Pid, Uid)
+				FOREIGN KEY (Pid) REFERENCES Photos(Pid) ON DELETE CASCADE
+				FOREIGN KEY (Uid) REFERENCES Users(Uid) ON DELETE CASCADE
 
 		); `
 		_, err = db.Exec(sqlStmt)
@@ -207,12 +207,12 @@ func New(db *sql.DB) (AppDatabase, error) {
 	if errors.Is(err, sql.ErrNoRows) {
 		sqlStmt := `CREATE TABLE Likes (
 
-				pid TEXT NOT NULL,
-				uid TEXT NOT NULL
+				Pid TEXT NOT NULL,
+				Uid TEXT NOT NULL
 
-				PRIMARY KEY (pid, uid)
-				FOREIGN KEY (pid) REFERENCES Photos(pid) ON DELETE CASCADE
-				FOREIGN KEY (uid) REFERENCES Users(uid) ON DELETE CASCADE
+				PRIMARY KEY (Pid, Uid)
+				FOREIGN KEY (Pid) REFERENCES Photos(Pid) ON DELETE CASCADE
+				FOREIGN KEY (Uid) REFERENCES Users(Uid) ON DELETE CASCADE
 
 		); `
 		_, err = db.Exec(sqlStmt)
@@ -226,12 +226,12 @@ func New(db *sql.DB) (AppDatabase, error) {
 	if errors.Is(err, sql.ErrNoRows) {
 		sqlStmt := `CREATE TABLE Follows (
 
-				followeeId TEXT NOT NULL,
-				followerId TEXT NOT NULL
+				FolloweeId TEXT NOT NULL,
+				FollowerId TEXT NOT NULL
 
-				PRIMARY KEY (followeeId, followerId)
-				FOREIGN KEY (followeeId) REFERENCES Users(uid) ON DELETE CASCADE
-				FOREIGN KEY (followerId) REFERENCES Users(uid) ON DELETE CASCADE
+				PRIMARY KEY (FolloweeId, FollowerId)
+				FOREIGN KEY (FolloweeId) REFERENCES Users(Uid) ON DELETE CASCADE
+				FOREIGN KEY (FollowerId) REFERENCES Users(Uid) ON DELETE CASCADE
 
 		); `
 		_, err = db.Exec(sqlStmt)
@@ -245,12 +245,12 @@ func New(db *sql.DB) (AppDatabase, error) {
 	if errors.Is(err, sql.ErrNoRows) {
 		sqlStmt := `CREATE TABLE Bans (
 
-				bannerId TEXT NOT NULL,
-				bannedId TEXT NOT NULL
+				BannerId TEXT NOT NULL,
+				BannedId TEXT NOT NULL
 
-				PRIMARY KEY (bannerId, bannedId)
-				FOREIGN KEY (bannerId) REFERENCES Users(uid) ON DELETE CASCADE
-				FOREIGN KEY (bannedId) REFERENCES Users(uid) ON DELETE CASCADE
+				PRIMARY KEY (BannerId, BannedId)
+				FOREIGN KEY (BannerId) REFERENCES Users(Uid) ON DELETE CASCADE
+				FOREIGN KEY (BannedId) REFERENCES Users(Uid) ON DELETE CASCADE
 			
 		); `
 		_, err = db.Exec(sqlStmt)

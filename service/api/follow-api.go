@@ -86,8 +86,7 @@ func (rt *_router) getFollowers(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 	}
 
-	// Get the followers from the db
-	// -- DA VEDERE 
+	// Get the followers from the db 
 	followers, err := rt.db.GetFollowers(uid)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError);

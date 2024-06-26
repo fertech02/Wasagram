@@ -114,7 +114,6 @@ func (rt *_router) checkLike(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	// Check if user liked the photo
-	// -- DA VEDERE
 	_, err = rt.db.CheckLike(pid, uid)
 	if err != nil {
 		ctx.Logger.WithField("error", err).Error("Failed to check if user liked the photo")
