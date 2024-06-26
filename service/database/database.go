@@ -156,7 +156,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 				Pid TEXT PRIMARY KEY,
 				Uid TEXT NOT NULL,
 				File BLOB NOT NULL,
-				Date TEXT NOT NULL
+				Date TEXT NOT NULL,
 
 				FOREIGN KEY (Uid) REFERENCES Users(Uid) ON DELETE CASCADE
 					
@@ -189,10 +189,10 @@ func New(db *sql.DB) (AppDatabase, error) {
 
 				Pid TEXT NOT NULL,
 				Uid TEXT NOT NULL,
-				Message TEXT NOT NULL
+				Message TEXT NOT NULL,
 
-				PRIMARY KEY (Pid, Uid)
-				FOREIGN KEY (Pid) REFERENCES Photos(Pid) ON DELETE CASCADE
+				PRIMARY KEY (Pid, Uid),
+				FOREIGN KEY (Pid) REFERENCES Photos(Pid) ON DELETE CASCADE,
 				FOREIGN KEY (Uid) REFERENCES Users(Uid) ON DELETE CASCADE
 
 		); `
@@ -208,10 +208,10 @@ func New(db *sql.DB) (AppDatabase, error) {
 		sqlStmt := `CREATE TABLE Likes (
 
 				Pid TEXT NOT NULL,
-				Uid TEXT NOT NULL
+				Uid TEXT NOT NULL,
 
-				PRIMARY KEY (Pid, Uid)
-				FOREIGN KEY (Pid) REFERENCES Photos(Pid) ON DELETE CASCADE
+				PRIMARY KEY (Pid, Uid),
+				FOREIGN KEY (Pid) REFERENCES Photos(Pid) ON DELETE CASCADE,
 				FOREIGN KEY (Uid) REFERENCES Users(Uid) ON DELETE CASCADE
 
 		); `
@@ -227,10 +227,10 @@ func New(db *sql.DB) (AppDatabase, error) {
 		sqlStmt := `CREATE TABLE Follows (
 
 				FolloweeId TEXT NOT NULL,
-				FollowerId TEXT NOT NULL
+				FollowerId TEXT NOT NULL,
 
-				PRIMARY KEY (FolloweeId, FollowerId)
-				FOREIGN KEY (FolloweeId) REFERENCES Users(Uid) ON DELETE CASCADE
+				PRIMARY KEY (FolloweeId, FollowerId),
+				FOREIGN KEY (FolloweeId) REFERENCES Users(Uid) ON DELETE CASCADE,
 				FOREIGN KEY (FollowerId) REFERENCES Users(Uid) ON DELETE CASCADE
 
 		); `
@@ -246,10 +246,10 @@ func New(db *sql.DB) (AppDatabase, error) {
 		sqlStmt := `CREATE TABLE Bans (
 
 				BannerId TEXT NOT NULL,
-				BannedId TEXT NOT NULL
+				BannedId TEXT NOT NULL,
 
-				PRIMARY KEY (BannerId, BannedId)
-				FOREIGN KEY (BannerId) REFERENCES Users(Uid) ON DELETE CASCADE
+				PRIMARY KEY (BannerId, BannedId),
+				FOREIGN KEY (BannerId) REFERENCES Users(Uid) ON DELETE CASCADE,
 				FOREIGN KEY (BannedId) REFERENCES Users(Uid) ON DELETE CASCADE
 			
 		); `
