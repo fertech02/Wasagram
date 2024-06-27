@@ -14,21 +14,21 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	var comment db.Comment
 	err := json.NewDecoder(r.Body).Decode(&comment)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest);
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	// get the photo id from the request params
 	photoId := ps.ByName("pid")
 	if photoId == "" {
-		w.WriteHeader(http.StatusBadRequest);
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	// get the user id from the request params
 	userId := ps.ByName("uid")
 	if userId == "" {
-		w.WriteHeader(http.StatusBadRequest);
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -36,13 +36,13 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	comment.Uid = userId
 
 	// get the message from the request body
-	var message struct {	
+	var message struct {
 		Message string `json:"message"`
 	}
 
 	err = json.NewDecoder(r.Body).Decode(&message)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest);
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -51,7 +51,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	// Add the comment in the db
 	err = rt.db.Comment(&comment)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError);
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 }
@@ -61,14 +61,14 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 	// get the photo id from the request params
 	pid := ps.ByName("pid")
 	if pid == "" {
-		w.WriteHeader(http.StatusBadRequest);
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	// get the user id from the request params
 	uid := ps.ByName("uid")
 	if uid == "" {
-		w.WriteHeader(http.StatusBadRequest);
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -84,11 +84,10 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-
 	// Delete the comment from the db
 	err = rt.db.Uncomment(pid, uid)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError);
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 }
@@ -98,21 +97,21 @@ func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httpro
 	// get the photo id from the request params
 	pid := ps.ByName("pid")
 	if pid == "" {
-		w.WriteHeader(http.StatusBadRequest);
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	// Get the comments from the db
 	comments, err := rt.db.GetComments(pid)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError);
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	// Return the comments
 	err = json.NewEncoder(w).Encode(comments)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError);
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 }

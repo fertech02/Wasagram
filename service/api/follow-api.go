@@ -9,16 +9,16 @@ import (
 )
 
 func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	
-	followeeId:= ps.ByName("followeeId")
+
+	followeeId := ps.ByName("followeeId")
 	if followeeId == "" {
-		w.WriteHeader(http.StatusBadRequest);
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	followerId := ps.ByName("followerId")
 	if followerId == "" {
-		w.WriteHeader(http.StatusBadRequest);
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -34,11 +34,10 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	}
 
-
 	// Follow the user
 	err = rt.db.Follow(followeeId, followerId)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError);
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 }
@@ -47,13 +46,13 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 
 	followeeId := ps.ByName("followeeId")
 	if followeeId == "" {
-		w.WriteHeader(http.StatusBadRequest);
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	followerId := ps.ByName("followerId")
 	if followerId == "" {
-		w.WriteHeader(http.StatusBadRequest);
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -69,15 +68,15 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 	}
 
-
 	// Unfollow the user
 	err = rt.db.Unfollow(followeeId, followerId)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError);
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 }
 
+/*
 func (rt *_router) getFollowers(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	uid := ps.ByName("uid")
@@ -86,7 +85,7 @@ func (rt *_router) getFollowers(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 	}
 
-	// Get the followers from the db 
+	// Get the followers from the db
 	followers, err := rt.db.GetFollowers(uid)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError);
@@ -100,27 +99,28 @@ func (rt *_router) getFollowers(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 	}
 }
+*/
 
-func (rt *_router) getFollowees(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) getFollowedUsers(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	uid := ps.ByName("uid")
 	if uid == "" {
-		w.WriteHeader(http.StatusBadRequest);
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	// Get the followees from the db
-	// -- DA VEDERE 
+	// -- DA VEDERE
 	followees, err := rt.db.GetFollowees(uid)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError);
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	// Return the followees
 	err = json.NewEncoder(w).Encode(followees)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError);
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 }

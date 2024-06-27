@@ -85,7 +85,6 @@ func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprout
 	w.WriteHeader(http.StatusOK)
 }
 
-
 // Get Banned users
 func (rt *_router) getBannedUsers(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 

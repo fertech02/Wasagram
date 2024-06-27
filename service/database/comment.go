@@ -34,7 +34,7 @@ func (db *appdbimpl) GetComments(pid string) ([]Comment, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	
+
 	var comments []Comment
 	for rows.Next() {
 		var c Comment

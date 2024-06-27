@@ -57,7 +57,7 @@ func (db *appdbimpl) GetPhotos(uid string) ([]*Photo, error) {
 	query := "SELECT * FROM Photos WHERE Uid = $1"
 	rows, err := db.c.Query(query, uid)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	photos := []*Photo{}
@@ -65,7 +65,7 @@ func (db *appdbimpl) GetPhotos(uid string) ([]*Photo, error) {
 		var p Photo
 		err = rows.Scan(&p.Pid, &p.Uid, &p.File, &p.Date)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 		photos = append(photos, &p)
 	}
@@ -79,14 +79,14 @@ func (db *appdbimpl) GetPhotoCount(uid string) (int, error) {
 	query := "SELECT COUNT(*) FROM Photos WHERE Uid = $1"
 	rows, err := db.c.Query(query, uid)
 	if err != nil {
-		panic(err)
+		return 0, err
 	}
 
 	var count int
 	for rows.Next() {
 		err = rows.Scan(&count)
 		if err != nil {
-			panic(err)
+			return 0, err
 		}
 	}
 

@@ -223,7 +223,7 @@ paths:
             application/json:
               schema:
                 type: object
-                description: List of  s
+                description: List of Comments
                 properties:
                   comments:
                     type: array

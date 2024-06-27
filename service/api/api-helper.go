@@ -8,7 +8,6 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-
 var mySigningKey = []byte("your-secret-key")
 
 func validateToken(tokenString string) (bool, error) {

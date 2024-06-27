@@ -67,7 +67,7 @@ func (db *appdbimpl) GetFolloweesCount(uid string) (int, error) {
 
 // GetFollowers
 func (db *appdbimpl) GetFollowers(uid string) ([]string, error) {
-	
+
 	var followers []string
 	rows, err := db.c.Query("SELECT FollowerId FROM Follow WHERE FolloweeId = ?", uid)
 	if err != nil {
@@ -89,7 +89,7 @@ func (db *appdbimpl) GetFollowers(uid string) ([]string, error) {
 
 // GetFollowees
 func (db *appdbimpl) GetFollowees(uid string) ([]string, error) {
-	
+
 	var followees []string
 	rows, err := db.c.Query("SELECT FolloweeId FROM Follow WHERE FollowerId = ?", uid)
 	if err != nil {

@@ -17,7 +17,7 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	
+
 	// Parse the user id from the request
 	uid := ps.ByName("uid")
 	if uid == "" {
@@ -42,7 +42,7 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 	err = rt.db.Like(uid, pid)
 	if err != nil {
 		ctx.Logger.WithField("error", err).Error("Failed to like photo")
-		w.WriteHeader(http.StatusInternalServerError);
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
@@ -53,14 +53,14 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	// Parse the photo id from the request
 	pid := ps.ByName("pid")
 	if pid != "" {
-		w.WriteHeader(http.StatusBadRequest);
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	// Parse the user id from the request
 	uid := ps.ByName("uid")
 	if uid != "" {
-		w.WriteHeader(http.StatusBadRequest);
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -79,12 +79,13 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	// Unlike the photo
 	err = rt.db.Unlike(pid, uid)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError);
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 }
 
+/*
 func (rt *_router) checkLike(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	// Parse the photo id from the request
@@ -122,7 +123,7 @@ func (rt *_router) checkLike(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 }
-
+*/
 
 // Get Likes
 func (rt *_router) getLikes(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -130,14 +131,14 @@ func (rt *_router) getLikes(w http.ResponseWriter, r *http.Request, ps httproute
 	// Parse the photo id from the request
 	pid := ps.ByName("pid")
 	if pid != "" {
-		w.WriteHeader(http.StatusBadRequest);
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	// Parse the user id from the request
 	uid := ps.ByName("uid")
 	if uid != "" {
-		w.WriteHeader(http.StatusBadRequest);
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -164,7 +165,7 @@ func (rt *_router) getLikes(w http.ResponseWriter, r *http.Request, ps httproute
 	// Return the likes
 	err = json.NewEncoder(w).Encode(likes)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError);
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
