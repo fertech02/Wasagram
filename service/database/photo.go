@@ -19,9 +19,9 @@ func (db *appdbimpl) DeletePhoto(pid string) error {
 		return err
 	}
 
-	_, er := db.c.Exec("DELETE FROM Comments WHERE Pid=?", pid)
+	_, err = db.c.Exec("DELETE FROM Comments WHERE Pid=?", pid)
 	if err != nil {
-		return er
+		return err
 	}
 
 	query := "DELETE FROM Photos WHERE Pid = $1"
