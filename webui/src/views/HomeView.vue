@@ -1,56 +1,105 @@
 <script>
+import CommentModal from '../components/CommentModal.vue'
+import SuccessMsg from '../components/SuccessMsg.vue'
+
 export default {
-	data: function() {
-		return {
-			errormsg: null,
-			loading: false,
-			some_data: null,
-		}
-	},
-	methods: {
-		async refresh() {
-			this.loading = true;
-			this.errormsg = null;
-			try {
-				let response = await this.$axios.get("/");
-				this.some_data = response.data;
-			} catch (e) {
-				this.errormsg = e.toString();
-			}
-			this.loading = false;
-		},
-	},
-	mounted() {
-		this.refresh()
-	}
+    components: {
+        CommentModal,
+        SuccessMsg
+    },
+    data: function() {
+        return {
+            errorMsg: null,
+            successMsg: null,
+            token: localStorage.getItem('token'),
+            username: localStorage.getItem('username'),
+            loading: false,
+
+            // Comments
+            PhotoComments : {
+                Uid : '',
+                Pid : '',
+                comments : [
+                    {
+                        Uid : '',
+                        Pid : '',
+                        comment : '',
+                    }
+                ],
+            },
+            comment: '',
+
+            // Stream
+            Stream: {
+
+            },
+
+            // Like
+            Like: {
+
+            },
+
+            // Profile
+            Profile: {
+
+            },
+
+            // Get User by Username
+            getUser: ''
+        }
+    },
+    methods: {
+
+        async uploadPhoto() {
+        },
+        async submitPhoto() {
+        },
+        async searchUser() {
+        },
+        async openLog(Uid, Pid) {
+
+        },
+        async refresh() {
+            this.getMyStream()
+        },
+        async getMyStream() {
+        },
+        async getUser() {
+        },
+        async getUserProfile() {
+        },
+        async commentPhoto() {
+        },
+        async likePhoto() {
+        },
+        async unlikePhoto() {
+        },
+        async Logout() {
+        },
+    },
+    mounted() {
+        this.getMyStream()
+    }
 }
 </script>
 
 <template>
-	<div>
-		<div
-			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-			<h1 class="h2">Home page</h1>
-			<div class="btn-toolbar mb-2 mb-md-0">
-				<div class="btn-group me-2">
-					<button type="button" class="btn btn-sm btn-outline-secondary" @click="refresh">
-						Refresh
-					</button>
-					<button type="button" class="btn btn-sm btn-outline-secondary" @click="exportList">
-						Export
-					</button>
-				</div>
-				<div class="btn-group me-2">
-					<button type="button" class="btn btn-sm btn-outline-primary" @click="newItem">
-						New
-					</button>
-				</div>
-			</div>
-		</div>
-
-		<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
-	</div>
+    <div>
+        <b-container>
+            <b-row>
+                <b-col>
+                    <b-card-group deck>
+                        <b-card v-for="log in logs" :key="log.photoId" :title="log.photoId" img-src="https://picsum.photos/600/300/?image=25" img-alt="Image" img-top>
+                            <b-card-text>
+                                {{ log.comment }}
+                            </b-card-text>
+                            <b-button @click="openLog(log)" variant="primary">View</b-button>
+                        </b-card>
+                    </b-card-group>
+                </b-col>
+            </b-row>
+        </b-container>
+        <CommentModal :log="selectedLog" :token="token" @uncomment="refresh" />
+        <SuccessMsg :message="successMsg" />
+    </div>
 </template>
-
-<style>
-</style>

@@ -2,7 +2,18 @@
 import { RouterLink, RouterView } from 'vue-router'
 </script>
 <script>
-export default {}
+export default {
+
+	data: function() {
+		return {
+			errormsg: null,
+		}
+	},
+	methods: {
+		async doLogin() {
+		}
+	},
+}
 </script>
 
 <template>
@@ -64,4 +75,8 @@ export default {}
 </template>
 
 <style>
+	.background {
+		background-color: #f8f9fa;
+		height: 100vh;
+	}
 </style>
