@@ -290,7 +290,7 @@ paths:
                 $ref: '#/components/schemas/Profile'
         "404": { $ref: "#/components/responses/NotFoundError" }
 
-  /user/{uid}/username:
+  /users/{uid}/username:
     parameters:
       - $ref: "#/components/parameters/user_id"
     put:
@@ -328,7 +328,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFoundError" }
         "500": { $ref: "#/components/responses/InternalServerError" }
   
-  /user/{uid}/follow:
+  /users/{uid}/follow:
     parameters:
       - $ref: "#/components/parameters/user_id"
     get:
@@ -358,7 +358,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFoundError" }
         "500": { $ref: "#/components/responses/InternalServerError" }
   
-  /user/{uid}/follow/{fid}:
+  /users/{uid}/follow/{fid}:
     parameters:
       - $ref: "#/components/parameters/user_id"
       - $ref: "#/components/parameters/follow_id"
@@ -393,7 +393,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFoundError" }
         "500": { $ref: "#/components/responses/InternalServerError" }
   
-  /user/{uid}/ban:
+  /users/{uid}/ban:
     parameters:
       - $ref: "#/components/parameters/user_id"
     get:
@@ -458,7 +458,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFoundError" }
         "500": { $ref: "#/components/responses/InternalServerError" }
   
-  /user/{uid}/stream:
+  /users/{uid}/stream:
     parameters:
       - $ref: "#/components/parameters/user_id"
     get:
@@ -488,7 +488,9 @@ paths:
         "500": { $ref: "#/components/responses/InternalServerError" }
      
 components:
+
   schemas:
+
     Photo:
       type: object
       description: Photo
@@ -500,9 +502,13 @@ components:
         user_id:
           type: string
           description: The user's identifier
-        url:
+          example: "abcdef012345"
+        file:
+          description: The photo's file
           type: string
-          description: The photo's URL
+          format: binary
+          minLength: 3
+          maxLength: 16
         date:
           type: string
           description: The photo's date

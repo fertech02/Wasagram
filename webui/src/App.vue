@@ -1,18 +1,22 @@
-<script setup>
-import { RouterLink, RouterView } from 'vue-router'
-</script>
-<script>
-export default {
 
-	data: function() {
+<script>
+const token = sessionStorage.getItem('authToken');
+import { RouterLink, RouterView } from 'vue-router'
+export default {
+	data() {
 		return {
-			errormsg: null,
+			mypath: "/users/" + token,
+			streampath: "/users/" + token + "/stream/",
 		}
 	},
 	methods: {
-		async doLogin() {
-		}
+		logout() {
+			localStorage.clear();
+			sessionStorage.clear();
+			location.reload();
+		},
 	},
+
 }
 </script>
 
