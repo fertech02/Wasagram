@@ -53,8 +53,12 @@ func (db *appdbimpl) GetMyStream(uid string) ([]*Photo, error) {
 		}
 		strm = append(strm, &p)
 	}
-	return strm, nil
 
+	if err = rows.Err(); err != nil {
+		return strm, err
+	}
+
+	return strm, nil
 }
 
 // Get User Id

@@ -302,6 +302,7 @@ export default {
                 </div>
             </div>
         </div>
+        <success-msg ref="successMsg" :successMsg="successMsg"></success-msg>
         <comment-modal ref="commentModal" :comments="Comments.comments" @comment="commentPhoto"></comment-modal>
     </div>
 </template>

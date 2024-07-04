@@ -70,6 +70,10 @@ func (db *appdbimpl) GetPhotos(uid string) ([]*Photo, error) {
 		photos = append(photos, &p)
 	}
 
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
 	return photos, nil
 }
 
@@ -88,6 +92,10 @@ func (db *appdbimpl) GetPhotoCount(uid string) (int, error) {
 		if err != nil {
 			return 0, err
 		}
+	}
+
+	if err = rows.Err(); err != nil {
+		return 0, err
 	}
 
 	return count, nil

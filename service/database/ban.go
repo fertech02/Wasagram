@@ -53,5 +53,9 @@ func (db *appdbimpl) GetBannedUsers(bannerId string) ([]string, error) {
 		bannedUsers = append(bannedUsers, bannedId)
 	}
 
+	if err = rows.Err(); err != nil {
+		return bannedUsers, err
+	}
+
 	return bannedUsers, nil
 }

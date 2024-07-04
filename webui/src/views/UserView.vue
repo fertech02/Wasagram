@@ -285,7 +285,7 @@ export default {
                 </div>
                 <div class="col-md-8">
                     <div class="row">
-                        <div class="col-md-4" v-for="photo in Photos.photos">
+                        <div class="col-md-4" v-for="photo in Photos.photos" :key="photo.Pid">
                             <div class="card">
                                 <img :src="'/photos/' + photo.Pid + '/file'" class="card-img-top" alt="...">
                                 <div class="card-body">

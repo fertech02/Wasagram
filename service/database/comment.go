@@ -45,5 +45,9 @@ func (db *appdbimpl) GetComments(pid string) ([]Comment, error) {
 		comments = append(comments, c)
 	}
 
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
 	return comments, nil
 }

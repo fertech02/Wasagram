@@ -57,5 +57,9 @@ func (db *appdbimpl) GetLikes(pid string) ([]Like, error) {
 		likes = append(likes, like)
 	}
 
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
 	return likes, nil
 }
