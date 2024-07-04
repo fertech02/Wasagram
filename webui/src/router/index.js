@@ -12,7 +12,6 @@ const router = createRouter({
 		{path: '/session', component: HomeView},
 		{path: '/users/:uid/profile', component: ProfileView},
 		{path: '/users/:uid/userview', component: UserView},
-		{path: '/:catchAll(.*)', component: ErrorView}
 	]
 })
 
