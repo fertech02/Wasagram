@@ -246,7 +246,7 @@ export default {
                             ">Photos</h5>
                             <div class="row">
                                 <div class="col-md-4" v-for="photo in Photos.photos" :key="photo.Pid">
-                                    <img :src="'http://localhost:3000/photos/' + photo.File" class="img-fluid" alt="Responsive image">
+                                    <img :src="photo.File" class="img-fluid" alt="Responsive image">
                                     <button class="btn btn-primary" @click="deletePhoto(photo.Pid)">Delete</button>
                                     <button class="btn btn-primary" @click="openComments(photo.Pid)">Comments</button>
                                     <button class="btn btn-primary" @click="likePhoto(photo.Pid, Uid)">Like</button>
