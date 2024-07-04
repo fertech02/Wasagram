@@ -7,7 +7,7 @@
                 <input type="text" id="username" v-model="username"  required minlength="3" maxlength="16" style="padding: 8px;"/>
                 <button type="submit" class="btn btn-sm btn-outline-primary" style="padding: 8px; float: right; font-size: large;" >Login <svg class="feather"> <use href="/feather-sprite-v4.29.0.svg#key" /></svg></button>
             </form>
-            <div v-if="identifier" != null>
+            <div v-if="identifier != null">
                 <p>Logged in as: {{identifier}}</p>
             </div>
         </div>
