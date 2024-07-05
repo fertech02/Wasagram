@@ -21,44 +21,31 @@ export default {
             username: '',
             identifier: '',
             loading: false,
-            errormsg: null
+            errormsg: null,
+
         }
     },
     methods: {
         async doLogin() {
             this.loading = true;
             this.errormsg = null;
-            if (this.username == '') {
-                this.$toast.error('Username cannot be empty');
-                this.loading = false;
-                return;
-            } else {
-                try {
-                    let response = await this.$axios.post('/session', {username: this.username}, {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        }
-                    });
-                    this.identifier = response.data;    
-                    localStorage.setItem('identifier', this.identifier);
-                    localStorage.setItem('username', this.username);
-                    this.$router.push({path : '/session'});
-                    
-                } catch (error) {
-                    if (error.response && error.response.status == 400) {
-                        this.$toast.error('Invalid username or password');
-                    } else {
-                        this.$toast.error('An error occurred');
-                    }
-                    if (error.response && error.response.status == 500) {
-                        this.$toast.error('Internal Error Occurred'); 
-                    } else {
-                        this.$toast.error('An error occurred');
-                    }
-                }
-            }
-        }
+
+            try {
+                let response = await this.$axios.post("/session/", {username: this.username},{
+                    headers: {
+                        'Accept' : 'application/json',
+                        'Content-Type' : 'application/json'
+                    },
+                });
+                this.identifier = response.data.identifier;
+                localStorage.setItem("token", this.identifier);
+                localStorage.setItem("username", this.username);
+                this.$router.push({path: '/session'});
+            } catch (error) {
+                this.errormsg = error.response.data.message;
+            } 
+            this.loading = false;
+        },
     }
 }
 </script>
