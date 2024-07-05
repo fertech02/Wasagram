@@ -117,6 +117,6 @@ func (db *appdbimpl) GetFollowees(uid string) ([]string, error) {
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
-	
+
 	return followees, nil
 }
