@@ -121,7 +121,7 @@ export default {
         
         async banUser(bannerId, bannedId){
             try {
-                let response = await this.$axios.post("/users/" + bannerId + "/ban/" + bannedId, {
+                let response = await this.$axios.put("/users/" + bannerId + "/ban/" + bannedId, {
                     headers: {
                         Authorization: "Bearer " + this.token
                     }
@@ -152,9 +152,24 @@ export default {
             }
         },
 
+        async getBannedUsers(){
+            try {
+                let response = await this.$axios.get("/users/" + this.$route.params.Uid + "/ban", {
+                    headers: {
+                        Authorization: "Bearer " + this.token
+                    }
+                })
+                this.ban = response.data
+            } catch (error) {
+                if (error.response) {
+                    this.errorMsg = error.response.data.message
+                }
+            }
+        },
+
         async followUser(followeeId, followerId){
             try {
-                let response = await this.$axios.post("/users/" + followeeId + "/follow/" + followerId, {
+                let response = await this.$axios.put("/users/" + followeeId + "/follow/" + followerId, {
                     headers: {
                         Authorization: "Bearer " + this.token
                     }
@@ -209,6 +224,22 @@ export default {
             }
         },
 
+        async uncommentPhoto(Pid, Uid) {
+            try {
+                let response = await this.$axios.delete("/photos/" + Pid + "/comments/" + Uid, {
+                    headers: {
+                        Authorization: "Bearer " + this.token
+                    }
+                })
+                this.clear = response.data
+                this.refresh()
+            } catch (error) {
+            if (error.response) {
+                this.errorMsg = error.response.data.message
+                }
+            }
+        },
+
         async openComments(){
             try {
                 let response = await this.$axios.get("/photos/" + Pid + "/comments", {
@@ -257,6 +288,21 @@ export default {
                 }
             }
         },
+
+        async getLikes(){
+            try {
+                let response = await this.$axios.get("/photos/" + this.$route.params.Pid + "/likes", {
+                    headers: {
+                        Authorization: "Bearer " + this.token
+                    }
+                })
+                this.likes = response.data
+            } catch (error) {
+                if (error.response) {
+                    this.errorMsg = error.response.data.message
+                }
+            }
+        }
     }
 
 };

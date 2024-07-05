@@ -188,7 +188,7 @@ export default {
 
         async likePhoto(Pid, Uid) {
             try {
-                let response = await this.$axios.post("/photos/" + Pid + "/likes/" + Uid, {
+                let response = await this.$axios.put("/photos/" + Pid + "/likes/" + Uid, {
                     headers: {
                         Authorization: "Bearer " + this.token
                     }
@@ -211,6 +211,21 @@ export default {
                 })
                 this.clear = response.data
                 this.refresh()
+            } catch (error) {
+                if (error.response) {
+                    this.errorMsg = error.response.data.message
+                }
+            }
+        },
+
+        async getLikes(){
+            try {
+                let response = await this.$axios.get("/photos/" + this.$route.params.Pid + "/likes", {
+                    headers: {
+                        Authorization: "Bearer " + this.token
+                    }
+                })
+                this.likes = response.data
             } catch (error) {
                 if (error.response) {
                     this.errorMsg = error.response.data.message

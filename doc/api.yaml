@@ -23,7 +23,6 @@ info:
   version: 1.0.0
 
 paths:
-
   /session:
     post:
       tags: ["Login"]

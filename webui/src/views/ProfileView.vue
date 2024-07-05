@@ -172,7 +172,7 @@ export default {
 
         async likePhoto(Pid, Uid){
             try {
-                let response = await this.$axios.post("/photos/" + Pid + "/likes/" + Uid, {
+                let response = await this.$axios.put("/photos/" + Pid + "/likes/" + Uid, {
                     headers: {
                         Authorization: "Bearer " + this.token
                     }
@@ -202,6 +202,21 @@ export default {
             }
         },
 
+        async getLikes(){
+            try {
+                let response = await this.$axios.get("/photos/" + this.$route.params.Pid + "/likes", {
+                    headers: {
+                        Authorization: "Bearer " + this.token
+                    }
+                })
+                this.likes = response.data
+            } catch (error) {
+                if (error.response) {
+                    this.errorMsg = error.response.data.message
+                }
+            }
+        },
+        
         async getFollowedUsers(){
             try {
                 let response = await this.$axios.get("/users/" + this.Uid + "/follow", {
@@ -217,7 +232,6 @@ export default {
             }
         },
 
-        // async getFollowers(){}
     }, 
 }
 </script>
