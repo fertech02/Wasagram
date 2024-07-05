@@ -31,7 +31,7 @@ export default {
             this.errormsg = null;
 
             try {
-                let response = await this.$axios.post("/session/", {username: this.username},{
+                let response = await this.$axios.post("/session", {username: this.username},{
                     headers: {
                         'Accept' : 'application/json',
                         'Content-Type' : 'application/json'
