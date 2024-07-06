@@ -24,6 +24,7 @@ export default {
             }
             try {
                 let response = await this.$axios.post("/session", {username: this.username});
+                console.log("Login response: ", response.data);
                 this.Profile = response.data;
                 localStorage.setItem("token", this.Profile.identifier);
                 localStorage.setItem("username", this.Profile.username);
@@ -69,5 +70,5 @@ export default {
     .h2 {
         margin: auto;
     }
-    
+
 </style>
