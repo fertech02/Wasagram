@@ -13,9 +13,8 @@ export default {
         return {
             errorMsg: null,
             successMsg: null,
-            token: localStorage.getItem('token'),
             Username: localStorage.getItem('username'),
-            Uid: localStorage.getItem('Uid'),
+            Uid: localStorage.getItem('token'),
             loading: false,
             image: null,
             images: null,
@@ -84,7 +83,7 @@ export default {
                         File: this.photo,
                     }, {
                         headers: {
-                            Authorization: "Bearer " + this.token
+                            Authorization: "Bearer " + this.Uid
                         }
                     })
                     this.successMsg = response.data.message
@@ -102,7 +101,7 @@ export default {
                 const response = await this.$axios.get(`/photos/`, {
                     params: { Uid: this.$route.params.Uid },
                     headers: {
-                        'Authorization': `Bearer ${token}`,
+                        'Authorization': `Bearer ${Uid}`,
                         'Accept': 'application/json',
                     },
                 });
@@ -118,7 +117,7 @@ export default {
             try {
                 let response = await this.$axios.get("/users/" + this.Uid + "/stream", {
                     headers: {
-                        Authorization: "Bearer " + this.token
+                        Authorization: "Bearer " + this.Uid
                     }
                 })
                 this.Stream = response.data
@@ -136,7 +135,7 @@ export default {
             try {
                 let response = await this.$axios.get("/users/" + this.$route.params.Uid+ "/profile", {
                     headers: {
-                        Authorization: "Bearer " + this.token
+                        Authorization: "Bearer " + this.Uid
                     }
                 })
                 this.Profile = response.data
@@ -157,7 +156,7 @@ export default {
                     Message: Message,
                 }, {
                     headers: {
-                        Authorization: "Bearer " + this.token
+                        Authorization: "Bearer " + this.Uid
                     }
                 })
                 this.clear = response.data
@@ -173,7 +172,7 @@ export default {
             try {
                 let response = await this.$axios.get("/photos/" + Pid + "/comments", {
                     headers: {
-                        Authorization: "Bearer " + this.token
+                        Authorization: "Bearer " + this.Uid
                     }
                 })
                 this.Comments = response.data
@@ -190,7 +189,7 @@ export default {
             try {
                 let response = await this.$axios.put("/photos/" + Pid + "/likes/" + Uid, {
                     headers: {
-                        Authorization: "Bearer " + this.token
+                        Authorization: "Bearer " + this.Uid
                     }
                 })
                 this.clear = response.data
@@ -206,7 +205,7 @@ export default {
             try {
                 let response = await this.$axios.delete("/photos/" + Pid + "/likes/" + Uid, {
                     headers: {
-                        Authorization: "Bearer " + this.token
+                        Authorization: "Bearer " + this.Uid
                     }
                 })
                 this.clear = response.data
@@ -222,7 +221,7 @@ export default {
             try {
                 let response = await this.$axios.get("/photos/" + this.$route.params.Pid + "/likes", {
                     headers: {
-                        Authorization: "Bearer " + this.token
+                        Authorization: "Bearer " + this.Uid
                     }
                 })
                 this.likes = response.data
@@ -234,7 +233,6 @@ export default {
         },
 
         async Logout() {
-            localStorage.removeItem('token')
             localStorage.removeItem('username')
             localStorage.removeItem('Uid')
             this.$router.push('/')

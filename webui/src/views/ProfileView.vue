@@ -9,9 +9,8 @@ export default {
         return {
 
             errorMsg: null,
-            Uid: localStorage.getItem('Uid'),
+            Uid: localStorage.getItem('token'),
             Username: localStorage.getItem('Username'),
-            token: localStorage.getItem('token'),
             newUsername: '',
 
             // User Profile
@@ -68,7 +67,7 @@ export default {
             try {
                 let response = await this.$axios.get("/users/" + this.$route.params.Uid+ "/profile", {
                     headers: {
-                        Authorization: "Bearer " + this.token
+                        Authorization: "Bearer " + this.Uid
                     }
                 })
                 this.Profile = response.data
@@ -84,7 +83,7 @@ export default {
                 const response = await this.$axios.get(`/photos/`, {
                     params: { Uid: this.$route.params.Uid },
                     headers: {
-                        'Authorization': `Bearer ${token}`,
+                        'Authorization': `Bearer ${Uid}`,
                         'Accept': 'application/json',
                     },
                 });
@@ -100,7 +99,7 @@ export default {
             try {
                 let response = await this.$axios.delete("/photos/" + Pid, {
                     headers: {
-                        Authorization: "Bearer " + this.token
+                        Authorization: "Bearer " + this.Uid
                     }
                 })
                 this.refresh()
@@ -121,7 +120,7 @@ export default {
                     Username: this.newUsername,
                 }, {
                     headers: {
-                        Authorization: "Bearer " + this.token
+                        Authorization: "Bearer " + this.Uid
                     }
                 })
             } catch (error) {
@@ -141,7 +140,7 @@ export default {
                     Message: Message,
                 }, {
                     headers: {
-                        Authorization: "Bearer " + this.token
+                        Authorization: "Bearer " + this.Uid
                     }
                 })
                 this.clear = response.data
@@ -157,7 +156,7 @@ export default {
             try {
                 let response = await this.$axios.get("/photos/" + Pid + "/comments", {
                     headers: {
-                        Authorization: "Bearer " + this.token
+                        Authorization: "Bearer " + this.Uid
                     }
                 })
                 this.Comments = response.data
@@ -174,7 +173,7 @@ export default {
             try {
                 let response = await this.$axios.put("/photos/" + Pid + "/likes/" + Uid, {
                     headers: {
-                        Authorization: "Bearer " + this.token
+                        Authorization: "Bearer " + this.Uid
                     }
                 })
                 this.clear = response.data
@@ -190,7 +189,7 @@ export default {
             try {
                 let response = await this.$axios.delete("/photos/" + Pid + "/likes/" + Uid, {
                     headers: {
-                        Authorization: "Bearer " + this.token
+                        Authorization: "Bearer " + this.Uid
                     }
                 })
                 this.clear = response.data
@@ -206,7 +205,7 @@ export default {
             try {
                 let response = await this.$axios.get("/photos/" + this.$route.params.Pid + "/likes", {
                     headers: {
-                        Authorization: "Bearer " + this.token
+                        Authorization: "Bearer " + this.Uid
                     }
                 })
                 this.likes = response.data
@@ -221,7 +220,7 @@ export default {
             try {
                 let response = await this.$axios.get("/users/" + this.Uid + "/follow", {
                     headers: {
-                        Authorization: "Bearer " + this.token
+                        Authorization: "Bearer " + this.Uid
                     }
                 })
                 this.Followees = response.data

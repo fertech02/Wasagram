@@ -91,7 +91,7 @@ export default {
             try {
                 let response = await this.$axios.get("/users/" + this.$route.params.Uid+ "/profile", {
                     headers: {
-                        Authorization: "Bearer " + this.token
+                        Authorization: "Bearer " + this.Uid
                     }
                 })
                 this.Profile = response.data
@@ -107,7 +107,7 @@ export default {
                 const response = await this.$axios.get(`/photos/`, {
                     params: { Uid: this.$route.params.Uid },
                     headers: {
-                        'Authorization': `Bearer ${token}`,
+                        'Authorization': `Bearer ${Uid}`,
                         'Accept': 'application/json',
                     },
                 });
@@ -123,7 +123,7 @@ export default {
             try {
                 let response = await this.$axios.put("/users/" + bannerId + "/ban/" + bannedId, {
                     headers: {
-                        Authorization: "Bearer " + this.token
+                        Authorization: "Bearer " + this.Uid
                     }
                 })
                 this.clear = response.data
@@ -140,7 +140,7 @@ export default {
             try{
                 let response = await this.$axios.delete("/users/" + bannerId + "/ban/" + bannedId, {
                     headers: {
-                        Authorization: "Bearer " + this.token
+                        Authorization: "Bearer " + this.Uid
                     }
                 })
                 this.ban = response.data
@@ -156,7 +156,7 @@ export default {
             try {
                 let response = await this.$axios.get("/users/" + this.$route.params.Uid + "/ban", {
                     headers: {
-                        Authorization: "Bearer " + this.token
+                        Authorization: "Bearer " + this.Uid
                     }
                 })
                 this.ban = response.data
@@ -171,7 +171,7 @@ export default {
             try {
                 let response = await this.$axios.put("/users/" + followeeId + "/follow/" + followerId, {
                     headers: {
-                        Authorization: "Bearer " + this.token
+                        Authorization: "Bearer " + this.Uid
                     }
                 })
                 this.clear = response.data
@@ -189,7 +189,7 @@ export default {
             try {
                 let response = await this.$axios.delete("/users/" + followeeId + "/follow/" + followerId, {
                     headers: {
-                        Authorization: "Bearer " + this.token
+                        Authorization: "Bearer " + this.Uid
                     }
                 })
                 this.clear = response.data
@@ -212,7 +212,7 @@ export default {
                     Message: Message,
                 }, {
                     headers: {
-                        Authorization: "Bearer " + this.token
+                        Authorization: "Bearer " + this.Uid
                     }
                 })
                 this.clear = response.data
@@ -228,7 +228,7 @@ export default {
             try {
                 let response = await this.$axios.delete("/photos/" + Pid + "/comments/" + Uid, {
                     headers: {
-                        Authorization: "Bearer " + this.token
+                        Authorization: "Bearer " + this.Uid
                     }
                 })
                 this.clear = response.data
@@ -244,7 +244,7 @@ export default {
             try {
                 let response = await this.$axios.get("/photos/" + Pid + "/comments", {
                     headers: {
-                        Authorization: "Bearer " + this.token
+                        Authorization: "Bearer " + this.Uid
                     }
                 })
                 this.Comments = response.data
@@ -261,7 +261,7 @@ export default {
             try {
                 let response = await this.$axios.post("/photos/" + Pid + "/likes/" + Uid, {
                     headers: {
-                        Authorization: "Bearer " + this.token
+                        Authorization: "Bearer " + this.Uid
                     }
                 })
                 this.clear = response.data
@@ -293,7 +293,7 @@ export default {
             try {
                 let response = await this.$axios.get("/photos/" + this.$route.params.Pid + "/likes", {
                     headers: {
-                        Authorization: "Bearer " + this.token
+                        Authorization: "Bearer " + this.Uid
                     }
                 })
                 this.likes = response.data
