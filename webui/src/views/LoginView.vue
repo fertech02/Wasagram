@@ -1,15 +1,17 @@
 <template>
-   <div class="login-container">
-    <form @submit.prevent="doLogin">
-      <div class="form-group">
-        <label for="username">Username:</label>
-        <input type="text" id="username" v-model="username" required>
-      </div>
-      <button type="submit" :disabled="loading">Login</button>
-    </form>
-    <div v-if="loading">Logging in...</div>
-    <div v-if="errormsg" class="error-message">{{ errormsg }}</div>
-  </div>   
+    <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Welcome to WASAPhoto</h1>
+    </div>
+    <div class="input-group mb-3">
+        <input type="text" id="username" v-model="username" class="form-control"
+            placeholder="Insert a username to log in WASAPhoto." aria-label="Recipient's username"
+            aria-describedby="basic-addon2">
+        <div class="input-group-append">
+            <button class="btn btn-success" type="button" @click="doLogin">Login</button>
+        </div>
+    </div>
+    <ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
 </template>
 
 <script>
