@@ -1,5 +1,5 @@
 <script>
-import { router } from '@/router'; // Import the router object from the Vue Router library
+// Import the router object from the Vue Router library
 
 export default {
     components: {},
@@ -18,26 +18,29 @@ export default {
 
     methods: {
         async doLogin() {
-            this.errormsg = null;
             if (this.username == "") {
                 this.errormsg = "Please insert a username.";
                 return;
-            }
-            try {
-                let response = await this.$axios.post("/session", {username: this.username});
-                this.Profile = response.data;
-                localStorage.setItem("token", this.Profile.identifier);
-                localStorage.setItem("username", this.Profile.username);
-                router.push({path: '/session'}); // Use the imported router object instead of $router
-            } catch (error) {
-                if (error.response && error.response.data) {
-                     this.errormsg = error.response.data.message;
-                } else {
-                    // Handle cases where the error does not come from the server
-                    this.errormsg = "An error occurred. Please try again.";
+            } else {
+                try {
+                    let response = await this.$axios.post("/session", {username: this.username})
+                    this.Profile = response.data;
+                    localStorage.setItem("token", this.Profile.identifier);
+                    localStorage.setItem("username", this.Profile.username);
+                    this.$router.push({path: '/session'})
+                } catch (error) {
+                    if (error.response && error.response.data) {
+                        this.errormsg = error.response.data.message;
+                    } else {
+                        // Handle cases where the error does not come from the server
+                        this.errormsg = "An error occurred. Please try again.";
+                    }
                 }
             } 
         },
+    },
+    mounted() {
+        
     }
 }
 
