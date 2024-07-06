@@ -1,6 +1,8 @@
 <script>
+
 export default {
     components: {},
+
     data: function() {
         return {
             username: "",
@@ -12,6 +14,7 @@ export default {
 
         }
     },
+
     methods: {
         async doLogin() {
             this.errormsg = null;
@@ -32,6 +35,7 @@ export default {
         },
     }
 }
+
 </script>
 
 <template>
@@ -52,14 +56,18 @@ export default {
 
 
 <style scoped>
+
     .input-group {
         width: 50%;
         margin: auto;
     }
+
     .btn-success {
         width: 100%;
     }
+
     .h2 {
         margin: auto;
     }
+    
 </style>
