@@ -1,17 +1,15 @@
 <template>
-    <div class="login-view">
-        <h1>Login</h1>
-        <LoadingSpinner v-if="loading" ></LoadingSpinner>
-        <div class="login-form">
-            <form @submit.prevent="login">
-                <input type="text" id="username" v-model="username"  required minlength="3" maxlength="16" style="padding: 8px;"/>
-                <button type="submit" class="btn btn-sm btn-outline-primary" style="padding: 8px; float: right; font-size: large;" >Login <svg class="feather"> <use href="/feather-sprite-v4.29.0.svg#key" /></svg></button>
-            </form>
-            <div v-if="identifier != null">
-                <p>Logged in as: {{identifier}}</p>
-            </div>
-        </div>
-    </div>
+   <div class="login-container">
+    <form @submit.prevent="doLogin">
+      <div class="form-group">
+        <label for="username">Username:</label>
+        <input type="text" id="username" v-model="username" required>
+      </div>
+      <button type="submit" :disabled="loading">Login</button>
+    </form>
+    <div v-if="loading">Logging in...</div>
+    <div v-if="errormsg" class="error-message">{{ errormsg }}</div>
+  </div>   
 </template>
 
 <script>
