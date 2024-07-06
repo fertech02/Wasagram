@@ -1,8 +1,9 @@
 <script>
 export default {
+    components: {},
     data: function() {
         return {
-            username: '',
+            username: "",
             errormsg: null,
             Profile: {
                 username: '',
