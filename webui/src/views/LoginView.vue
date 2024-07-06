@@ -24,15 +24,18 @@ export default {
             }
             try {
                 let response = await this.$axios.post("/session", {username: this.username});
-                console.log("Login response: ", response.data);
                 this.Profile = response.data;
                 localStorage.setItem("token", this.Profile.identifier);
                 localStorage.setItem("username", this.Profile.username);
                 this.$router.push({path: '/session'});
             } catch (error) {
-                this.errormsg = error.response.data.message;
+                if (error.response && error.response.data) {
+                     this.errormsg = error.response.data.message;
+                } else {
+                    // Handle cases where the error does not come from the server
+                    this.errormsg = "An error occurred. Please try again.";
+                }
             } 
-            this.loading = false;
         },
     }
 }
