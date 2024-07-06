@@ -15,30 +15,22 @@ export default {
 
 <template>
 	<div>
-		<header>
-			<nav class="navbar navbar-expand-lg navbar-light bg-light">
-				<div class="container-fluid">
-					<router-link to="/" class="navbar-brand">Wasaphoto</router-link>
-					<button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-						data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
-						aria-label="Toggle navigation">
-						<span class="navbar-toggler-icon"></span>
-					</button>
-					<div class="collapse navbar-collapse" id="navbarNav">
-						<ul class="navbar-nav">
-							<li class="nav-item">
-								<router-link to="/session" class="nav-link">Session</router-link>
-							</li>
-							<li class="nav-item">
-								<router-link to="/upload" class="nav-link">Upload</router-link>
-							</li>
-							<li class="nav-item">
-								<router-link to="/logout" class="nav-link">Logout</router-link>
-							</li>
-						</ul>
-					</div>
-				</div>
-			</nav>
+		<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+			<a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6" href="#/">WASAPhoto</a>
+			<button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse"
+				data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false"
+				aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
 		</header>
+
+		<div class="container-fluid">
+			<div class="row">
+				<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+					<RouterView />
+				</main>
+			</div>
+		</div>
+
 	</div>
 </template>
