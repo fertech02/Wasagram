@@ -1,4 +1,5 @@
 <script>
+import { router } from '@/router'; // Import the router object from the Vue Router library
 
 export default {
     components: {},
@@ -27,7 +28,7 @@ export default {
                 this.Profile = response.data;
                 localStorage.setItem("token", this.Profile.identifier);
                 localStorage.setItem("username", this.Profile.username);
-                this.$router.push({path: '/session'});
+                router.push({path: '/session'}); // Use the imported router object instead of $router
             } catch (error) {
                 if (error.response && error.response.data) {
                      this.errormsg = error.response.data.message;
