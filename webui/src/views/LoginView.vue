@@ -8,11 +8,6 @@ export default {
         return {
             username: "",
             errormsg: null,
-            Profile: {
-                username: '',
-                identifier: ''
-            }
-
         }
     },
 
@@ -24,9 +19,9 @@ export default {
             } else {
                 try {
                     let response = await this.$axios.post("/session", {username: this.username})
-                    this.Profile = response.data;
-                    localStorage.setItem("token", this.Profile.identifier);
-                    localStorage.setItem("username", this.Profile.username);
+                    let user = response.data
+                    localStorage.setItem("token", user.Uid);
+                    localStorage.setItem("username", user.Username);
                     this.$router.push({path: '/session'})
                 } catch (error) {
                     if (error.response && error.response.data) {
