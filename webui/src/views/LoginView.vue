@@ -1,79 +1,82 @@
-<script>
-export default {
-    components: {},
-    data: function () {
-        return {
-            errormsg: null,
-            username: "",
-            profile: {
-                id: "",
-                username: "",
-            },
-        }
-    },
-    methods: {
-        async doLogin() {
-            if (this.username == "") {
-                this.errormsg = "Username cannot be empty.";
-            } else {
-                try {
-                    let response = await this.$axios.post("/session", { username: this.username })
-                    this.profile = response.data
-                    localStorage.setItem("token", this.profile.id);
-                    localStorage.setItem("username", this.profile.username);
-                    this.$router.push({ path: '/session' })
-                } catch (e) {
-                    if (e.response && e.response.status === 400) {
-                        this.errormsg = "Form error, please check all fields and try again. If you think that this is an error, write an e-mail to us.";
-                        this.detailedmsg = null;
-                    } else if (e.response && e.response.status === 500) {
-                        this.errormsg = "An internal error occurred. We will be notified. Please try again later.";
-                        this.detailedmsg = e.toString();
-                    } else {
-                        this.errormsg = e.toString();
-                        this.detailedmsg = null;
-                    }
-                }
-            }
-
-        }
-    },
-    mounted() {
-
-    }
-
-}
-</script>
-
 <template>
-    <div
-        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">Welcome to WASAPhoto</h1>
-    </div>
-    <div class="input-group mb-3">
-        <input type="text" id="username" v-model="username" class="form-control"
-            placeholder="Insert a username to log in WASAPhoto." aria-label="Recipient's username"
-            aria-describedby="basic-addon2">
-        <div class="input-group-append">
-            <button class="btn btn-success" type="button" @click="doLogin">Login</button>
+    <div class="login-container">
+        <LoadingSpinner v-if="loading"></LoadingSpinner>
+        <div class="login-form">
+            <h2>Login into your account</h2>
+            <form @submit.prevent="login">
+                <label class="login-label" for="username">Username:</label>
+                <input type="text" id="username" v-model="username" required minlength="3" maxlength="16"
+                    style="padding: 6px;" />
+                <button type="submit" class="btn btn-sm btn-outline-primary"
+                    style="padding: 8px; float: right; font-size: 20px;">Login <svg class="feather">
+                        <use href="/feather-sprite-v4.29.0.svg#key" />
+                    </svg></button>
+            </form>
+            <div v-if="identifier !== null">
+                <p>Login successful! User identifier: {{ identifier.userId }}</p>
+            </div>
         </div>
     </div>
-    <ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
 </template>
+  
+<script>
+export default {
+    data() {
+        return {
+            username: "",
+            identifier: null,
+            loading: false,
+        };
+    },
 
+    methods: {
+        async login() {
+            this.loading = true;
+            this.errormsg = null;
+            try {
+                let response = await this.$axios.post('/session/', { username: this.username }, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                });
+                this.identifier = response.data
+                this.saveTokenToSessionStorage()
+            } catch (error) {
+                console.error("Error while logging in!");
+            }
+            this.loading = false;
+            this.navigateToMyPage()
+        },
+        navigateToMyPage() {
+            this.$router.push('/users/' + this.identifier.userId);
+        },
+        saveTokenToSessionStorage() {
+            const bearerToken = `${this.identifier.userId}`;
+            sessionStorage.setItem('authToken', bearerToken);
+        },
+    },
+};
+</script>
+  
 <style scoped>
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
 
-    .input-group {
-        width: 50%;
-        margin: auto;
-    }
+.login-form {
+    padding: 20px;
+    border: 1px solid #000000;
+    align-items: center;
+    border-radius: 8px;
+}
 
-    .btn-success {
-        width: 100%;
-    }
-
-    .h2 {
-        margin: auto;
-    }
-
+.login-label {
+    padding: 3px;
+    display: block;
+    margin-bottom: 8px;
+}
 </style>

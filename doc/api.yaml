@@ -54,7 +54,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                type: object
+                description: Object containing user identifier.
+                properties:
+                  identifier:
+                    description: |-
+                      User unique identifier, 
+                      string utilization that corresponds 
+                      as the one on the path.
+                    type: string
+                    
   /photos:
     post:
       tags: ["Photos"]
@@ -520,6 +529,7 @@ components:
           description: The user's username
       required:
         - user_id
+        - username
       
     Profile:
       type: object

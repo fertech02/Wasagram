@@ -1,276 +1,211 @@
-<script>
-import CommentModal from '../components/CommentModal.vue'
-
-export default {
-    components: {
-        CommentModal
-    },
-    data: function() {
-        return {
-
-            errorMsg: null,
-            Uid: localStorage.getItem('token'),
-            Username: localStorage.getItem('Username'),
-            newUsername: '',
-
-            // User Profile
-            Profile : {
-                Uid: '',
-                Username: '',
-                Followers: 0,
-                Followees: 0,
-                PhotosCount: 0,
-            },
-
-            // User Photos
-            Photos : {
-                photos: [
-                    {
-                        Pid: '',
-                        Uid: '',
-                        File: '',
-                        Date: '',
-                    }
-                ],
-            },
-
-            // Photo Comments
-            Message: "",
-            Comments: {
-                comments: [
-                    {
-                        Uid: '',
-                        Pid: '',
-                        Message: '',
-                    }
-                ],
-            },
-            
-
-            // Followees
-            Followees : [],
-            
-            // Followers
-            Followers : [],
-
-            // Get User by Username
-            getUser: ''
-        }
-    },
-    methods: {
-        async refresh() {
-            await this.getUserProfile(),
-            await this.getUserPhotos()
-        },
-
-        async getUserProfile(){
-            try {
-                let response = await this.$axios.get("/users/" + this.$route.params.Uid+ "/profile", {
-                    headers: {
-                        Authorization: "Bearer " + this.Uid
-                    }
-                })
-                this.Profile = response.data
-            } catch (error) {
-                if (error.response) {
-                    this.errorMsg = error.response.data.message
-                }
-            }
-        },
-
-        async getUserPhotos(){
-            try {
-                const response = await this.$axios.get(`/photos/`, {
-                    params: { Uid: this.$route.params.Uid },
-                    headers: {
-                        'Authorization': `Bearer ${Uid}`,
-                        'Accept': 'application/json',
-                    },
-                });
-                this.Photos = response.data
-            } catch (error) {
-                if (error.response) {
-                    this.errorMsg = error.response.data.message
-                }
-            }
-        },
-
-        async deletePhoto(Pid){
-            try {
-                let response = await this.$axios.delete("/photos/" + Pid, {
-                    headers: {
-                        Authorization: "Bearer " + this.Uid
-                    }
-                })
-                this.refresh()
-            } catch (error) {
-                if (error.response) {
-                    this.errorMsg = error.response.data.message
-                }
-            }
-        },
-
-        async setMyUserName(){
-            if (this.newUsername == ""){
-                this.errorMsg = "Username cannot be empty"
-                return
-            }
-            try {
-                let response = await this.$axios.put("/users/" + this.Uid + "/username", {
-                    Username: this.newUsername,
-                }, {
-                    headers: {
-                        Authorization: "Bearer " + this.Uid
-                    }
-                })
-            } catch (error) {
-                if (error.response) {
-                    this.errorMsg = error.response.data.message
-                }
-            }
-        },
-
-        async commentPhoto(Pid, Uid, Message){
-            if (Message == ""){
-                this.errorMsg = "Comment cannot be empty"
-                return
-            }
-            try {
-                let response = await this.$axios.post("/photos/" + Pid + "/comments/" + Uid, {
-                    Message: Message,
-                }, {
-                    headers: {
-                        Authorization: "Bearer " + this.Uid
-                    }
-                })
-                this.clear = response.data
-                this.refresh()
-            } catch (error) {
-                if (error.response) {
-                    this.errorMsg = error.response.data.message
-                }
-            }
-        },
-
-        async openComments(){
-            try {
-                let response = await this.$axios.get("/photos/" + Pid + "/comments", {
-                    headers: {
-                        Authorization: "Bearer " + this.Uid
-                    }
-                })
-                this.Comments = response.data
-                const modal = this.$refs.commentModal
-                modal.show()
-            } catch (error) {
-                if (error.response) {
-                    this.errorMsg = error.response.data.message
-                }
-            }
-        },
-
-        async likePhoto(Pid, Uid){
-            try {
-                let response = await this.$axios.put("/photos/" + Pid + "/likes/" + Uid, {
-                    headers: {
-                        Authorization: "Bearer " + this.Uid
-                    }
-                })
-                this.clear = response.data
-                this.refresh()
-            } catch (error) {
-                if (error.response) {
-                    this.errorMsg = error.response.data.message
-                }
-            }
-        },
-
-        async unlikePhoto(Pid, Uid){
-            try {
-                let response = await this.$axios.delete("/photos/" + Pid + "/likes/" + Uid, {
-                    headers: {
-                        Authorization: "Bearer " + this.Uid
-                    }
-                })
-                this.clear = response.data
-                this.refresh()
-            } catch (error) {
-                if (error.response) {
-                    this.errorMsg = error.response.data.message
-                }
-            }
-        },
-
-        async getLikes(){
-            try {
-                let response = await this.$axios.get("/photos/" + this.$route.params.Pid + "/likes", {
-                    headers: {
-                        Authorization: "Bearer " + this.Uid
-                    }
-                })
-                this.likes = response.data
-            } catch (error) {
-                if (error.response) {
-                    this.errorMsg = error.response.data.message
-                }
-            }
-        },
-        
-        async getFollowedUsers(){
-            try {
-                let response = await this.$axios.get("/users/" + this.Uid + "/follow", {
-                    headers: {
-                        Authorization: "Bearer " + this.Uid
-                    }
-                })
-                this.Followees = response.data
-            } catch (error) {
-                if (error.response) {
-                    this.errorMsg = error.response.data.message
-                }
-            }
-        },
-
-    }, 
-}
-</script>
-
 <template>
-    <div>
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Profile</h5>
-                            <p class="card-text">Username: {{ Profile.Username }}</p>
-                            <p class="card-text">Followers: {{ Profile.Followers }}</p>
-                            <p class="card-text">Followees: {{ Profile.Followees }}</p>
-                            <p class="card-text">Photos: {{ Profile.PhotosCount }}</p>
-                            <button class="btn btn-primary" @click="setMyUserName">Change Username</button>
-                            <input type="text" v-model="newUsername" placeholder="New Username">
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-8">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title
-                            ">Photos</h5>
-                            <div class="row">
-                                <div class="col-md-4" v-for="photo in Photos.photos" :key="photo.Pid">
-                                    <img :src="photo.File" class="img-fluid" alt="Responsive image">
-                                    <button class="btn btn-primary" @click="deletePhoto(photo.Pid)">Delete</button>
-                                    <button class="btn btn-primary" @click="openComments(photo.Pid)">Comments</button>
-                                    <button class="btn btn-primary" @click="likePhoto(photo.Pid, Uid)">Like</button>
-                                    <button class="btn btn-primary" @click="unlikePhoto(photo.Pid, Uid)">Unlike</button>
-                                </div>
-                            </div>
-                        </div>
+    <div class="container mt-5">
+        <h1 class="display-4" style="font-size: 50px;">{{ userName }}</h1>
+        <div v-if="found">
+            <div>
+                <div v-if="!isItMe">
+                    <div class="btn-group mt-1">
+                        <button @click="toggleFollow" class="btn btn-warning">
+                            {{ isFollowed ? 'Unfollow' : 'Follow' }} <svg class="feather">
+                                <use href="/feather-sprite-v4.29.0.svg#user-plus" />
+                            </svg>
+                        </button>
+                        <button @click="toggleBan" class="btn btn-danger">
+                            {{ isBanned ? 'Unban' : 'Ban' }} <svg class="feather">
+                                <use href="/feather-sprite-v4.29.0.svg#slash" />
+                            </svg>
+                        </button>
                     </div>
                 </div>
             </div>
+            <div style="font-size: 20px;" class="container mt-2">
+                <div class="row bg-light p-4 shadow-lg">
+                    <div class="row">Followers: {{ followCount }}</div>
+                    <div class="row">Followed: {{ followedCount }}</div>
+                    <div class="row">Photos: {{ photoCount }}</div>
+                </div>
+            </div>
+
         </div>
-        <CommentModal ref="commentModal" :comments="Comments.comments" @comment="commentPhoto"></CommentModal>
+        <hr />
+        <div class="photos">
+            <PhotoCard v-for="photo in photoList" :key="photo.id" :photoId="photo.id" :date="photo.date"
+                :authorName="userName" :likeCount="photo.likecount" :caption="photo.caption" />
+        </div>
     </div>
 </template>
+  
+<script>
+import PhotoCard from '@/components/PhotoCard.vue';
+const token = sessionStorage.getItem('authToken');
+
+export default {
+    mounted() {
+        if (localStorage.getItem('reloadedstream')) {
+            localStorage.removeItem('reloadedstream');
+        } else {
+            localStorage.setItem('reloadedstream', '1');
+            location.reload();
+        }
+    },
+    data() {
+        return {
+            userName: '',
+            found: false,
+            followCount: 0,
+            followedCount: 0,
+            photoCount: 0,
+            isBanned: false,
+            isFollowed: false,
+            isItMe: false,
+            photoList: [],
+            reloadFlag: true,
+        };
+    },
+    watch: {
+        '$route.params.userId'(newParam, oldParam) {
+            if (newParam !== oldParam) {
+                this.refresh();
+            }
+        },
+    },
+    async created() {
+        const userId = this.$route.params.userId;
+        this.isItMe = (userId == token);
+        this.fetchUserData();
+    },
+    methods: {
+        refresh() {
+            location.reload();
+        },
+        async fetchUserData() {
+            const userId = this.$route.params.userId;
+            try {
+                const response = await this.$axios.get(`/users/${userId}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                this.found = true;
+                this.userName = response.data.userName;
+                this.followCount = response.data.followCount;
+                this.followedCount = response.data.followedCount;
+                this.photoCount = response.data.photoCount;
+                this.isBanned = response.data.isBanned;
+                this.isFollowed = response.data.isFollowed;
+                this.photoList = response.data.PList;
+            } catch (error) {
+                if (error.response) {
+                    const statusCode = error.response.status;
+                    switch (statusCode) {
+                        case 400:
+                            console.error('Bad request');
+                            this.userName = "You have to login first"
+                        case 401:
+                            console.error('Access Unauthorized:', error.response.data);
+                            // unauthorized
+                            this.userName = "You are not logged in"
+                            break;
+                        case 403:
+                            console.error('Access Forbidden:', error.response.data);
+                            // forbidden
+                            this.userName = "You have been banned by the user"
+                            break;
+                        case 404:
+                            console.error('Not Found:', error.response.data);
+                            // not found
+                            if (userId === "null") {
+                                this.userName = "You are not logged in";
+                            }
+                            else {
+                                this.userName = "User not found";
+                            }
+                            break;
+                        default:
+                            console.error(`Unhandled HTTP Error (${statusCode}):`, error.response.data);
+                    }
+                } else {
+                    console.error('Error:', error);
+                }
+            }
+        },
+        async toggleFollow() {
+            // frontend
+            this.isFollowed = !this.isFollowed;
+            // backend
+            const userId = this.$route.params.userId;
+            const token = sessionStorage.getItem('authToken');
+            try {
+                if (this.isFollowed) {
+                    this.followCount += 1;
+                    await this.$axios.put(`/users/${token}/follows/${userId}`, {
+                    }, {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    });
+                } else {
+                    this.followCount -= 1;
+                    await this.$axios.delete(`/users/${token}/follows/${userId}`, {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error(error, "Error modifying follow status.")
+            }
+
+        },
+        async toggleBan() {
+            // frontend
+            this.isBanned = !this.isBanned;
+            // backend
+            const userId = this.$route.params.userId;
+            const token = sessionStorage.getItem('authToken');
+            try {
+                if (this.isBanned) {
+                    await this.$axios.put(`/users/${token}/bans/${userId}`, {
+                    }, {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    });
+                } else {
+                    await this.$axios.delete(`/users/${token}/bans/${userId}`, {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    });
+
+                }
+            } catch (error) {
+                console.error(error, "Error modifying ban status.")
+            }
+        },
+    },
+    components: {
+        PhotoCard,
+    },
+};
+</script>
+  
+<style scoped>
+.user-info {
+    text-align: center;
+    font-size: 20px;
+}
+
+hr {
+    margin: 20px 0;
+}
+
+.photos {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.photos .photo-card {
+    margin-bottom: 30px;
+}
