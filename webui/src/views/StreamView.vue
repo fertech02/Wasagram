@@ -26,13 +26,13 @@ export default {
     },
     async created() {
         const userId = this.$route.params.userId;
-        this.fetchUserData();
+        this.getMyStream();
     },
     methods: {
         refresh() {
             location.reload();
         },
-        async fetchUserData() {
+        async getMyStream() {
             const userId = this.$route.params.userId;
             try {
                 const response = await this.$axios.get(`/users/${userId}/stream/`, {
@@ -88,8 +88,8 @@ export default {
         <hr />
 
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            <PhotoCard v-for="photo in photoList" :key="photo.id" :photoId="photo.id" :date="photo.date"
-                :authorName="photo.publisherName" :likeCount="photo.likecount" :caption="photo.caption" class="col mb-4" />
+            <PhotoCard v-for="photo in photoList" :key="photo.Pid" :photoId="photo.Pid" :date="photo.Date"
+                :authorName="photo.Uid" :likeCount="photo.likecount"  class="col mb-4" />
         </div>
     </div>
 </template>

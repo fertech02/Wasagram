@@ -24,6 +24,14 @@ export default {
             isItMe: false,
             photoList: [],
             reloadFlag: true,
+
+            profile: {
+                user_id: '',
+                username: '',
+                followers: 0,
+                followees: 0,
+                photos: 0,
+            },
         };
     },
     watch: {
@@ -36,13 +44,34 @@ export default {
     async created() {
         const userId = this.$route.params.userId;
         this.isItMe = (userId == token);
-        this.fetchUserData();
+        this.getUserProfile();
     },
     methods: {
         refresh() {
             location.reload();
         },
-       async getUserProfile() {},
+        
+        async getUserProfile() {
+            try {
+                    let response = await this.$axios.get("/users/" + this.username + "/profile", {
+                        headers: {
+                            Authorization: "Bearer " + localStorage.getItem("token")
+                        }
+                    })
+                    this.profile = response.data
+            } catch (e) {
+                if (e.response && e.response.status === 400) {
+                    this.errormsg = "Form error, please check all fields and try again. If you think that this is an error, write an e-mail to us.";
+                    this.detailedmsg = null;
+                } else if (e.response && e.response.status === 500) {
+                    this.errormsg = "An internal error occurred. We will be notified. Please try again later.";
+                    this.detailedmsg = e.toString();
+                } else {
+                    this.errormsg = e.toString();
+                    this.detailedmsg = null;
+                }
+            }
+        },
        
         async Follow() {
             this.isFollowed = !this.isFollowed;
@@ -120,3 +149,4 @@ hr {
 .photos .photo-card {
     margin-bottom: 30px;
 }
+</style>
