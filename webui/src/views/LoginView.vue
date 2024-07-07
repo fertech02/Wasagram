@@ -1,12 +1,9 @@
 <script>
-// Import the router object from the Vue Router library
-
 export default {
     components: {},
 
     data: function() {
-        return {
-            username: "",
+        return { 
             errormsg: null,
         }
     },
@@ -18,7 +15,13 @@ export default {
                 return;
             } else {
                 try {
-                    let response = await this.$axios.post("/session", {username: this.username})
+                    let username = document.getElementById('username').value;
+				    if (!username.match("^[a-zA-Z][a-zA-Z0-9_]{2,15}$")) {
+                        alert("Invalid username: 3 - 16 characters; first character must be a letter; only letters, numbers and underscores allowed");
+                        return;
+				    }
+                    let response = await this.$axios.post("/session", {username: username},
+                        {headers: { 'Content-Type': 'application/json' }});
                     let user = response.data
                     localStorage.setItem("token", user.Uid);
                     localStorage.setItem("username", user.Username);
@@ -42,19 +45,16 @@ export default {
 </script>
 
 <template>
-    <div
-        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">Welcome to Wasaphoto</h1>
-    </div>
-    <div class="input-group mb-3">
-        <input type="text" id="username" v-model="username" class="form-control"
-            placeholder="Insert a username to log in Wasaphoto." aria-label="Recipient's username"
-            aria-describedby="basic-addon2">
-        <div class="input-group-append">
-            <button class="btn btn-success" type="button" @click="doLogin">Login</button>
+    <div>
+        <h2 class="h2">Login</h2>
+        <div class="input-group">
+            <input id="username" type="text" class="form-control" placeholder="Username" required>
+            <button class="btn btn-success" @click="doLogin">Login</button>
+        </div>
+        <div v-if="errormsg" class="alert alert-danger" role="alert">
+            {{ errormsg }}
         </div>
     </div>
-    <ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
 </template>
 
 
