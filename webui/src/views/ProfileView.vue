@@ -1,5 +1,5 @@
 
-  <script>
+<script>
 import PhotoCard from '@/components/PhotoCard.vue';
 const token = sessionStorage.getItem('authToken');
 
@@ -45,9 +45,7 @@ export default {
        async getUserProfile() {},
        
         async Follow() {
-            // frontend
             this.isFollowed = !this.isFollowed;
-            // backend
             const userId = this.$route.params.userId;
             const token = sessionStorage.getItem('authToken');
             try {
@@ -73,9 +71,7 @@ export default {
 
         },
         async Ban() {
-            // frontend
-            this.isBanned = !this.isBanned;
-            // backend
+            this.isBanned = !this.isBanned
             const userId = this.$route.params.userId;
             const token = sessionStorage.getItem('authToken');
             try {

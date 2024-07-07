@@ -6,8 +6,6 @@ import UploadPhotoView from '../views/UploadPhoto.vue'
 import SearchUserView from '../views/SearchUserView.vue'
 import StreamView from '../views/StreamView.vue'
 import SetUserNameView from '../views/SetUserNameView.vue'
-import LogoutView from '../views/LogoutView.vue'
-import SetUserNameView from '../views/SetUserNameView.vue'
 
 const router = createRouter({
 	history: createWebHashHistory(import.meta.env.BASE_URL),
