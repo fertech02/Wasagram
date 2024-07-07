@@ -9,8 +9,8 @@ export default {
         return {
 
             errorMsg: null,
-            Uid: localStorage.getItem('token'),
-            Username: localStorage.getItem('Username'),
+            Uid: sessionStorage.getItem('token'),
+            Username: sessionStorage.getItem('Username'),
             newUsername: '',
 
             // User Profile

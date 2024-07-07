@@ -23,8 +23,8 @@ export default {
                     let response = await this.$axios.post("/session", {username: username},
                         {headers: { 'Content-Type': 'application/json' }});
                     let user = response.data
-                    localStorage.setItem("token", user.Uid);
-                    localStorage.setItem("username", user.Username);
+                    sessionStorage.setItem("token", user.Uid);
+                    sessionStorage.setItem("username", user.Username);
                     this.$router.push({path: '/session'})
                 } catch (error) {
                     if (error.response && error.response.data) {
