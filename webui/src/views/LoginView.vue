@@ -49,10 +49,10 @@ export default {
             this.navigateToMyPage()
         },
         navigateToMyPage() {
-            this.$router.push('/users/' + this.identifier.userId + '/profile/');
+            this.$router.push('/users/' + this.identifier.uid + '/profile/');
         },
         saveTokenToSessionStorage() {
-            const bearerToken = `${this.identifier.userId}`;
+            const bearerToken = `${this.identifier.uid}`;
             sessionStorage.setItem('authToken', bearerToken);
         },
     },

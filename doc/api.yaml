@@ -55,15 +55,10 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Object containing user identifier.
                 properties:
                   identifier:
-                    description: |-
-                      User unique identifier, 
-                      string utilization that corresponds 
-                      as the one on the path.
                     type: string
-                    
+                    example: "abcdef012345"
   /photos:
     post:
       tags: ["Photos"]
