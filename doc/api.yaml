@@ -54,14 +54,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                description: User identifier
-                properties:
-                  identifier:
-                    type: string
-                    description: The user's identifier
-                    example: "abcdef012345"
-
+                $ref: "#/components/schemas/User"
   /photos:
     post:
       tags: ["Photos"]
