@@ -13,8 +13,8 @@ export default {
         return {
             errorMsg: null,
             successMsg: null,
-            Username: sessionStorage.getItem('username'),
-            Uid: sessionStorage.getItem('token'),
+            Username: localStorage.getItem('username'),
+            Uid: localStorage.getItem('token'),
             loading: false,
             image: null,
             images: null,

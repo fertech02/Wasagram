@@ -4,10 +4,10 @@ import CommentModal from '../components/CommentModal.vue';
 export default {
 
     mounted() {
-        if (sessionStorage.getItem("reloadedStream")) {
-            sessionStorage.removeItem("reloadedStream");
+        if (localStorage.getItem("reloadedStream")) {
+            localStorage.removeItem("reloadedStream");
         } else {
-            sessionStorage.setItem("reloadedStream", "1");
+            localStorage.setItem("reloadedStream", "1");
             location.reload();
         }
     },
