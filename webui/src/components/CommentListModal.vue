@@ -8,13 +8,13 @@
                 </div>
                 <div class="modal-body">
                     <ul class="list-group">
-                        <li v-for="comment in comments" :key="comment.id" class="list-group-item">
+                        <li v-for="comment in comments" :key="comment.Uid" class="list-group-item">
                             <div>
-                                <strong>{{ comment.publisherName }}</strong>
+                                <strong>{{ comment.Uid }}</strong>
                             </div>
                             <div>{{ comment.text }}</div>
-                            <div v-if="comment.publisherId == this.token">
-                                <button @click="deleteComment(comment.photoId, comment.id)" class="btn btn-danger btn-sm">Delete</button>
+                            <div v-if="comment.Uid == this.token">
+                                <button @click="deleteComment(comment.Pid, comment.Uid)" class="btn btn-danger btn-sm">Delete</button>
                             </div>
                         </li>
                     </ul>
@@ -37,10 +37,10 @@ export default {
         };
     },
     async created() {
-        this.fetchComments();
+        this.getComments();
     },
     methods: {
-        async fetchComments() {
+        async getComments() {
             try {
                 const response = await this.$axios.get(`/photos/${this.photoId}/comments/`, {
                     headers: {
@@ -75,9 +75,9 @@ export default {
             }
 
         },
-        async deleteComment(pId, cId) {
+        async deleteComment(Pid, Uid) {
             try {
-                const response = await this.$axios.delete(`/photos/${pId}/comments/${cId}`, {
+                const response = await this.$axios.delete(`/photos/${Pid}/comments/${Uid}`, {
                     headers: {
                         'Authorization': `Bearer ${this.token}`,
                     }

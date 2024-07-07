@@ -1,49 +1,4 @@
-<template>
-    <div class="container mt-5" v-if="notBanned">
-      <div class="center-container">
-        <div class="card photo-card">
-          <button v-if="isMe" @click="deletePhoto" class="btn btn-danger delete-button mb-2">
-            Delete Photo <svg class="feather">
-              <use href="/feather-sprite-v4.29.0.svg#trash-2" />
-            </svg>
-          </button>
-  
-          <img :src="imgSrc" alt="Photo" class="card-img-top" />
-          <div class="card-body photo-details">
-            <div class="author">{{ authorName }}, {{ date }}</div>
-            <div class="card-text text-center bg-light fs-5">{{ caption }}</div>
-            <div class="actions">
-              <button @click="likePhoto" class="btn btn-sm btn-outline-primary ms-3">
-                {{ isLiked ? 'Unlike' : 'Like' }}
-              </button>
-              <span class="like-counter">{{ LikeCount }} Likes <svg class="feather">
-                  <use href="/feather-sprite-v4.29.0.svg#thumbs-up" />
-                </svg></span>
-              <button @click="commentPhoto" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
-                :data-bs-target="'#usersModal' + modalId">
-                Comment <svg class="feather">
-                  <use href="/feather-sprite-v4.29.0.svg#message-circle" />
-                </svg>
-              </button>
-              <button @click="viewComments" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
-                :data-bs-target="'#listModal' + modalId">
-                View Comments <svg class="feather">
-                  <use href="/feather-sprite-v4.29.0.svg#message-square" />
-                </svg>
-              </button>
-              <CommentModal :photoId="this.modalId" />
-              <CommentListModal :photoId="this.modalId" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </template>
-  
-  
-  
-  
-  <script>
+<script>
   import CommentModal from '@/components/CommentModal.vue';
   import CommentListModal from '@/components/CommentListModal.vue';
   
@@ -54,130 +9,135 @@
       CommentListModal,
     },
     props: {
-      photoId: Number,
-      likeCount: Number,
-      authorName: String,
-      caption: String,
+      Pid: String,
+      Uid: String,
+      File: String,
       date: String,
     },
     data() {
       return {
-        imgSrc: null,
+        imgSrc: this.File,
+        authorId: this.Uid,
         isLiked: false,
-        LikeCount: this.likeCount,
-        authorId: 0,
         isMe: false,
         notBanned: true,
-        modalId: String(this.photoId),
+        caption: '',
+        LikeCount: 0,
+        isMe: false,
       };
     },
   
     async created() {
-      if (this.photoId) {
+      if (this.Pid) {
         try {
-          const response = await this.$axios.get(`/photos/${this.photoId}`, {
+          const response = await this.$axios.get('/photos/' + this.Pid, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-            responseType: 'blob',
           });
-          const imageUrl = URL.createObjectURL(response.data);
-          this.imgSrc = imageUrl;
-          const isL = await this.$axios.get(`/photos/${this.photoId}/likes/${token}`, {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          });
-          this.isLiked = isL.data.isLiked
-          this.findAuthorId();
-        } catch (error) {
-          if (error.response) {
-            const statusCode = error.response.status;
-            this.notBanned = false;
-            switch (statusCode) {
-              case 401:
-                console.error('Access Unauthorized:', error.response.data);
-                // unauthorized
-                break;
-              case 403:
-                console.error('Access Forbidden:', error.response.data);
-                // forbidden
-                break;
-              case 404:
-                console.error('Not Found:', error.response.data);
-                // not found
-                break;
-              default:
-                console.error(`Unhandled HTTP Error (${statusCode}):`, error.response.data);
-            }
-          } else {
-            console.error('Error:', error);
+        const imageUrl = URL.createObjectURL(response.data);
+        this.imgSrc = imageUrl;
+        const isL = await this.$axios.get(`/photos/${this.photoId}/likes/${token}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
           }
+        });
+        this.isLiked = isL.data.isLiked
+        this.findAuthorId();
         }
+        catch (error) {
+          console.error(error);
+        }
+      } else {
+        console.error('Error:', error)
       }
     },
     computed: {
   
     },
     methods: {
-      async findAuthorId() {
+
+      async findAuthor() {
         try {
-          const userId = this.$route.params.userId;
-          const hasStreamSegment = this.$route.path.includes('/stream');
-          if (userId == token && !hasStreamSegment) {
+          const response = this.$route.params.userId;
+          const hasStream = this.$route.path.includes('/stream');
+          if (userId == token && !hasStream) {
             this.isMe = true;
-          };
-        }
-        catch (error) {
-          console.error(error, "Error searching photo owner.")
+          }
+
+        } catch (error) {
+          console.error(error);
         }
       },
-      async deletePhoto() {
+
+      async deletePhoto(){
         try {
-          const response = await this.$axios.delete(`/photos/${this.photoId}`, {
+          const response = await this.$axios.delete(`/photos/${this.Pid}`, {
             headers: {
-              'Authorization': `Bearer ${token}`,
-            }
-          },);
+              Authorization: `Bearer ${token}`,
+            },
+          });
           location.reload();
-        }
-        catch (error) {
-          console.error(error, "cant delete photo!")
+        } catch (error) {
+          console.error(error);
         }
       },
+
       async likePhoto() {
-        // frontend
         this.isLiked = !this.isLiked;
-        // backend
         try {
-          const token = sessionStorage.getItem('authToken');
           if (this.isLiked) {
             this.LikeCount += 1;
-            await this.$axios.put(`/photos/${this.photoId}/likes/${token}`, {
-            }, {
-              headers: {
-                Authorization: `Bearer ${token}`
-              }
-            });
+            const response = await this.$axios.put('/photos/' + this.Pid + '/likes' + this.Uid, {}, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
           } else {
             this.LikeCount -= 1;
-            await this.$axios.delete(`/photos/${this.photoId}/likes/${token}`, {
+            await this.$axios.delete('/photos/' + this.Pid + '/likes' + this.Uid, {
               headers: {
-                Authorization: `Bearer ${token}`
-              }
+                Authorization: `Bearer ${token}`,
+              },
             });
-  
           }
+
         } catch (error) {
-          console.error(error, "Error modifying like status.")
+          console.error(error);
         }
-  
       },
-    },
+    }
   };
   </script>
+
+<template>
+  <div class="center-container">
+    <div class="photo-card  ">
+      <img :src="imgSrc" alt="Photo" width="100%" />
+      <div class="photo-details">
+        <div class="author">
+          <router-link :to="'/users/' + authorId">{{ authorId }}</router-link>
+        </div>
+        <div class="actions">
+          <div>
+            <button v-on:click="likePhoto">Like</button>
+            <div class="like-counter">{{ LikeCount }}</div>
+          </div>
+          <div>
+            <button v-on:click="deletePhoto" v-if="isMe">Delete</button>
+          </div>
+        </div>
+        <div class="caption">
+          <div class="caption-border"></div>
+          <div class="caption-text">{{ caption }}</div>
+          <div class="caption-border"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
   
-  <style scoped>
+<style scoped>
   .center-container {
     display: flex;
     justify-content: center;

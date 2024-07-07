@@ -7,7 +7,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form @submit.prevent="postComment">
+                    <form @submit.prevent="commentPhoto">
                         <div class="mb-3">
                             <input v-model="commentText" class="form-control" id="commentText" rows="4"
                                 placeholder="Enter your comment" />
@@ -29,31 +29,27 @@ const token = sessionStorage.getItem('authToken');
 export default {
     props: {
         photoId: String,
+        userId: String,
     },
     data() {
         return {
             commentText: '',
-            Text: '',
-            commentPostTry: false,
         };
     },
     methods: {
-        async postComment() {
+        async commentPhoto() {
             console.log("Posting comment:", this.commentText);
-            this.commentPostTry = true;
             try {
                 const config = {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     },
                 };
-                const response = await this.$axios.post(`/photos/${this.photoId}/comments/`, { commentText: this.commentText }, config);
-                this.Text = "Comment Posted!";
+                const response = await this.$axios.post(`/photos/${this.photoId}/comments/${this.userId}`, { commentText: this.commentText }, config);
                 location.reload();
             }
             catch {
                 console.error(error.response.data);
-                this.Text = "Error posting comment :(";
             }
         },
     },
