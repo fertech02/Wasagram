@@ -6,7 +6,7 @@ export default {
             errormsg: null,
             username: "",
             profile: {
-                id: 0,
+                id: "",
                 username: "",
             },
         }
