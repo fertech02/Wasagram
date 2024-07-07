@@ -78,58 +78,9 @@ export default {
         refresh() {
             location.reload();
         },
-        async fetchUserData() {
-            const userId = this.$route.params.userId;
-            try {
-                const response = await this.$axios.get(`/users/${userId}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                this.found = true;
-                this.userName = response.data.userName;
-                this.followCount = response.data.followCount;
-                this.followedCount = response.data.followedCount;
-                this.photoCount = response.data.photoCount;
-                this.isBanned = response.data.isBanned;
-                this.isFollowed = response.data.isFollowed;
-                this.photoList = response.data.PList;
-            } catch (error) {
-                if (error.response) {
-                    const statusCode = error.response.status;
-                    switch (statusCode) {
-                        case 400:
-                            console.error('Bad request');
-                            this.userName = "You have to login first"
-                        case 401:
-                            console.error('Access Unauthorized:', error.response.data);
-                            // unauthorized
-                            this.userName = "You are not logged in"
-                            break;
-                        case 403:
-                            console.error('Access Forbidden:', error.response.data);
-                            // forbidden
-                            this.userName = "You have been banned by the user"
-                            break;
-                        case 404:
-                            console.error('Not Found:', error.response.data);
-                            // not found
-                            if (userId === "null") {
-                                this.userName = "You are not logged in";
-                            }
-                            else {
-                                this.userName = "User not found";
-                            }
-                            break;
-                        default:
-                            console.error(`Unhandled HTTP Error (${statusCode}):`, error.response.data);
-                    }
-                } else {
-                    console.error('Error:', error);
-                }
-            }
-        },
-        async toggleFollow() {
+       async getUserProfile() {},
+       
+        async Follow() {
             // frontend
             this.isFollowed = !this.isFollowed;
             // backend
@@ -157,7 +108,7 @@ export default {
             }
 
         },
-        async toggleBan() {
+        async Ban() {
             // frontend
             this.isBanned = !this.isBanned;
             // backend

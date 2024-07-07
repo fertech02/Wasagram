@@ -1,48 +1,61 @@
+<template>
+    <div class="modal fade" :id="'usersModal' + photoId" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="ModalLabel">Post a comment for photo</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form @submit.prevent="postComment">
+                        <div class="mb-3">
+                            <input v-model="commentText" class="form-control" id="commentText" rows="4"
+                                placeholder="Enter your comment" />
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Post Comment</button>
+                        </div>
+                    </form>
+                    <p v-if="commentPostTry" class="mt-3" style="font-size: 25px;">{{ Text }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
 <script>
-export default {
-    props: ['log', 'token'],
-    data() {
-        return {}
-    },
+const token = sessionStorage.getItem('authToken');
 
+export default {
+    props: {
+        photoId: String,
+    },
+    data() {
+        return {
+            commentText: '',
+            Text: '',
+            commentPostTry: false,
+        };
+    },
     methods: {
-        async uncommentPhoto(uid, pid) {
+        async postComment() {
+            console.log("Posting comment:", this.commentText);
+            this.commentPostTry = true;
             try {
-                let response = await this.$axios.delete('/photos/'+pid+'/comments/'+uid, {
-                    method: 'DELETE',
+                const config = {
                     headers: {
-                        'Authorization': "Bearer " + localStorage.getItem('token')       
-                    }
-                })
+                        'Authorization': `Bearer ${token}`,
+                    },
+                };
+                const response = await this.$axios.post(`/photos/${this.photoId}/comments/`, { commentText: this.commentText }, config);
+                this.Text = "Comment Posted!";
                 location.reload();
-                if (response.ok) {
-                    this.$emit('uncomment', this.log.commentId);
-                } else {
-                    console.log('Error deleting comment');
-                }
-            } catch (error) {
-                console.log('Error deleting comment');
+            }
+            catch {
+                console.error(error.response.data);
+                this.Text = "Error posting comment :(";
             }
         },
     },
-}
+};
 </script>
-
-<template>
-    <div>
-        <b-modal id="commentModal" title="Comment" hide-footer>
-            <div class="d-flex justify-content-between">
-                <p>{{ log.comment }}</p>
-                <button @click="uncommentPhoto(log.commentId, log.photoId)" class="btn btn-danger">Delete</button>
-            </div>
-        </b-modal>
-    </div>
-</template>
-
-<style scoped>
-.modal textarea {
-    font-family: 'Roboto', sans-serif;
-    width: 100%;
-    height: 100px;
-}
-</style>
