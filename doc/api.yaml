@@ -512,15 +512,15 @@ components:
       type: object
       description: User
       properties:
-        user_id:
+        Uid:
           type: string
           description: The user's identifier
-        username:
+        Username:
           type: string
           description: The user's username
       required:
-        - user_id
-        - username
+        - Uid
+        - Username
       
     Profile:
       type: object
