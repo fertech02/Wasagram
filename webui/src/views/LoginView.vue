@@ -12,7 +12,7 @@
                         <use href="/feather-sprite-v4.29.0.svg#key" />
                     </svg></button>
             </form>
-            <div v-if=" Profile.Uid != '' ">
+            <div v-if=" Profile.Uid !== '' ">
                 <p>Login successful! User identifier: {{ Profile.Uid }}</p>
             </div>
         </div>
@@ -52,7 +52,7 @@ export default {
             this.navigateToMyPage()
         },
         navigateToMyPage() {
-            this.$router.push('/users/' + this.Profile.Uid + '/profile/');
+            this.$router.push('/users/' + this.Profile.Uid + '/profile');
         },
         saveTokenToSessionStorage() {
             const bearerToken = this.Profile.Uid;

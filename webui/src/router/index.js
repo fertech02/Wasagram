@@ -13,10 +13,10 @@ const router = createRouter({
 		{path: '/', component: LoginView},
 		{path: '/session', component: LoginView},
 		{path: '/logout/', component: LogoutView},
-		{path: '/users/:uid/profile/', component: ProfileView},
+		{path: '/users/:uid/profile', component: ProfileView},
 		{path: '/photos/', component: UploadPhotoView},
-		{path: '/users/:uid/stream/', component: StreamView},
-		{path: '/set-name/', component: SetUserNameView},
+		{path: '/users/:uid/stream', component: StreamView},
+		{path: '/users/:uid/username', component: SetUserNameView},
 		{path: '/users/', component: SearchUserView}
 
 	]

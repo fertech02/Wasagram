@@ -59,7 +59,7 @@
 
       async findAuthor() {
         try {
-          const response = this.$route.params.userId;
+          const response = this.$route.params.uid;
           const hasStream = this.$route.path.includes('/stream');
           if (userId == token && !hasStream) {
             this.isMe = true;

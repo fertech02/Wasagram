@@ -18,14 +18,14 @@ export default {
         }
     },
     watch: {
-        '$route.params.userId'(newParam, oldParam) {
+        '$route.params.uid'(newParam, oldParam) {
             if (newParam !== oldParam) {
                 this.refresh();
             }
         },
     },
     async created() {
-        const userId = this.$route.params.userId;
+        const uid = this.$route.params.uid;
         this.getMyStream();
     },
     methods: {
@@ -33,9 +33,9 @@ export default {
             location.reload();
         },
         async getMyStream() {
-            const userId = this.$route.params.userId;
+            const uisd = this.$route.params.uid;
             try {
-                const response = await this.$axios.get(`/users/${userId}/stream/`, {
+                const response = await this.$axios.get(`/users/${uid}/stream`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },

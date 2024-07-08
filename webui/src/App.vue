@@ -4,8 +4,9 @@ import { RouterLink, RouterView } from 'vue-router'
 export default {
 	data() {
 		return {
-			mypath: "/users/" + token + "/profile/",
-			streampath: "/users/" + token + "/stream/",
+			mypath: "/users/" + token + "/profile",
+			streampath: "/users/" + token + "/stream",
+			username: "/users/" + token + "/username"
 		}
 	},
 	methods: {
@@ -93,7 +94,7 @@ export default {
 							</RouterLink>
 						</li>
 						<li class="nav-item">
-							<RouterLink to="/set-name/" class="nav-link">
+							<RouterLink :to="username" class="nav-link">
 								<svg class="feather">
 									<use href="/feather-sprite-v4.29.0.svg#edit-3" />
 								</svg>

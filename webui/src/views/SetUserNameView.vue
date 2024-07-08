@@ -22,7 +22,7 @@ export default {
             } else {
                 try {
 
-                    const response = await this.$axios.post('/users/' + token + '/username/',
+                    const response = await this.$axios.post('/users/' + token + '/username',
                         {
                             username: this.newname
                         },

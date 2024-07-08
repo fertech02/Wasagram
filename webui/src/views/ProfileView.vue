@@ -35,14 +35,14 @@ export default {
         };
     },
     watch: {
-        '$route.params.Uid'(newParam, oldParam) {
+        '$route.params.uid'(newParam, oldParam) {
             if (newParam !== oldParam) {
                 this.refresh();
             }
         },
     },
     async created() {
-        const Uid = this.$route.params.Uid;
+        const Uid = this.$route.params.uid;
         this.isItMe = (Uid == token);
         this.getUserProfile();
     },
@@ -75,7 +75,7 @@ export default {
        
         async Follow() {
             this.isFollowed = !this.isFollowed;
-            const Uid = this.$route.params.Uid;
+            const Uid = this.$route.params.uid;
             const token = sessionStorage.getItem('authToken');
             try {
                 if (this.isFollowed) {
@@ -101,7 +101,7 @@ export default {
         },
         async Ban() {
             this.isBanned = !this.isBanned
-            const Uid = this.$route.params.Uid;
+            const Uid = this.$route.params.uid;
             const token = sessionStorage.getItem('authToken');
             try {
                 if (this.isBanned) {
