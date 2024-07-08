@@ -53,7 +53,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	}
 
-	response := map[string]string{"uid": nu.Uid}
+	response := map[string]string{"uid": nu.Uid, "username": nu.Username}
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(response)
 	if err != nil {

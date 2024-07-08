@@ -13,7 +13,7 @@
                     </svg></button>
             </form>
             <div v-if="identifier !== null">
-                <p>Login successful! User identifier: {{ identifier.userId }}</p>
+                <p>Login successful! User identifier: {{ Profile.uid }}</p>
             </div>
         </div>
     </div>
@@ -24,7 +24,10 @@ export default {
     data() {
         return {
             username: "",
-            identifier: null,
+            profile: {
+                uid: "",
+                username: "",
+            },
             loading: false,
         };
     },
@@ -40,7 +43,7 @@ export default {
                         'Content-Type': 'application/json',
                     },
                 });
-                this.identifier = response.data
+                this.Profile = response.data
                 this.saveTokenToSessionStorage()
             } catch (error) {
                 console.error("Error while logging in!");
@@ -49,10 +52,10 @@ export default {
             this.navigateToMyPage()
         },
         navigateToMyPage() {
-            this.$router.push('/users/' + this.identifier.uid + '/profile/');
+            this.$router.push('/users/' + this.Profile.uid + '/profile/');
         },
         saveTokenToSessionStorage() {
-            const bearerToken = `${this.identifier.uid}`;
+            const bearerToken = `${this.Profile.uid}`;
             sessionStorage.setItem('authToken', bearerToken);
         },
     },
