@@ -43,6 +43,7 @@ export default {
                         'Content-Type': 'application/json',
                     },
                 });
+                
                 this.Profile = response.data
                 this.saveTokenToSessionStorage()
             } catch (error) {

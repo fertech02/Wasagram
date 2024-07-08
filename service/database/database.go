@@ -82,7 +82,7 @@ type AppDatabase interface {
 	Ping() error
 
 	// User
-	CreateUser(username string) (*User, error)
+	CreateUser(username string) (User, error)
 	GetUserId(username string) (string, error)
 	GetUsername(uid string) (string, error)
 	UpdateUsername(userid string, username string) error

@@ -14,7 +14,7 @@ type User struct {
 	Username string `json:"username"`
 }
 
-func (u *User) fromDBUser(dbu *database.User) {
+func (u *User) fromDBUser(dbu database.User) {
 	u.Uid = dbu.Uid
 	u.Username = dbu.Username
 }

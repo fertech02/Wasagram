@@ -5,13 +5,13 @@ import (
 )
 
 // Create a new User
-func (db *appdbimpl) CreateUser(username string) (*User, error) {
+func (db *appdbimpl) CreateUser(username string) (User, error) {
 
 	_, err := db.c.Exec("INSERT INTO User (Uid, Username) VALUES (?, ?)", uuid.New().String(), username)
 	if err != nil {
-		return nil, err
+		return User{}, err
 	}
-	return &User{Uid: uuid.New().String(), Username: username}, nil
+	return User{Uid: uuid.New().String(), Username: username}, nil
 }
 
 // Update Username
