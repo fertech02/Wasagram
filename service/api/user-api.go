@@ -5,14 +5,27 @@ import (
 	"net/http"
 
 	"github.com/fertech02/Wasa-repository/service/api/reqcontext"
+	"github.com/fertech02/Wasa-repository/service/database"
 	"github.com/julienschmidt/httprouter"
 )
+
+type User struct {
+	Uid      string `json:"uid"`
+	Username string `json:"username"`
+}
+
+func (u *User) fromDBUser(dbu *database.User) {
+	u.Uid = dbu.Uid
+	u.Username = dbu.Username
+}
 
 func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	var requestData struct {
 		Username string `json:"username"`
 	}
+
+	var user User
 
 	err := json.NewDecoder(r.Body).Decode(&requestData)
 	if err != nil {
@@ -53,9 +66,9 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	}
 
-	response := map[string]string{"uid": nu.Uid, "username": nu.Username}
+	user.fromDBUser(nu)
 	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(response)
+	err = json.NewEncoder(w).Encode(user)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
