@@ -12,7 +12,7 @@
                         <use href="/feather-sprite-v4.29.0.svg#key" />
                     </svg></button>
             </form>
-            <div v-if=" Profile != null">
+            <div v-if=" Profile.Uid != '' ">
                 <p>Login successful! User identifier: {{ Profile.Uid }}</p>
             </div>
         </div>
@@ -24,7 +24,10 @@ export default {
     data() {
         return {
             username: "",
-            Profile: null,
+            Profile: {
+                Uid: "",
+                Username: ""
+            },
             loading: false,
         };
     },
