@@ -19,6 +19,13 @@ func (u *User) fromDBUser(dbu database.User) {
 	u.Username = dbu.Username
 }
 
+func (u *User) toDBUser() database.User {
+	return database.User{
+		Uid:      u.Uid,
+		Username: u.Username,
+	}
+}
+
 func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	var user User
@@ -30,7 +37,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 	}
 
 
-	nu, err := rt.db.CreateUser(user.Username)
+	nu, err := rt.db.CreateUser(user.toDBUser().Username)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

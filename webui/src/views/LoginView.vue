@@ -43,13 +43,14 @@ export default {
                         'Content-Type': 'application/json',
                     },
                 });
+                console.log(response)
                 this.profile = response.data;
                 this.saveTokenToSessionStorage()
+                this.loading = false;
+                this.navigateToMyPage()
             } catch (error) {
-                console.error("Error while logging in!");
+                console.error("Error while logging in!", error);
             }
-            this.loading = false;
-            this.navigateToMyPage()
         },
         navigateToMyPage() {
             this.$router.push('/users/' + this.profile.Uid + '/profile');
