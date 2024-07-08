@@ -35,15 +35,15 @@ export default {
         };
     },
     watch: {
-        '$route.params.userId'(newParam, oldParam) {
+        '$route.params.Uid'(newParam, oldParam) {
             if (newParam !== oldParam) {
                 this.refresh();
             }
         },
     },
     async created() {
-        const userId = this.$route.params.userId;
-        this.isItMe = (userId == token);
+        const Uid = this.$route.params.Uid;
+        this.isItMe = (Uid == token);
         this.getUserProfile();
     },
     methods: {
@@ -53,7 +53,7 @@ export default {
         
         async getUserProfile() {
             try {
-                    let response = await this.$axios.get("/users/" + this.username + "/profile", {
+                    let response = await this.$axios.get("/users/" + Uid + "/profile", {
                         headers: {
                             Authorization: "Bearer " + localStorage.getItem("token")
                         }
@@ -75,12 +75,12 @@ export default {
        
         async Follow() {
             this.isFollowed = !this.isFollowed;
-            const userId = this.$route.params.userId;
+            const Uid = this.$route.params.Uid;
             const token = sessionStorage.getItem('authToken');
             try {
                 if (this.isFollowed) {
                     this.followCount += 1;
-                    await this.$axios.put(`/users/${token}/follows/${userId}`, {
+                    await this.$axios.put(`/users/${token}/follow/${Uid}`, {
                     }, {
                         headers: {
                             Authorization: `Bearer ${token}`
@@ -88,7 +88,7 @@ export default {
                     });
                 } else {
                     this.followCount -= 1;
-                    await this.$axios.delete(`/users/${token}/follows/${userId}`, {
+                    await this.$axios.delete(`/users/${token}/follow/${Uid}`, {
                         headers: {
                             Authorization: `Bearer ${token}`
                         }
@@ -101,18 +101,18 @@ export default {
         },
         async Ban() {
             this.isBanned = !this.isBanned
-            const userId = this.$route.params.userId;
+            const Uid = this.$route.params.Uid;
             const token = sessionStorage.getItem('authToken');
             try {
                 if (this.isBanned) {
-                    await this.$axios.put(`/users/${token}/bans/${userId}`, {
+                    await this.$axios.put(`/users/${token}/ban/${Uid}`, {
                     }, {
                         headers: {
                             Authorization: `Bearer ${token}`
                         }
                     });
                 } else {
-                    await this.$axios.delete(`/users/${token}/bans/${userId}`, {
+                    await this.$axios.delete(`/users/${token}/ban/${Uid}`, {
                         headers: {
                             Authorization: `Bearer ${token}`
                         }
