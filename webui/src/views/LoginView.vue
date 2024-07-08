@@ -12,8 +12,8 @@
                         <use href="/feather-sprite-v4.29.0.svg#key" />
                     </svg></button>
             </form>
-            <div v-if=" identifier !== null ">
-                <p>Login successful! User identifier: {{ identifier.Uid }}</p>
+            <div v-if=" Profile.Uid !== '' ">
+                <p>Login successful! User identifier: {{ Profile.Uid }}</p>
             </div>
         </div>
     </div>
@@ -24,7 +24,10 @@ export default {
     data() {
         return {
             username: "",
-            identifier: null,
+            Profile: {
+                Uid: "",
+                Username: ""
+            },
             loading: false,
         };
     },
@@ -41,7 +44,7 @@ export default {
                     },
                 });
                 console.log(response.data)
-                this.identifier = response.data
+                this.Profile = response.data
                 this.saveTokenToSessionStorage()
             } catch (error) {
                 console.error("Error while logging in!");
@@ -50,10 +53,10 @@ export default {
             this.navigateToMyPage()
         },
         navigateToMyPage() {
-            this.$router.push('/users/' + this.identifier.Uid + '/profile');
+            this.$router.push('/users/' + this.Profile.Uid + '/profile');
         },
         saveTokenToSessionStorage() {
-            const bearerToken = this.identifier.Uid;
+            const bearerToken = this.Profile.Uid;
             sessionStorage.setItem('authToken', bearerToken);
         },
     },
