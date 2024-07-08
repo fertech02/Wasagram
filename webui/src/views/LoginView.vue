@@ -13,7 +13,7 @@
                     </svg></button>
             </form>
             <div v-if=" Profile != null">
-                <p>Login successful! User identifier: {{ Profile.uid }}</p>
+                <p>Login successful! User identifier: {{ Profile.Uid }}</p>
             </div>
         </div>
     </div>
@@ -34,7 +34,7 @@ export default {
             this.loading = true;
             this.errormsg = null;
             try {
-                let response = await this.$axios.post('/session/', { username: this.username }, {
+                let response = await this.$axios.post('/session', { username: this.username }, {
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json',
@@ -49,10 +49,10 @@ export default {
             this.navigateToMyPage()
         },
         navigateToMyPage() {
-            this.$router.push('/users/' + this.Profile.uid + '/profile/');
+            this.$router.push('/users/' + this.Profile.Uid + '/profile/');
         },
         saveTokenToSessionStorage() {
-            const bearerToken = `${this.Profile.uid}`;
+            const bearerToken = `${this.Profile.Uid}`;
             sessionStorage.setItem('authToken', bearerToken);
         },
     },

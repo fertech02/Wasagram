@@ -11,7 +11,7 @@ const router = createRouter({
 	history: createWebHashHistory(import.meta.env.BASE_URL),
 	routes: [
 		{path: '/', component: LoginView},
-		{path: '/session/', component: LoginView},
+		{path: '/session', component: LoginView},
 		{path: '/logout/', component: LogoutView},
 		{path: '/users/:uid/profile/', component: ProfileView},
 		{path: '/photos/', component: UploadPhotoView},
