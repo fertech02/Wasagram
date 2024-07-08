@@ -1,33 +1,3 @@
-<template>
-    <div class="container mt-5 text-center">
-        <h2 class="display-4 mb-4">User Search</h2>
-        <form @submit.prevent="searchUsers" class="mb-4">
-            <div class="form-group d-flex justify-content-center align-items-center">
-                <label for="searchQuery" class="mr-3" style="font-size: 30px; margin: 20px;">Username: </label>
-                <input type="text" id="searchQuery" v-model="searchQuery" class="form-control"
-                    placeholder="Enter username" />
-                <button type="submit" class="btn btn-sm btn-outline-secondary ml-2" @click="searchUsers"
-                    style="margin: 20px; font-size: 30px;">Search</button>
-            </div>
-        </form>
-        <p v-if="searchExecuted" class="mt-3" style="font-size: 25px;">
-            {{ Text }}
-        <ul class="list-group list-group-flush">
-            <li v-for="User in UserList" :key="User.id" class="list-group-item">
-                <div class="container">
-                    {{ User.username }}
-                    <button type="button" class="btn btn-secondary"
-                        @click="$router.push(`/users/${User.id}`)">Profile</button>
-                </div>
-
-
-            </li>
-        </ul>
-        </p>
-    </div>
-</template>
-  
-  
 <script>
 const token = sessionStorage.getItem('authToken');
 
@@ -90,5 +60,34 @@ export default {
     },
 };
 </script>
+
+<template>
+    <div class="container mt-5 text-center">
+        <h2 class="display-4 mb-4">User Search</h2>
+        <form @submit.prevent="searchUsers" class="mb-4">
+            <div class="form-group d-flex justify-content-center align-items-center">
+                <label for="searchQuery" class="mr-3" style="font-size: 30px; margin: 20px;">Username: </label>
+                <input type="text" id="searchQuery" v-model="searchQuery" class="form-control"
+                    placeholder="Enter username" />
+                <button type="submit" class="btn btn-sm btn-outline-secondary ml-2" @click="searchUsers"
+                    style="margin: 20px; font-size: 30px;">Search</button>
+            </div>
+        </form>
+        <p v-if="searchExecuted" class="mt-3" style="font-size: 25px;">
+            {{ Text }}
+        <ul class="list-group list-group-flush">
+            <li v-for="User in UserList" :key="User.id" class="list-group-item">
+                <div class="container">
+                    {{ User.username }}
+                    <button type="button" class="btn btn-secondary"
+                        @click="$router.push(`/users/${User.uid}`)">Profile</button>
+                </div>
+
+
+            </li>
+        </ul>
+        </p>
+    </div>
+</template>
 
 <style scoped></style>

@@ -14,7 +14,7 @@ export default {
     },
     data() {
         return {
-            userName: '',
+            username: '',
             found: false,
             followCount: 0,
             followedCount: 0,
@@ -129,6 +129,43 @@ export default {
     },
 };
 </script>
+
+<template>
+    <div class="container mt-5">
+        <h1 class="display-4" style="font-size: 50px;">{{ username }}</h1>
+        <div v-if="found">
+            <div>
+                <div v-if="!isItMe">
+                    <div class="btn-group mt-1">
+                        <button @click="Follow" class="btn btn-warning">
+                            {{ isFollowed ? 'Unfollow' : 'Follow' }} <svg class="feather">
+                                <use href="/feather-sprite-v4.29.0.svg#user-plus" />
+                            </svg>
+                        </button>
+                        <button @click="Ban" class="btn btn-danger">
+                            {{ isBanned ? 'Unban' : 'Ban' }} <svg class="feather">
+                                <use href="/feather-sprite-v4.29.0.svg#slash" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div style="font-size: 20px;" class="container mt-2">
+                <div class="row bg-light p-4 shadow-lg">
+                    <div class="row">Followers: {{ followCount }}</div>
+                    <div class="row">Followed: {{ followedCount }}</div>
+                    <div class="row">Photos: {{ photoCount }}</div>
+                </div>
+            </div>
+
+        </div>
+        <hr />
+        <div class="photos">
+            <PhotoCard v-for="photo in photoList" :key="photo.Pid" :photoId="photo.Pid" :date="photo.date"
+                :authorName="photo.Uid" :likeCount="photo.likecount" :caption="photo.caption" />
+        </div>
+    </div>
+</template>
   
 <style scoped>
 .user-info {
