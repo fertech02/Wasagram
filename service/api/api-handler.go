@@ -10,14 +10,14 @@ func (rt *_router) Handler() http.Handler {
 	// User routes
 	rt.router.POST("/session", rt.wrap(rt.doLogin))
 	rt.router.PUT("/users/:uid/username", rt.wrap(rt.setMyUserName))
-	rt.router.GET("/users/:uid/stream/", rt.wrap(rt.getMyStream))
-	rt.router.GET("/users/:uid/profile/", rt.wrap(rt.getUserProfile))
+	rt.router.GET("/users/:uid/stream", rt.wrap(rt.getMyStream))
+	rt.router.GET("/users/:uid/profile", rt.wrap(rt.getUserProfile))
 
 	// Photo routes
-	rt.router.POST("/photos/", rt.wrap(rt.uploadPhoto))
+	rt.router.POST("/photos", rt.wrap(rt.uploadPhoto))
 	rt.router.DELETE("/photos/:pid", rt.wrap(rt.deletePhoto))
 	rt.router.GET("/photos/:pid", rt.wrap(rt.getPhoto))
-	rt.router.GET("/photos/", rt.wrap(rt.getPhotos))
+	rt.router.GET("/photos", rt.wrap(rt.getPhotos))
 
 	// Follow routes
 	rt.router.PUT("/users/:uid/follow/:fid", rt.wrap(rt.followUser))
