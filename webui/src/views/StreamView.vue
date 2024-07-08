@@ -33,7 +33,7 @@ export default {
             location.reload();
         },
         async getMyStream() {
-            const uisd = this.$route.params.uid;
+            const uid = this.$route.params.uid;
             try {
                 const response = await this.$axios.get(`/users/${uid}/stream`, {
                     headers: {

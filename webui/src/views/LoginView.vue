@@ -40,7 +40,7 @@ export default {
                         'Content-Type': 'application/json',
                     },
                 });
-
+                console.log(response.data)
                 this.identifier = response.data
                 this.saveTokenToSessionStorage()
             } catch (error) {
