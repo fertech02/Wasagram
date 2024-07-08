@@ -55,7 +55,7 @@ export default {
             this.$router.push('/users/' + this.Profile.Uid + '/profile/');
         },
         saveTokenToSessionStorage() {
-            const bearerToken = `${this.Profile.Uid}`;
+            const bearerToken = this.Profile.Uid;
             sessionStorage.setItem('authToken', bearerToken);
         },
     },
