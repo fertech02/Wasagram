@@ -7,17 +7,18 @@ import (
 // Create a new User
 func (db *appdbimpl) CreateUser(username string) (User, error) {
 
-	_, err := db.c.Exec("INSERT INTO User (Uid, Username) VALUES (?, ?)", uuid.New().String(), username)
+	uuid := uuid.New().String()
+	_, err := db.c.Exec("INSERT INTO User (Uid, Username) VALUES (?, ?)", uuid, username)
 	if err != nil {
 		return User{}, err
 	}
-	return User{Uid: uuid.New().String(), Username: username}, nil
+	return User{Uid: uuid, Username: username}, nil
 }
 
 // Update Username
-func (db *appdbimpl) UpdateUsername(userid string, username string) error {
+func (db *appdbimpl) UpdateUsername(uid string, username string) error {
 
-	_, err := db.c.Exec("UPDATE User SET Username=? WHERE Uid=?", username, userid)
+	_, err := db.c.Exec("UPDATE User SET Username=? WHERE Uid=?", username, uid)
 	if err != nil {
 		return err
 	}

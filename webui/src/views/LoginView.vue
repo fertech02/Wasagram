@@ -3,7 +3,7 @@
         <LoadingSpinner v-if="loading"></LoadingSpinner>
         <div class="login-form">
             <h2>Login into your account</h2>
-            <form @submit.prevent="login">
+            <form @submit.prevent="doLogin">
                 <label class="login-label" for="username">Username:</label>
                 <input type="text" id="username" v-model="username" required minlength="3" maxlength="16"
                     style="padding: 6px;" />
@@ -33,7 +33,7 @@ export default {
     },
 
     methods: {
-        async login() {
+        async doLogin() {
             this.loading = true;
             this.errormsg = null;
             try {
@@ -45,12 +45,12 @@ export default {
                 });
                 console.log(response)
                 this.profile = response.data;
-                this.saveTokenToSessionStorage()
-                this.loading = false;
-                this.navigateToMyPage()
             } catch (error) {
                 console.error("Error while logging in!", error);
             }
+            this.saveTokenToSessionStorage()
+            this.loading = false;
+            this.navigateToMyPage()
         },
         navigateToMyPage() {
             this.$router.push('/users/' + this.profile.Uid + '/profile');

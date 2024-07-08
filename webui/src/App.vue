@@ -63,7 +63,7 @@ export default {
 							</RouterLink>
 						</li>
 						<li class="nav-item">
-							<RouterLink to="/session/" class="nav-link">
+							<RouterLink to="/session" class="nav-link">
 								<svg class="feather">
 									<use href="/feather-sprite-v4.29.0.svg#key" />
 								</svg>
@@ -86,7 +86,7 @@ export default {
 					</h6>
 					<ul class="nav flex-column">
 						<li class="nav-item">
-							<RouterLink to="/photos/" class="nav-link">
+							<RouterLink to="/photos" class="nav-link">
 								<svg class="feather">
 									<use href="/feather-sprite-v4.29.0.svg#upload" />
 								</svg>
