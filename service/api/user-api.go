@@ -185,3 +185,34 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 }
+
+func (rt *_router) searchUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+
+	// Get the Authorization header
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	// Validate the token
+	isValid, err := validateToken(authHeader)
+	if err != nil || !isValid {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	usernameToSearch := r.URL.Query().Get("username")
+	usersList, err := rt.db.SearchUser(usernameToSearch)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(usersList)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}

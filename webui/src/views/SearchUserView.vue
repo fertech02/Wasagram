@@ -14,7 +14,7 @@ export default {
         async searchUsers() {
             try {
                 console.log("search started")
-                const response = await this.$axios.get(`/users/`, {
+                const response = await this.$axios.get(`/users`, {
                     params: { userName: this.searchQuery },
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -80,7 +80,7 @@ export default {
                 <div class="container">
                     {{ User.username }}
                     <button type="button" class="btn btn-secondary"
-                        @click="$router.push(`/users/${User.uid}`)">Profile</button>
+                        @click="$router.push(`/users/${User.uid}/profile`)">Profile</button>
                 </div>
 
 

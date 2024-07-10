@@ -42,7 +42,7 @@ export default {
     methods: {
         async getComments() {
             try {
-                const response = await this.$axios.get(`/photos/${this.photoId}/comments/`, {
+                const response = await this.$axios.get(`/photos/${this.photoId}/comments`, {
                     headers: {
                         Authorization: `Bearer ${this.token}`,
                     },

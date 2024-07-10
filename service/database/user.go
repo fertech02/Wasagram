@@ -62,6 +62,31 @@ func (db *appdbimpl) GetMyStream(uid string) ([]*Photo, error) {
 	return strm, nil
 }
 
+// Search User
+
+func (db *appdbimpl) SearchUser(usernameToSearch string) (usersList []User, err error) {
+
+	query := "SELECT * FROM Users WHERE Username LIKE ?"
+
+	rows, err := db.c.Query(query, usernameToSearch+"%")
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var user User
+		err = rows.Scan(&user.Uid, &user.Username)
+		if err != nil {
+			return
+		}
+		usersList = append(usersList, user)
+	}
+
+	err = rows.Err()
+	return
+}
+
 // Get User Id
 func (db *appdbimpl) GetUserId(username string) (string, error) {
 
