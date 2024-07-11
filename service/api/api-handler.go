@@ -26,14 +26,14 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.GET("/users/:uid/follow", rt.wrap(rt.getFollowedUsers))
 
 	// Comment routes
-	rt.router.POST("/photo/:pid/comments/:uid", rt.wrap(rt.commentPhoto))
-	rt.router.DELETE("/photo/:pid/comments/:uid", rt.wrap(rt.uncommentPhoto))
-	rt.router.GET("/photo/:pid/comments", rt.wrap(rt.getComments))
+	rt.router.POST("/photos/:pid/comments/:uid", rt.wrap(rt.commentPhoto))
+	rt.router.DELETE("/photos/:pid/comments/:uid", rt.wrap(rt.uncommentPhoto))
+	rt.router.GET("/photos/:pid/comments", rt.wrap(rt.getComments))
 
 	// Like routes
-	rt.router.PUT("/photo/:pid/likes/:uid", rt.wrap(rt.likePhoto))
-	rt.router.DELETE("/photo/:pid/likes/:uid", rt.wrap(rt.unlikePhoto))
-	rt.router.GET("/photo/:pid/likes", rt.wrap(rt.getLikes))
+	rt.router.PUT("/photos/:pid/likes/:uid", rt.wrap(rt.likePhoto))
+	rt.router.DELETE("/photos/:pid/likes/:uid", rt.wrap(rt.unlikePhoto))
+	rt.router.GET("/photos/:pid/likes", rt.wrap(rt.getLikes))
 
 	// Ban routes
 	rt.router.PUT("/users/:uid/ban/:bid", rt.wrap(rt.banUser))
