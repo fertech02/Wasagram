@@ -38,10 +38,6 @@ export default {
                             // unauthorized
                             this.Text = "You have to log in first";
                             break;
-                        case 403:
-                            console.error('Access Forbidden:', error.response.data);
-                            // forbidden
-                            break;
                         case 404:
                             console.error('Not Found:', error.response.data);
                             // not found
