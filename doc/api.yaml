@@ -275,16 +275,12 @@ paths:
       tags:
         - users
       parameters:
-<<<<<<< HEAD
-        - $ref: "#/components/parameters/username"
-=======
         - name: username
           in: query
           description: The username of the user
           required: true
           schema:
             $ref: "#/components/schemas/username"
->>>>>>> a38279d (ADJUSTED API)
       responses:
         "200":
           description: User id found and returned.
