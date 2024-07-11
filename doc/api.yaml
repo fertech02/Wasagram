@@ -275,7 +275,7 @@ paths:
       tags:
         - users
       parameters:
-        - $ref: "#/components/parameters/userName"
+        - $ref: "#/components/parameters/username"
       responses:
         "200":
           description: User id found and returned.
@@ -515,6 +515,15 @@ paths:
 components:
 
   schemas:
+    
+    username:
+      title: username
+      description: "This object represents the name of the user"
+      type: string
+      pattern: '^.*?$'
+      example: MickeyMouse
+      minLength: 3
+      maxLength: 16
 
     Photo:
       type: object
