@@ -68,3 +68,76 @@ export default {
         </form>
     </div>
 </template>
+
+<style scoped>
+    .container {
+        background-color: #f8f9fa;
+    }
+    .border {
+        border: 1px solid #ced4da;
+    }
+    .rounded {
+        border-radius: 0.25rem;
+    }
+    .vh-100 {
+        height: 100vh;
+    }
+    .d-flex {
+        display: flex;
+    }
+    .justify-content-center {
+        justify-content: center;
+    }
+    .align-items-center {
+        align-items: center;
+    }
+    .mb-4 {
+        margin-bottom: 1.5rem;
+    }
+    .mb-3 {
+        margin-bottom: 1rem;
+    }
+    .form-label {
+        margin-bottom: 0.5rem;
+    }
+    .form-control {
+        display: block;
+        width: 100%;
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #495057;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+    .btn {
+        display: inline-block;
+        font-weight: 400;
+        color: #212529;
+        text-align: center;
+        vertical-align: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        background-color: #007bff;
+        border: 1px solid #007bff;
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        border-radius: 0.25rem;
+        transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+    .btn-primary {
+        color: #fff;
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+    .btn-primary:hover {
+        color: #fff;
+        background-color: #0069d9
+    }
+</style>
