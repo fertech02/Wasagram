@@ -29,7 +29,7 @@
     async created() {
       if (this.Pid) {
         try {
-          const response = await this.$axios.get('/photos' + this.Pid, {
+          const response = await this.$axios.get('/photos/' + this.Pid, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
