@@ -21,7 +21,7 @@ export default {
 				this.errormsg = "Please select a file to upload."
 			} else {
 				try {
-					const response = await this.$axios.post("/photos/", {
+					const response = await this.$axios.post("/photos", {
                         photo: this.photo,
                     }, {
                         headers: {
