@@ -1,24 +1,19 @@
 import {createRouter, createWebHashHistory} from 'vue-router'
-import LoginView from '../views/LoginView.vue'
-import LogoutView from '../views/LogoutView.vue'
+import HomeView from '../views/HomeView.vue'
+import SearchView from '../views/SearchView.vue'
 import ProfileView from '../views/ProfileView.vue'
-import UploadPhotoView from '../views/UploadPhoto.vue'
-import SearchUserView from '../views/SearchUserView.vue'
-import StreamView from '../views/StreamView.vue'
-import SetUserNameView from '../views/SetUserNameView.vue'
+import PersonalProfile from '../views/PersonalProfile.vue'
+import SetMyUsername from '../views/SetMyUserName.vue'
 
 const router = createRouter({
 	history: createWebHashHistory(import.meta.env.BASE_URL),
 	routes: [
-		{path: '/', component: LoginView},
-		{path: '/session', component: LoginView},
-		{path: '/logout/', component: LogoutView},
+		{path: '/', redirect: '/login'},
+		{path: '/home', component: HomeView},
+		{path: '/search', component: SearchView},
+		{path: '/personalProfile', component: PersonalProfile},
 		{path: '/users/:uid/profile', component: ProfileView},
-		{path: '/photos/', component: UploadPhotoView},
-		{path: '/users/:uid/stream', component: StreamView},
-		{path: '/users/:uid/username', component: SetUserNameView},
-		{path: '/users/', component: SearchUserView}
-
+		{path: '/set-name', component: SetMyUsername},
 	]
 })
 

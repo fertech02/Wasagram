@@ -98,19 +98,6 @@ func run() error {
 		return fmt.Errorf("creating AppDatabase: %w", err)
 	}
 
-	// Check for the photos folder
-	dirpath := "/tmp/photos/"
-	if _, err := os.Stat(dirpath); os.IsNotExist(err) {
-		err = os.Mkdir(dirpath, 0755)
-		if err != nil {
-			return err
-		}
-	} else if err != nil {
-		return err
-	} else {
-		logger.Info("filesystem folder already exists")
-	}
-
 	// Start (main) API server
 	logger.Info("initializing API server")
 

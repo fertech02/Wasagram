@@ -1,115 +1,147 @@
+<script setup>
+import { RouterLink, RouterView } from 'vue-router';
+</script>
+
 <script>
-const token = sessionStorage.getItem('authToken');
-import { RouterLink, RouterView } from 'vue-router'
 export default {
-	data() {
+	data: function() {
 		return {
-			mypath: "/users/" + token + "/profile",
-			streampath: "/users/" + token + "/stream",
-			username: "/users/" + token + "/username"
+			errormsg: null,
 		}
 	},
 	methods: {
-		logout() {
-			localStorage.clear();
-			sessionStorage.clear();
-			location.reload();
-		},
+		async doLogin() {
+			try {
+				let username = document.getElementById('username').value;
+				let response = await this.$axios.post('/session/', {username: username}, {headers : {'Content-Type': 'application/json'}});
+				let user = response.data // userID, username
+				sessionStorage.setItem('token', user.user_id);
+				sessionStorage.setItem('username', user.username);
+				this.$router.replace('/home');
+			} catch (error) {
+				const status = error.response.status;
+        		const reason = error.response.data;
+                this.errormsg = `Status ${status}: ${reason}`;
+			}
+		}
 	},
-
 }
 </script>
 
 <template>
-	<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-		<a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6" href="#/">Wasaphoto</a>
-		<button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse"
-			data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
-			<span class="navbar-toggler-icon"></span>
-		</button>
-	</header>
 
-	<div class="container-fluid">
-		<div class="row">
-			<nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-				<div class="position-sticky pt-3 sidebar-sticky">
-					<h6
-						class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
-						<span>General</span>
-					</h6>
-					<ul class="nav flex-column">
-						<li class="nav-item">
-							<RouterLink :to="mypath" class="nav-link">
-								<svg class="feather">
-									<use href="/feather-sprite-v4.29.0.svg#home" />
-								</svg>
-								My profile
-							</RouterLink>
-						</li>
-						<li class="nav-item">
-							<RouterLink :to="streampath" class="nav-link">
-								<svg class="feather">
-									<use href="/feather-sprite-v4.29.0.svg#list" />
-								</svg>
-								Stream
-							</RouterLink>
-						</li>
-						<li class="nav-item">
-							<RouterLink to="/users/" class="nav-link">
-								<svg class="feather">
-									<use href="/feather-sprite-v4.29.0.svg#search" />
-								</svg>
-								Search user
-							</RouterLink>
-						</li>
-						<li class="nav-item">
-							<RouterLink to="/session" class="nav-link">
-								<svg class="feather">
-									<use href="/feather-sprite-v4.29.0.svg#key" />
-								</svg>
-								Login
-							</RouterLink>
-						</li>
-						<li class="nav-item" @click.prevent="logout">
-							<RouterLink to="/logout/" class="nav-link">
-								<svg class="feather">
-									<use href="/feather-sprite-v4.29.0.svg#log-out" />
-								</svg>
-								Logout
-							</RouterLink>
-						</li>
-					</ul>
+	<div v-if="$route.path !== '/login'">
+		<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+			<a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6" href="#/">WASAPHOTO</a>
+			<button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+		</header>
 
-					<h6
-						class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
-						<span>Actions</span>
-					</h6>
-					<ul class="nav flex-column">
-						<li class="nav-item">
-							<RouterLink to="/photos" class="nav-link">
-								<svg class="feather">
-									<use href="/feather-sprite-v4.29.0.svg#upload" />
-								</svg>
-								Upload photo
-							</RouterLink>
-						</li>
-						<li class="nav-item">
-							<RouterLink :to="username" class="nav-link">
-								<svg class="feather">
-									<use href="/feather-sprite-v4.29.0.svg#edit-3" />
-								</svg>
-								Change my username
-							</RouterLink>
-						</li>
-					</ul>
-				</div>
-			</nav>
+		<div class="container-fluid">
+			<div class="row">
+				<nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+					<div class="position-sticky pt-3 sidebar-sticky">
+						<h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
+							<span>General</span>
+						</h6>
+						<ul class="nav flex-column">
+							<li class="nav-item">
+								<RouterLink to="/home" class="nav-link">
+									<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#home"/></svg>
+									Home
+								</RouterLink>
+							</li>
+							<li class="nav-item">
+								<RouterLink to="/search" class="nav-link">
+									<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#search"/></svg>
+									Search
+								</RouterLink>
+							</li>
+							<li class="nav-item">
+								<RouterLink to="/personalProfile" class="nav-link">
+									<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#user"/></svg>
+									Profile
+								</RouterLink>
+							</li>
+						</ul>
 
-			<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-				<RouterView />
-			</main>
+						<h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
+							<span>Secondary menu</span>
+						</h6>
+						<ul class="nav flex-column">
+							<li class="nav-item">
+								<RouterLink to="/set-name" class="nav-link">
+									<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#settings"/></svg>
+									Settings
+								</RouterLink>
+							</li>
+							<li class="nav-item">
+								<RouterLink to="/login" class="nav-link">
+									<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#log-out"/></svg>
+									Logout
+								</RouterLink>
+							</li>
+						</ul>
+					</div>
+				</nav>
+
+				<main class="col-md-9 ms-sm-auto col-lg-10 px-md-0">
+					<RouterView />
+				</main>
+			</div>
 		</div>
 	</div>
+
+	<div v-else>
+		<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+			<a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6" href="#/">WASAPHOTO</a>
+			<button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+		</header>
+		<div class="background">
+			<div class="container py-5">
+				<div class="row justify-content-center align-items-center">
+					<div class="col-md-6">
+						<div class="card bg-white text-dark rounded-3">
+							<div class="card-body p-5 text-center">
+								<h2 class="fw-bold mb-4 text-uppercase">Welcome to wasaphoto</h2>
+								<p class="text-muted">
+									Please enter your username
+								</p>
+								<div class="form-group">
+									<input
+										type="text"
+										id="username"
+										class="form-control form-control-lg rounded-pill mb-3"
+										placeholder="Username"
+										required
+										/>
+								</div>
+								<div class="d-grid gap-3" @click="doLogin">
+									<button
+										class="btn btn-primary rounded-pill"
+										type="submit"
+										style="background-color: 1">
+										Login
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<ErrorMsg v-if="errormsg" :msg="errormsg" />
+		</div>
+	</div>
+
 </template>
 
-<style></style>
+<style>
+	.background {
+		background-color: rgb(149, 180, 178);
+		height: 100vh;
+	}
+	
+</style>

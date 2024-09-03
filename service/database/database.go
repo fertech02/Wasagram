@@ -83,7 +83,7 @@ type AppDatabase interface {
 
 	// User
 	CreateUser(username string) (User, error)
-	GetUserId(username string) (string, error)
+	GetUserId(username string) (user User, present bool, err error)
 	GetUsername(uid string) (string, error)
 	UpdateUsername(userid string, username string) error
 	GetMyStream(uid string) ([]*Photo, error)

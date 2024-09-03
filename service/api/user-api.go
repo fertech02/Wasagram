@@ -28,55 +28,34 @@ func (u *User) ToDatabase() database.User {
 
 func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	
-	var requestData string
-	
 	var user User
+	err := json.NewDecoder(r.Body).Decode(&user)
 
-	err := json.NewDecoder(r.Body).Decode(&requestData)
 	if err != nil {
-		ctx.Logger.WithError(err).WithField("username", requestData).Error("Can't login user")
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	username := requestData
+	dbUser, present, err := rt.db.GetUserId(user.Username)
 
-	userID, err := rt.db.GetUserId(username)
-	if err != nil {
-		ctx.Logger.WithError(err).WithField("username", username).Error("Can't operate database")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	if (userID != "") {
-		response := map[string]string{"Uid": userID, "Username": username}
-		w.Header().Set("Content-Type", "application/json")
-		err = json.NewEncoder(w).Encode(response)
-		if err != nil {
-			ctx.Logger.WithError(err).WithField("username", username).Error("Can't login user")
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+	if present {
 		w.WriteHeader(http.StatusOK)
-		return
+	} else {
+		w.WriteHeader(http.StatusCreated)
+		dbUser, err = rt.db.CreateUser(user.Username)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	}
 
-	newUser, err := rt.db.CreateUser(username)
 	if err != nil {
-		ctx.Logger.WithError(err).WithField("username", username).Error("Can't login user")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	user.FromDatabase(newUser)
-	response := user
-	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(response)
-	if err != nil {
-		ctx.Logger.WithError(err).WithField("username", username).Error("Can't login user")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
+	w.Header().Set("content-type", "application/json")
+	user.FromDatabase(dbUser)
+	_ = json.NewEncoder(w).Encode(user)
 }
 
 func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
