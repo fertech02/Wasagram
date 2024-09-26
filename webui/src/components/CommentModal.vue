@@ -99,27 +99,24 @@ export default {
     </div>
 </template>
 
-<style> 
-.my-modal-disp-none{
-	display: none;
-}
-.my-btn-comm{
-    border: none;
-}
-.my-btn-comm:hover{
-    border: none;
-    color: red;
-    transform: scale(1.1);
-}
-
-.scrollable-content {
-    max-height: 300px; /* Adjust the height as needed */
-    overflow-y: auto;
-}
-
+<style>
 .comment-container {
-    margin-bottom: 30px;
-    border-radius: 1cm;
-    border-color: black; /* Adjust the value to increase or decrease the space between comments */
+    border-bottom: 1px solid #e0e0e0;
+    padding: 10px;
 }
+
+.my-modal-disp-none {
+    display: none;
+}
+
+.my-trash-icon {
+    color: #e0e0e0;
+}
+
+.my-btn-comm {
+    background-color: transparent;
+    border: none;
+    color: #e0e0e0;
+}
+
 </style>

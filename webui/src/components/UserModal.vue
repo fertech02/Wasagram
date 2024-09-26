@@ -46,18 +46,3 @@ export default {
 	</div>
 </template>
 
-<style>
-.my-modal-disp-none{
-	display: none;
-}
-.user-mini-card{
-    color: black;
-    width: 25%;
-    border: none;
-    border-color: black;
-}
-.user-mini-card-title:hover{
-    cursor: pointer;
-    font-weight: bold;
-}
-</style>

@@ -129,35 +129,23 @@ export default {
     </div>
 </template>
 
-<style>
-.photo-background-color{
-	background-color: rgb(255, 255, 255);
+<style scoped>
+.my-card {
+    width: 100%;
+    max-width: 500px;
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
-.my-card{
-	width: 27rem;
-	border-color: black;
-	border-width: thin;
+
+.photo-background-color {
+    background-color: #f0f0f0;
+    border-radius: 10px 10px 0 0;
 }
-.my-heart-color{
-	color: rgb(0, 0, 0);
+
+.my-heart-color {
+    color: #ff0000;
 }
-.my-heart-color:hover{
-	color: red;
-}
-.my-comment-color {
-	color: rgb(0, 0, 0);
-}
-.my-comment-color:hover{
-	color: rgb(255, 0, 0);
-}
-.my-comment-color-2{
-	color:rgb(0, 0, 0)
-}
-.my-dlt-btn{
-	font-size: 19px;
-}
-.my-dlt-btn:hover{
-	font-size: 19px;
-	color: var(--color-red-danger);
-}
+
+
 </style>
