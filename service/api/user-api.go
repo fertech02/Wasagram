@@ -27,34 +27,41 @@ func (u *User) ToDatabase() database.User {
 }
 
 func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	
+
+
 	var user User
-	err := json.NewDecoder(r.Body).Decode(&user)
+	var requestData struct {
+		Username string `json:"username"`
+	}
+	err := json.NewDecoder(r.Body).Decode(&requestData)
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	dbUser, present, err := rt.db.GetUserId(user.Username)
+	username := requestData.Username
 
-	if present {
-		w.WriteHeader(http.StatusOK)
-	} else {
-		w.WriteHeader(http.StatusCreated)
-		dbUser, err = rt.db.CreateUser(user.Username)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-	}
+	userid, err := rt.db.GetUserId(username)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
+	// The user already exists
+	if userid != "" {
+		w.WriteHeader(http.StatusOK)
+		return
+	} 
+	// The user does not exist
+	DBuser, err := rt.db.CreateUser(username)
+	if err != nil {
+		http.Error(w, "Error creating user", http.StatusInternalServerError)
+	}
+
 	w.Header().Set("content-type", "application/json")
-	user.FromDatabase(dbUser)
+	user.FromDatabase(DBuser)
 	_ = json.NewEncoder(w).Encode(user)
 }
 

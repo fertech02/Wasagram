@@ -14,9 +14,9 @@ export default {
 			try {
 				let username = document.getElementById('username').value;
 				let response = await this.$axios.post('/session/', {username: username}, {headers : {'Content-Type': 'application/json'}});
-				let user = response.data // userID, username
-				sessionStorage.setItem('token', user.user_id);
-				sessionStorage.setItem('username', user.username);
+				let user = response.data // Uid, Username
+				sessionStorage.setItem('token', user.Uid);
+				sessionStorage.setItem('username', user.Username);
 				this.$router.replace('/home');
 			} catch (error) {
 				const status = error.response.status;
@@ -137,11 +137,3 @@ export default {
 	</div>
 
 </template>
-
-<style>
-	.background {
-		background-color: rgb(149, 180, 178);
-		height: 100vh;
-	}
-	
-</style>
