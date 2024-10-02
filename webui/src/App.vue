@@ -13,17 +13,21 @@ export default {
 		async doLogin() {
 			try {
 				let username = document.getElementById('username').value;
-				let response = await this.$axios.post('/session/', {username: username}, {headers : {'Content-Type': 'application/json'}});
-				let user = response.data // Uid, Username
-				sessionStorage.setItem('token', user.Uid);
-				sessionStorage.setItem('username', user.Username);
+				if (!username.match("^[a-zA-Z][a-zA-Z0-9_]{2,15}$")) {
+                alert("Invalid username: 3 - 16 characters; first character must be a letter; only letters, numbers and underscores allowed");
+                return;
+				}
+				let response = await this.$axios.post('/session/', {username: username}, {headers: {'Content-Type': 'application/json'}});
+				let user = response.data 
+				sessionStorage.setItem('token', user.user_id);
+				sessionStorage.setItem('username', user.username);
 				this.$router.replace('/home');
 			} catch (error) {
 				const status = error.response.status;
         		const reason = error.response.data;
                 this.errormsg = `Status ${status}: ${reason}`;
 			}
-		}
+		},
 	},
 }
 </script>
@@ -71,7 +75,7 @@ export default {
 						</h6>
 						<ul class="nav flex-column">
 							<li class="nav-item">
-								<RouterLink to="/set-name" class="nav-link">
+								<RouterLink to="/settings" class="nav-link">
 									<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#settings"/></svg>
 									Settings
 								</RouterLink>

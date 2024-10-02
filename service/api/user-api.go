@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"github.com/fertech02/Wasa-repository/service/api/reqcontext"
 	"github.com/fertech02/Wasa-repository/service/database"
@@ -26,42 +27,40 @@ func (u *User) ToDatabase() database.User {
 	}
 }
 
+func validUsername(identifier string) bool {
+	var trimmedId = strings.TrimSpace(identifier)
+	return len(identifier) >= 3 && len(identifier) <= 16 && trimmedId != "" && !strings.ContainsAny(trimmedId, "?_")
+}
+
 func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-
 	var user User
-	var requestData struct {
-		Username string `json:"username"`
-	}
-	err := json.NewDecoder(r.Body).Decode(&requestData)
+	err := json.NewDecoder(r.Body).Decode(&user)
 
-	if err != nil {
+	if err != nil || !validUsername(user.Username) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	username := requestData.Username
+	dbUser, present, err := rt.db.GetUserId(user.Username)
 
-	userid, err := rt.db.GetUserId(username)
+	if present {
+		w.WriteHeader(http.StatusOK)
+	} else {
+		w.WriteHeader(http.StatusCreated)
+		dbUser, err = rt.db.CreateUser(user.Username)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	// The user already exists
-	if userid != "" {
-		w.WriteHeader(http.StatusOK)
-		return
-	} 
-	// The user does not exist
-	DBuser, err := rt.db.CreateUser(username)
-	if err != nil {
-		http.Error(w, "Error creating user", http.StatusInternalServerError)
-	}
-
 	w.Header().Set("content-type", "application/json")
-	user.FromDatabase(DBuser)
+	user.FromDatabase(dbUser)
 	_ = json.NewEncoder(w).Encode(user)
 }
 

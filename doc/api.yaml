@@ -47,17 +47,18 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: "#/components/schemas/username"
         "201":
-          description: User log-in action successful
+          description: User sign-in action successful
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: "#/components/schemas/username"
         "400":
           $ref: "#/components/responses/BadRequest"
         "500":
           $ref: "#/components/responses/InternalServerError"
+  
   /photos:
     post:
       tags: ["Photos"]
