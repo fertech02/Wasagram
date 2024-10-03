@@ -353,16 +353,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              description: User's new username
-              properties: 
-                username: 
-                  type: string
-                  pattern: '^[a-zA-Z0-9-_]+$'
-                  minLength: 3
-                  maxLength: 12
-                  description: "The new username"
-                  example: "new_username"
+              $ref: "#/components/schemas/username"
       responses:
         "200": 
           description: Username updated sucessfully
