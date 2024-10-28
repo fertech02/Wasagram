@@ -22,7 +22,7 @@ func (u *User) FromDatabase(user database.User) {
 
 func (u *User) ToDatabase() database.User {
 	return database.User{
-		Uid:       u.Uid,
+		Uid:      u.Uid,
 		Username: u.Username,
 	}
 }
