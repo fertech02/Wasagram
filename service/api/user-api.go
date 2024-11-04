@@ -3,65 +3,60 @@ package api
 import (
 	"encoding/json"
 	"net/http"
-	"strings"
 
 	"github.com/fertech02/Wasa-repository/service/api/reqcontext"
-	"github.com/fertech02/Wasa-repository/service/database"
 	"github.com/julienschmidt/httprouter"
 )
 
-type User struct {
-	Uid      string `json:"uid"`
-	Username string `json:"username"`
-}
-
-func (u *User) FromDatabase(user database.User) {
-	u.Uid = user.Uid
-	u.Username = user.Username
-}
-
-func (u *User) ToDatabase() database.User {
-	return database.User{
-		Uid:      u.Uid,
-		Username: u.Username,
-	}
-}
-
-func validUsername(identifier string) bool {
-	var trimmedId = strings.TrimSpace(identifier)
-	return len(identifier) >= 3 && len(identifier) <= 16 && trimmedId != "" && !strings.ContainsAny(trimmedId, "?_")
-}
-
 func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	var user User
-	err := json.NewDecoder(r.Body).Decode(&user)
+	var requestData struct {
+		Username string `json:"username"`
+	}
 
-	if err != nil || !validUsername(user.Username) {
+	err := json.NewDecoder(r.Body).Decode(&requestData)
+	if err != nil {
+		ctx.Logger.Error("Error decoding request body: %v", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	dbUser, present, err := rt.db.GetUserId(user.Username)
+	username := requestData.Username
 
-	if present {
-		w.WriteHeader(http.StatusOK)
-	} else {
-		w.WriteHeader(http.StatusCreated)
-		dbUser, err = rt.db.CreateUser(user.Username)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-	}
+	userId, err := rt.db.GetUserId(username)
 
 	if err != nil {
+		ctx.Logger.WithError(err).WithField("username", username).Error("Error getting user id")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	w.Header().Set("content-type", "application/json")
-	user.FromDatabase(dbUser)
-	_ = json.NewEncoder(w).Encode(user)
+	if userId != "" {
+		response := map[string]string{"userId": userId}
+		w.Header().Set("Content-Type", "application/json")
+		err = json.NewEncoder(w).Encode(response)
+		if err != nil {
+			ctx.Logger.WithError(err).WithField("username", username).Error("Error encoding response")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+	}
+
+	newUser, err := rt.db.CreateUser(username)
+	if err != nil {
+		ctx.Logger.WithError(err).WithField("username", username).Error("Error creating user")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	response := map[string]string{"userId": newUser.Uid}
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(response)
+	if err != nil {
+		ctx.Logger.WithError(err).WithField("username", username).Error("Error encoding response")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 }
 
 func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {

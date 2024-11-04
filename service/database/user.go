@@ -88,20 +88,14 @@ func (db *appdbimpl) SearchUser(usernameToSearch string) (usersList []User, err 
 }
 
 // Get User Id
-func (db *appdbimpl) GetUserId(username string) (user User,present bool, err error) {
+func (db *appdbimpl) GetUserId(username string) (user string, err error) {
 
-	query := `SELECT * FROM Users WHERE Uid = ?;`
-	err = db.c.QueryRow(query, username).Scan(&user.Uid, &user.Username)
-	if err != nil && err != sql.ErrNoRows {
-		return
-	} else if err == sql.ErrNoRows {
-		err = nil
-		return
-	} else {
-		err = nil
-		present = true
-		return
+	var Id string
+	err = db.c.QueryRow("SELECT Uid FROM Users WHERE Username = ?", username).Scan(&Id)
+	if err == sql.ErrNoRows {
+		return "", nil
 	}
+	return Id, err
 }
 
 // Get Username

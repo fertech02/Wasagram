@@ -37,7 +37,7 @@ import (
 )
 
 type User struct {
-	Uid 	 string `json:"uid"`
+	Uid      string `json:"uid"`
 	Username string `json:"username"`
 }
 
@@ -83,7 +83,7 @@ type AppDatabase interface {
 
 	// User
 	CreateUser(username string) (User, error)
-	GetUserId(username string) (User, bool, error)
+	GetUserId(username string) (string, error)
 	GetUsername(uid string) (string, error)
 	UpdateUsername(userid string, username string) error
 	GetMyStream(uid string) ([]*Photo, error)

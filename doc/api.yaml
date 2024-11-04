@@ -37,8 +37,10 @@ paths:
         description: |-
           User details for login.               
         content:
-          application/json:
-            schema:
+          description: Username
+          type: object
+          properties:
+            name: 
               $ref: "#/components/schemas/username"
         required: true
       responses:

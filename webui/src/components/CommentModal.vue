@@ -15,7 +15,7 @@ export default {
             try {
                 let response = await this.$axios.post(`/photos/${this.pid}/comments/${this.token}`, this.text, {headers: {'Authorization': `${sessionStorage.getItem('token')}`, 'Content-Type': 'text/plain'}});
                 let comment = response.data;
-                this.$emit('addComment', comment); // signal to parent
+                this.$emit('addComment', comment); 
                 console.log("new comment:" ,this.comments);
                 this.text = "";
             } catch(error) {
@@ -28,7 +28,7 @@ export default {
         async uncommentPhoto() {
             try {
                 await this.$axios.delete(`/photos/${this.pid}/comments/${this.token}/`, {headers: {'Authorization': `${sessionStorage.getItem('token')}`}});
-                this.$emit('removeComment', comment_id); // signal to parent
+                this.$emit('removeComment', comment_id); 
             } catch(error) {
                 const status = error.response.status;
                 const reason = error.response.data;
@@ -39,84 +39,8 @@ export default {
 
 	},
     mounted() {
-        // Log comments when the component is mounted
+
         console.log("Comments List:", this.comments);
     }
 }
 </script>
-
-<template>
-    <div class="modal fade my-modal-disp-none" :id="modalID" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-dialog modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" :id="modalID">Comments</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-footer d-flex justify-content-center w-100">
-                    <div class="row w-100 ">
-                        <div class="col-10">
-                            <div class="mb-3 me-auto">
-                                <textarea class="form-control" id="exampleFormControlTextarea1" 
-								placeholder="Add a comment..." rows="1" maxLength="2200" v-model="text"></textarea>
-                            </div>
-                        </div>
-                        <div class="col-2 d-flex align-items-center">
-                            <button type="button" class="btn btn-primary" 
-							@click.prevent="commentPhoto" 
-							:disabled="text.length < 1 || text.length > 2200">
-							Send
-							</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-body" style="overflow-y: auto;">
-                    <div v-for="comment in comments" :key="comment.Pid" class="comment-container">
-                        <div class="container-fluid">
-                            <div class="row">
-                                <div class="col-10">
-                                    <h5>@<b>{{comment.username}}</b></h5>
-                                </div>
-                                <div class="col-2">
-                                    <button v-if="token == comment.Uid || isOwner" class="btn my-btn-comm" @click="uncommentPhoto()">
-                                        <i class="fa-regular fa-trash-can my-trash-icon"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-12">
-                                   <h4>{{comment.text}}</h4> 
-                                   {{ comment.date }}
-                                </div>
-                            </div>
-                            
-                        </div>
-                    </div>
-                </div>
-               
-            </div>
-        </div>
-    </div>
-</template>
-
-<style>
-.comment-container {
-    border-bottom: 1px solid #e0e0e0;
-    padding: 10px;
-}
-
-.my-modal-disp-none {
-    display: none;
-}
-
-.my-trash-icon {
-    color: #e0e0e0;
-}
-
-.my-btn-comm {
-    background-color: transparent;
-    border: none;
-    color: #e0e0e0;
-}
-
-</style>
