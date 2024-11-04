@@ -1,18 +1,21 @@
 <script>
 const token = sessionStorage.getItem('authToken');
 export default {
+
   data() {
     return {
       photo: null,
-      caption: '',
       uploadSuccess: false,
       endText: '',
     };
   },
+
   methods: {
+
     onFileChange(event) {
       this.photo = event.target.files[0];
     },
+
     async uploadPhoto() {
       if (!this.photo) {
         console.log('Photo is required');
@@ -21,11 +24,7 @@ export default {
 
       const formData = new FormData();
       formData.append('file', this.photo);
-      const additionalData = {
-        Caption: this.caption,
-      };
-
-      formData.append('additionalData', JSON.stringify(additionalData));
+      
       const config = {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -52,5 +51,23 @@ export default {
       }
     },
   },
+
 };
 </script>
+
+<template>
+  <div class="container mt-5">
+    <h2 class="display-4 mb-4">Upload Photo</h2>
+    <form @submit.prevent="uploadPhoto" class="needs-validation" novalidate style="font-size: 17px;">
+      <div class="container mt-3">
+        <div class="input-group">
+          <input type="file" class="form-control-file" id="photo" @change="onFileChange" required />
+          <div class="invalid-feedback" v-if="!photo">Photo is required</div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-lg" style="margin: 20px;">Upload</button>
+      <p v-if="uploadSuccess" class="alert alert-success mt-3">{{ endText }}</p>
+    </form>
+  </div>
+</template>

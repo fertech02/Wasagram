@@ -52,9 +52,9 @@ export default {
 
         },
 
-        async deleteComment(pId, cId) {
+        async deleteComment(pId, uId) {
             try {
-                const response = await this.$axios.delete(`/photos/${pId}/comments/${cId}`, {
+                const response = await this.$axios.delete(`/photos/${pId}/comments/${uId}`, {
                     headers: {
                         'Authorization': `Bearer ${this.token}`,
                     }
@@ -69,3 +69,29 @@ export default {
     },
 };
 </script>
+
+<template>
+    <div class="modal fade" tabindex="-1" :id="'listModal' + photoId" aria-labelledby="ModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Comments</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="list-group">
+                        <li v-for="comment in comments" :key="comment.photoId" class="list-group-item">
+                            <div>
+                                <strong>{{ comment.userId }}</strong>
+                            </div>
+                            <div>{{ comment.Message }}</div>
+                            <div v-if="comment.userId == this.token">
+                                <button @click="deleteComment(comment.photoId, comment.userId)" class="btn btn-danger btn-sm">Delete</button>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

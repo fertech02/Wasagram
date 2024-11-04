@@ -1,46 +1,65 @@
 <script>
-export default {	
-	data(){
-		return{
-            token: sessionStorage.getItem('token'),
-			text:"",
-		}
-	},
+const token = sessionStorage.getItem('authToken');
 
-	props:['modalID','comments','isOwner','pid'],
-
-	methods: {
-
-		async commentPhoto() {
+export default {
+    props: {
+        photoId: String,
+        userId: String,
+    },
+    data() {
+        return {
+            commentText: '',
+            Text: '',
+            commentPostTry: false,
+        };
+    },
+    methods: {
+        async commentPhoto() {
+            console.log("Posting comment:", this.commentText);
+            this.commentPostTry = true;
             try {
-                let response = await this.$axios.post(`/photos/${this.pid}/comments/${this.token}`, this.text, {headers: {'Authorization': `${sessionStorage.getItem('token')}`, 'Content-Type': 'text/plain'}});
-                let comment = response.data;
-                this.$emit('addComment', comment); 
-                console.log("new comment:" ,this.comments);
-                this.text = "";
-            } catch(error) {
-                const status = error.response.status;
-                const reason = error.response.data;
-                this.errormsg = `Status` + status + `: ` + reason;
-                alert(this.errormsg);
+                const config = {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                };
+                const response = await this.$axios.post(`/photos/${this.photoId}/comments/${this.userId}`, { commentText: this.commentText }, config);
+                this.Text = "Comment Posted!";
+                location.reload();
+            }
+            catch {
+                console.error(error.response.data);
+                this.Text = "Error posting comment";
             }
         },
-        async uncommentPhoto() {
-            try {
-                await this.$axios.delete(`/photos/${this.pid}/comments/${this.token}/`, {headers: {'Authorization': `${sessionStorage.getItem('token')}`}});
-                this.$emit('removeComment', comment_id); 
-            } catch(error) {
-                const status = error.response.status;
-                const reason = error.response.data;
-                this.errormsg = `Status` + status + `: ` + reason;
-                alert(this.errormsg);
-            }
-        },
+    },
+};
 
-	},
-    mounted() {
-
-        console.log("Comments List:", this.comments);
-    }
-}
 </script>
+
+
+<template>
+    <div class="modal fade" :id="'usersModal' + photoId" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="ModalLabel">Post a comment for photo</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form @submit.prevent="commentPhoto">
+                        <div class="mb-3">
+                            <input v-model="commentText" class="form-control" id="commentText" rows="4"
+                                placeholder="Enter your comment" />
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Post Comment</button>
+                        </div>
+                    </form>
+                    <p v-if="commentPostTry" class="mt-3" style="font-size: 25px;">{{ Text }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

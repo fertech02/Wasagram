@@ -3,11 +3,14 @@ import CommentModal from '@/components/CommentModal.vue';
 import CommentListModal from '@/components/CommentListModal.vue';
 
 const token = sessionStorage.getItem('authToken');
+
 export default {
+
   components: {
     CommentModal,
     CommentListModal,
   },
+
   props: {
     photoId: String,
     likeCount: Number,
@@ -15,6 +18,7 @@ export default {
     caption: String,
     date: String,
   },
+
   data() {
     return {
       imgSrc: null,
@@ -23,7 +27,7 @@ export default {
       authorId: "",
       isMe: false,
       notBanned: true,
-      modalId: String(this.photoId),
+      modalId: this.photoId,
     };
   },
 
@@ -45,7 +49,8 @@ export default {
         });
         this.isLiked = isL.data.isLiked
         this.findAuthorId();
-      } catch (error) {
+      } 
+      catch (error) {
         if (error.response) {
           const statusCode = error.response.status;
           this.notBanned = false;
@@ -72,7 +77,6 @@ export default {
   computed: {
 
   },
-
 
   methods: {
 
@@ -135,3 +139,45 @@ export default {
   
 };
 </script>
+
+<template>
+  <div class="container mt-5" v-if="notBanned">
+    <div class="center-container">
+      <div class="card photo-card">
+        <button v-if="isMe" @click="deletePhoto" class="btn btn-danger delete-button mb-2">
+          Delete Photo <svg class="feather">
+            <use href="/feather-sprite-v4.29.0.svg#trash-2" />
+          </svg>
+        </button>
+
+        <img :src="imgSrc" alt="Photo" class="card-img-top" />
+        <div class="card-body photo-details">
+          <div class="author">{{ authorName }}, {{ date }}</div>
+          <div class="card-text text-center bg-light fs-5">{{ caption }}</div>
+          <div class="actions">
+            <button @click="likePhoto" class="btn btn-sm btn-outline-primary ms-3">
+              {{ isLiked ? 'Unlike' : 'Like' }}
+            </button>
+            <span class="like-counter">{{ LikeCount }} Likes <svg class="feather">
+                <use href="/feather-sprite-v4.29.0.svg#thumbs-up" />
+              </svg></span>
+            <button @click="commentPhoto" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
+              :data-bs-target="'#usersModal' + modalId">
+              Comment <svg class="feather">
+                <use href="/feather-sprite-v4.29.0.svg#message-circle" />
+              </svg>
+            </button>
+            <button @click="viewComments" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
+              :data-bs-target="'#listModal' + modalId">
+              View Comments <svg class="feather">
+                <use href="/feather-sprite-v4.29.0.svg#message-square" />
+              </svg>
+            </button>
+            <CommentModal :photoId="this.modalId" />
+            <CommentListModal :photoId="this.modalId" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

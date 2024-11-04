@@ -9,6 +9,7 @@ export default {
     },
 
     methods: {
+
         async doLogin() {
             this.loading = true;
             this.errormsg = null;
@@ -27,9 +28,11 @@ export default {
             this.loading = false;
             this.navigateToMyPage()
         },
+
         navigateToMyPage() {
             this.$router.push('/users/' + this.identifier.userId + '/profile');
         },
+        
         saveTokenToSessionStorage() {
             const bearerToken = `${this.identifier.userId}`;
             sessionStorage.setItem('authToken', bearerToken);
