@@ -595,9 +595,6 @@ components:
       type: object
       description: User Profile
       properties:
-        user_id:
-          type: string
-          description: The user's identifier
         username:
           type: string
           description: The user's username
@@ -619,7 +616,22 @@ components:
           example: 0
           minimum: 0
           maximum: 9999
-              
+        is_followed:
+          type: boolean
+          description: True if the user is followed by the logged user
+          example: false
+        is_banned:
+          type: boolean
+          description: True if the user is banned by the logged user
+          example: false
+        PhotoList:
+          type: array
+          description: List of photos uploaded by the user
+          items:
+            $ref: "#/components/schemas/Photo"
+          minItems: 0
+          maxItems: 100
+        
     Like:
       type: object
       description: Like

@@ -25,17 +25,6 @@ func (db *appdbimpl) UpdateUsername(uid string, username string) error {
 	return nil
 }
 
-// Get User Profile
-func (db *appdbimpl) GetUserProfile(uid string) (*Profile, error) {
-
-	var p Profile
-	err := db.c.QueryRow("SELECT Uid, Username, (SELECT COUNT(*) FROM Follow WHERE FolloweeId=?) AS Followers, (SELECT COUNT(*) FROM Follow WHERE FollowerId=?) AS Followees, (SELECT COUNT(*) FROM Photo WHERE Uid=?) FROM User AS Photos WHERE Uid=?", uid, uid, uid, uid).Scan(&p.Uid, &p.Username, &p.Followers, &p.Followees, &p.PhotosCount)
-	if err != nil {
-		return nil, err
-	}
-	return &p, nil
-}
-
 // Get My Stream
 func (db *appdbimpl) GetMyStream(uid string) ([]*Photo, error) {
 
@@ -62,8 +51,28 @@ func (db *appdbimpl) GetMyStream(uid string) ([]*Photo, error) {
 	return strm, nil
 }
 
-// Search User
+// Get Profile Photos
+func (db *appdbimpl) GetProfilePhotos(uid string) ([]*Photo, error) {
 
+	var photos []*Photo
+	rows, err := db.c.Query("SELECT Pid, Uid, File, Date FROM Photo WHERE Uid=? ORDER BY Date DESC", uid)
+	if err != nil {
+		return photos, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var p Photo
+		err = rows.Scan(&p.Pid, &p.Uid, &p.File, &p.Date)
+		if err != nil {
+			return photos, err
+		}
+		photos = append(photos, &p)
+	}
+	return photos, nil
+}
+
+// Search User
 func (db *appdbimpl) SearchUser(usernameToSearch string) (usersList []User, err error) {
 
 	query := "SELECT * FROM Users WHERE Username LIKE ?"

@@ -50,3 +50,17 @@ func CheckAuthorizedId(r *http.Request, id string) (bool, error) {
 
 	return true, nil
 }
+
+func GetIdFromBearer(r *http.Request) string {
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		return ""
+	}
+
+	authHeaderParts := strings.Fields(authHeader)
+	if len(authHeaderParts) != 2 || strings.ToLower(authHeaderParts[0]) != "bearer" {
+		return ""
+	}
+
+	return authHeaderParts[1]
+}

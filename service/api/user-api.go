@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/fertech02/Wasa-repository/service/api/reqcontext"
+	components "github.com/fertech02/Wasa-repository/service/database"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -103,36 +104,115 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 
 func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	// Get the Authorization header
-	authHeader := r.Header.Get("Authorization")
-	if authHeader == "" {
-		w.WriteHeader(http.StatusUnauthorized)
+	uid := ps.ByName("uid")
+	var photoStream []*components.Photo
+	photoStream, err := rt.db.GetProfilePhotos(uid)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	// Validate the token
+	authHeader := r.Header.Get("Authorization")
 	isValid, err := validateToken(authHeader)
 	if err != nil || !isValid {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	uid := ps.ByName("userId")
+	myId := GetIdFromBearer(r)
 
-	profile, err := rt.db.GetUserProfile(uid)
+	hisId := uid
+
+	userName, err := rt.db.GetUsername(hisId)
 	if err != nil {
+		ctx.Logger.WithError(err).Error("Error during name getting")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
+	}
+	if userName == "" {
+		ctx.Logger.WithError(err).Error("Error user not found")
+		w.WriteHeader(http.StatusNotFound)
+		return
 
+	}
+
+	isBan, err := rt.db.CheckBan(myId, hisId)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("Error during ban getting")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if isBan {
+		ctx.Logger.Error("Banned")
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	var followCount int
+	followCount, err = rt.db.GetFollowersCount(uid)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("Error during follow count getting")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	var followingCount int
+	followingCount, err = rt.db.GetFolloweesCount(uid)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("Error during following count getting")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	var isBanned bool
+	isBanned, err = rt.db.CheckBan(uid, myId)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("Error during ban bool getting")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	var isFollowed bool
+	isFollowed, err = rt.db.CheckFollow(uid, myId)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("Error during follow bool getting")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	var photoCount int
+	photoCount, err = rt.db.GetPhotoCount(uid)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("Error during photo count getting")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	response := components.Response{
+		PhotoList:     photoStream,
+		UserName:      userName,
+		FollowCount:   followCount,
+		FollowedCount: followingCount,
+		PhotoCount:    photoCount,
+		IsBanned:      isBanned,
+		IsFollowed:    isFollowed,
+	}
+
+	profileJSON, err := json.Marshal(response)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("Error during json writing")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(profile)
+	_, err = w.Write(profileJSON)
 	if err != nil {
+		ctx.Logger.WithError(err).Error("Error during json sending")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
 }
 
 func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {

@@ -41,14 +41,6 @@ type User struct {
 	Username string `json:"username"`
 }
 
-type Profile struct {
-	Uid         string `json:"uid"`
-	Username    string `json:"username"`
-	Followers   int    `json:"followersCount"`
-	Followees   int    `json:"followeesCount"`
-	PhotosCount int    `json:"photosCount"`
-}
-
 type Photo struct {
 	Pid  string `json:"pid"`
 	Uid  string `json:"uid"`
@@ -77,6 +69,16 @@ type Ban struct {
 	BannedId string `json:"bannedId"`
 }
 
+type Response struct {
+	PhotoList     []*Photo `json:"photoList"`
+	UserName      string   `json:"userName"`
+	FollowCount   int      `json:"followCount"`
+	FollowedCount int      `json:"followedCount"`
+	PhotoCount    int      `json:"photoCount"`
+	IsFollowed    bool     `json:"isFollowed"`
+	IsBanned      bool     `json:"isBanned"`
+}
+
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
 	Ping() error
@@ -90,7 +92,7 @@ type AppDatabase interface {
 	SearchUser(username string) ([]User, error)
 
 	// Profile
-	GetUserProfile(uid string) (*Profile, error)
+	GetProfilePhotos(uid string) ([]*Photo, error)
 
 	// Photo
 	PostPhoto(p *Photo) (*Photo, error)

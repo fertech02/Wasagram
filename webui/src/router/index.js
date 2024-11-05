@@ -14,6 +14,7 @@ const router = createRouter({
 	routes: [
 		{path: '/', component: LoginView},
 		{path: '/session/', component: LoginView},
+		{path: '/logout/', component: LogoutView},
 		{path: '/photos/', component: PostPhotoView},
 		{path: '/users/', component: UserSearchView},
 		{path: '/set-name/', component: SetMyUserNameView},
