@@ -1,6 +1,6 @@
 <script>
 import ErrorMsg from '@/components/ErrorMsg.vue'
-const token = sessionStorage.getItem('authToken');
+const token = sessionStorage.getItem('token');
 export default {
     components: {
         ErrorMsg

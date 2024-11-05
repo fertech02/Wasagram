@@ -9,7 +9,7 @@ export default {
         return {
             showModal: false,
             comments: [],
-            token: sessionStorage.getItem('authToken'),
+            token: sessionStorage.getItem('token'),
         };
     },
 

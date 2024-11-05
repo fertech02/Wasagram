@@ -17,8 +17,8 @@ const router = createRouter({
 		{path: '/photos/', component: PostPhotoView},
 		{path: '/users/', component: UserSearchView},
 		{path: '/set-name/', component: SetMyUserNameView},
-		{path: '/users/:userId/profile', component: ProfileView},
-		{path: '/users/:userId/stream', component: StreamView},
+		{path: '/users/:uid/profile', component: ProfileView},
+		{path: '/users/:uid/stream', component: StreamView},
 
 	]
 })

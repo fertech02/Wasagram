@@ -49,13 +49,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/username"
+                type: object
+                description: Object containing the user identifier.
+                properties:
+                  identifier:
+                    type: string
+                    description: The user's identifier
+                    example: "abcdef012345"
         "201":
           description: User sign-in action successful
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/username"
+                type: object
+                description: Object containing the user identifier.
+                properties:
+                  identifier:
+                    type: string
+                    description: The user's identifier
+                    example: "abcdef012345"
         "400":
           $ref: "#/components/responses/BadRequest"
         "500":

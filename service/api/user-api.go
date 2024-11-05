@@ -16,35 +16,36 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	err := json.NewDecoder(r.Body).Decode(&requestData)
 	if err != nil {
-		ctx.Logger.Error("Error decoding request body: %v", err)
-		w.WriteHeader(http.StatusBadRequest)
+		ctx.Logger.WithError(err).WithField("username", requestData.Username).Error("Can't login user")
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	username := requestData.Username
 
-	userId, err := rt.db.GetUserId(username)
-
+	userID, err := rt.db.GetUserId(username)
 	if err != nil {
-		ctx.Logger.WithError(err).WithField("username", username).Error("Error getting user id")
+		ctx.Logger.WithError(err).WithField("username", username).Error("Can't operate database")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	if userId != "" {
-		response := map[string]string{"userId": userId}
+	if userID != "" {
+		response := map[string]string{"userId": userID}
 		w.Header().Set("Content-Type", "application/json")
 		err = json.NewEncoder(w).Encode(response)
 		if err != nil {
-			ctx.Logger.WithError(err).WithField("username", username).Error("Error encoding response")
+			ctx.Logger.WithError(err).WithField("username", username).Error("Can't login user")
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+		w.WriteHeader(http.StatusOK)
+		return
 	}
 
 	newUser, err := rt.db.CreateUser(username)
 	if err != nil {
-		ctx.Logger.WithError(err).WithField("username", username).Error("Error creating user")
+		ctx.Logger.WithError(err).WithField("username", username).Error("Can't login user")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -53,7 +54,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(response)
 	if err != nil {
-		ctx.Logger.WithError(err).WithField("username", username).Error("Error encoding response")
+		ctx.Logger.WithError(err).WithField("username", username).Error("Can't login user")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -91,8 +92,8 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 	}
 
 	username := requestData.Username
-	userId := ps.ByName("uid")
-	err = rt.db.UpdateUsername(userId, username)
+	uid := ps.ByName("uid")
+	err = rt.db.UpdateUsername(uid, username)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -116,7 +117,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	uid := ps.ByName("uid")
+	uid := ps.ByName("userId")
 
 	profile, err := rt.db.GetUserProfile(uid)
 	if err != nil {
@@ -150,8 +151,8 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	userId := ps.ByName("uid")
-	photos, err := rt.db.GetMyStream(userId)
+	uid := ps.ByName("uid")
+	photos, err := rt.db.GetMyStream(uid)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

@@ -2,7 +2,7 @@
 import CommentModal from '@/components/CommentModal.vue';
 import CommentListModal from '@/components/CommentListModal.vue';
 
-const token = sessionStorage.getItem('authToken');
+const token = sessionStorage.getItem('token');
 
 export default {
 

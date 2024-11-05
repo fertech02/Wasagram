@@ -1,34 +1,33 @@
 <script>
 import PhotoCard from '@/components/Photo.vue';
-const token = sessionStorage.getItem('authToken');
+const token = sessionStorage.getItem('token');
 
 export default {
     mounted() {
         if (localStorage.getItem('reloadedstream')) {
             localStorage.removeItem('reloadedstream');
+            console.log("Not reloading page");
         } else {
             localStorage.setItem('reloadedstream', '1');
+            console.log("Reloading page");
             location.reload();
         }
     },
 
     data() {
         return {
-            Username: '',
-            found: false,
+            user_id: '',
+            username: '',
             followCount: 0,
             followedCount: 0,
             photoCount: 0,
-            isBanned: false,
-            isFollowed: false,
-            isItMe: false,
-            photoList: [],
+            found: false,
             reloadFlag: true,
         };
     },
 
     watch: {
-        '$route.params.userId'(newParam, oldParam) {
+        '$route.params.uid'(newParam, oldParam) {
             if (newParam !== oldParam) {
                 this.refresh();
             }
@@ -36,9 +35,12 @@ export default {
     },
 
     async created() {
-        const userId = this.$route.params.userId;
+        const userId = this.$route.params.uid;
+        console.log("User ID: ", userId);
+        const token = sessionStorage.getItem('token');
         this.isItMe = (userId == token);
-        this.fetchUserData();
+        console.log("Is it me? ", this.isItMe);
+        this.fetchUserData(token);
     },
 
     methods: {
@@ -47,23 +49,24 @@ export default {
             location.reload();
         },
 
-        async fetchUserData() {
-            const userId = this.$route.params.userId;
+        async fetchUserData(token) {
             try {
+                const userId = this.$route.params.uid;
+
+                console.log("Session token: ", token);
+                console.log("User ID: ", userId);
                 const response = await this.$axios.get(`/users/${userId}/profile`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
                 });
+                
 
-                this.found = true;
-                this.Username = response.data.Username;
-                this.followCount = response.data.followCount;
-                this.followedCount = response.data.followedCount;
-                this.photoCount = response.data.photoCount;
-                this.isBanned = response.data.isBanned;
-                this.isFollowed = response.data.isFollowed;
-                this.photoList = response.data.PList;
+                this.user_id = response.data.user_id;
+                this.username = response.data.username;
+                this.followers = response.data.followers;
+                this.followees = response.data.followees;
+                this.photo_count = response.data.photo_count;
 
             } catch (error) {
                 if (error.response) {
@@ -71,22 +74,22 @@ export default {
                     switch (statusCode) {
                         case 400:
                             console.error('Bad request');
-                            this.Username = "You have to login first"
+                            this.username = "You have to login first"
                         case 401:
                             console.error('Access Unauthorized:', error.response.data);
-                            this.Username = "You are not logged in"
+                            this.username = "You are not logged in"
                             break;
                         case 403:
                             console.error('Access Forbidden:', error.response.data);
-                            this.Username = "You have been banned by the user"
+                            this.username = "You have been banned by the user"
                             break;
                         case 404:
                             console.error('Not Found:', error.response.data);
-                            if (userId === "null") {
-                                this.Username = "You are not logged in";
+                            if (user_id === "null") {
+                                this.username = "You are not logged in";
                             }
                             else {
-                                this.Username = "User not found";
+                                this.username = "User not found";
                             }
                             break;
                         default:
@@ -100,7 +103,7 @@ export default {
 
         async toggleFollow() {
             this.isFollowed = !this.isFollowed;
-            const userId = this.$route.params.userId;
+            const userId = this.$route.params.uid;
             const token = sessionStorage.getItem('authToken');
             try {
                 if (this.isFollowed) {
@@ -129,7 +132,7 @@ export default {
             
             this.isBanned = !this.isBanned;
             
-            const userId = this.$route.params.userId;
+            const userId = this.$route.params.uid;
             const token = sessionStorage.getItem('authToken');
             try {
                 if (this.isBanned) {
@@ -160,7 +163,7 @@ export default {
 
 <template>
     <div class="container mt-5">
-        <h1 class="display-4" style="font-size: 50px;">{{ Username }}</h1>
+        <h1 class="display-4" style="font-size: 50px;">{{ username }}</h1>
         <div v-if="found">
             <div>
                 <div v-if="!isItMe">
@@ -189,8 +192,6 @@ export default {
         </div>
         <hr />
         <div class="photos">
-            <PhotoCard v-for="photo in photoList" :key="photo.photoId" :photoId="photo.photoId" :date="photo.Date"
-                :authorName="Username" :likeCount="photo.likecount" :caption="photo.caption" />
         </div>
     </div>
 </template>

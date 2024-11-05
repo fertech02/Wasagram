@@ -1,6 +1,6 @@
 <script>
 import PhotoCard from '@/components/Photo.vue';
-const token = sessionStorage.getItem('authToken');
+const token = sessionStorage.getItem('token');
 
 export default {
     mounted() {
@@ -20,7 +20,7 @@ export default {
     },
 
     watch: {
-        '$route.params.userId'(newParam, oldParam) {
+        '$route.params.uid'(newParam, oldParam) {
             if (newParam !== oldParam) {
                 this.refresh();
             }
@@ -28,7 +28,6 @@ export default {
     },
 
     async created() {
-        const userId = this.$route.params.userId;
         this.fetchUserData();
     },
 
@@ -39,7 +38,7 @@ export default {
         },
 
         async fetchUserData() {
-            const userId = this.$route.params.userId;
+            const userId = this.$route.params.uid;
             try {
                 const response = await this.$axios.get(`/users/${userId}/stream/`, {
                     headers: {
