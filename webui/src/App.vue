@@ -1,5 +1,5 @@
 <script>
-const token = sessionStorage.getItem('authToken');
+const token = sessionStorage.getItem('token');
 import { RouterLink, RouterView } from 'vue-router'
 export default {
 	data() {
@@ -54,7 +54,7 @@ export default {
 							</RouterLink>
 						</li>
 						<li class="nav-item">
-							<RouterLink to="/users/" class="nav-link">
+							<RouterLink to="/users" class="nav-link">
 								<svg class="feather">
 									<use href="/feather-sprite-v4.29.0.svg#search" />
 								</svg>
@@ -85,7 +85,7 @@ export default {
 					</h6>
 					<ul class="nav flex-column">
 						<li class="nav-item">
-							<RouterLink to="/photos/" class="nav-link">
+							<RouterLink to="/photos" class="nav-link">
 								<svg class="feather">
 									<use href="/feather-sprite-v4.29.0.svg#upload" />
 								</svg>

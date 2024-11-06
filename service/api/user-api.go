@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/fertech02/Wasa-repository/service/api/reqcontext"
-	components "github.com/fertech02/Wasa-repository/service/database"
+	"github.com/fertech02/Wasa-repository/service/database"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -105,22 +105,20 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	uid := ps.ByName("uid")
-	var photoStream []*components.Photo
+	if uid == "" {
+		ctx.Logger.Error("No user id")
+		return
+	}
+
+	var photoStream []*database.Photo
 	photoStream, err := rt.db.GetProfilePhotos(uid)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.WithError(err).Error("Error during photo getting")
 		return
 	}
 
-	authHeader := r.Header.Get("Authorization")
-	isValid, err := validateToken(authHeader)
-	if err != nil || !isValid {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
-	myId := GetIdFromBearer(r)
-
+	myId := r.Header.Get("Authorization")
 	hisId := uid
 
 	userName, err := rt.db.GetUsername(hisId)
@@ -189,7 +187,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	response := components.Response{
+	response := database.Response{
 		PhotoList:     photoStream,
 		UserName:      userName,
 		FollowCount:   followCount,
@@ -199,20 +197,10 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		IsFollowed:    isFollowed,
 	}
 
-	profileJSON, err := json.Marshal(response)
-	if err != nil {
-		ctx.Logger.WithError(err).Error("Error during json writing")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
 	w.Header().Set("Content-Type", "application/json")
-	_, err = w.Write(profileJSON)
-	if err != nil {
-		ctx.Logger.WithError(err).Error("Error during json sending")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(response)
+
 }
 
 func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {

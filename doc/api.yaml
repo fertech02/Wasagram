@@ -595,35 +595,6 @@ components:
       type: object
       description: User Profile
       properties:
-        username:
-          type: string
-          description: The user's username
-        followers:
-          type: integer
-          description: Number of followers
-          example: 0
-          minimum: 0
-          maximum: 9999
-        followees:
-          type: integer
-          description: Number of followees
-          example: 0
-          minimum: 0
-          maximum: 9999
-        photo_count:
-          type: integer
-          description: Number of photos uploaded by the user
-          example: 0
-          minimum: 0
-          maximum: 9999
-        is_followed:
-          type: boolean
-          description: True if the user is followed by the logged user
-          example: false
-        is_banned:
-          type: boolean
-          description: True if the user is banned by the logged user
-          example: false
         PhotoList:
           type: array
           description: List of photos uploaded by the user
@@ -631,6 +602,35 @@ components:
             $ref: "#/components/schemas/Photo"
           minItems: 0
           maxItems: 100
+        Username:
+          type: string
+          description: The user's username
+        FollowCount:
+          type: integer
+          description: Number of followers
+          example: 0
+          minimum: 0
+          maximum: 9999
+        FollowedCount:
+          type: integer
+          description: Number of followees
+          example: 0
+          minimum: 0
+          maximum: 9999
+        PhotoCount:
+          type: integer
+          description: Number of photos uploaded by the user
+          example: 0
+          minimum: 0
+          maximum: 9999
+        IsFollowed:
+          type: boolean
+          description: True if the user is followed by the logged user
+          example: false
+        IsBanned:
+          type: boolean
+          description: True if the user is banned by the logged user
+          example: false
         
     Like:
       type: object
