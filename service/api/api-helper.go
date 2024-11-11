@@ -1,32 +1,26 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
-
-	"github.com/dgrijalva/jwt-go"
 )
 
 var mySigningKey = []byte("your-secret-key")
 
-func validateToken(tokenString string) (bool, error) {
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-		}
-		return mySigningKey, nil
-	})
+func CheckValidAuth(r *http.Request) bool {
 
-	if err != nil {
-		return false, err
+	// Get the Authorization header
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		return false
 	}
 
-	if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		return true, nil
-	} else {
-		return false, nil
+	authParts := strings.Fields(authHeader)
+	if len(authParts) != 2 || strings.ToLower(authParts[0]) != "bearer" || authParts[1] == "null" {
+		return false
 	}
+
+	return true
 }
 
 // IsAuthorized checks if the user is authorized
