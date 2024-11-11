@@ -52,7 +52,6 @@ export default {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
-                    timeout: 5000,
                 });
 
                 this.found = true;

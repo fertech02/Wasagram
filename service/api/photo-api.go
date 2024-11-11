@@ -25,13 +25,6 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	// Validate the Authorization header
-	_, err := validateToken(authHeader)
-	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
 	// Get the file path from the request
 	file, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -98,13 +91,6 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	// Validate the Authorization header
-	_, err := validateToken(authHeader)
-	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
 	// Get the photo ID
 	pid := ps.ByName("pid")
 	if pid == "" {
@@ -151,13 +137,6 @@ func (rt *_router) getPhotos(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 
-	// Validate the Authorization header
-	_, err := validateToken(authHeader)
-	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
 	// Get the user ID
 	userID := ps.ByName("uid")
 	if userID == "" {
@@ -186,13 +165,6 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 	// Get the Authorization header
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
-	// Validate the Authorization header
-	_, err := validateToken(authHeader)
-	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}

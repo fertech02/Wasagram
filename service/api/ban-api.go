@@ -22,22 +22,8 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
-	// Get the Authorization header
-	authHeader := r.Header.Get("Authorization")
-	if authHeader == "" {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
-	// Validate the token
-	isValid, err := validateToken(authHeader)
-	if err != nil || !isValid {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
 	// Ban the user
-	err = rt.db.Ban(bannerId, bannedId)
+	err := rt.db.Ban(bannerId, bannedId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -61,22 +47,8 @@ func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 
-	// Get the Authorization header
-	authHeader := r.Header.Get("Authorization")
-	if authHeader == "" {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
-	// Validate the token
-	isValid, err := validateToken(authHeader)
-	if err != nil || !isValid {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
 	// Unban the user
-	err = rt.db.Unban(bannerId, bannedId)
+	err := rt.db.Unban(bannerId, bannedId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -92,20 +64,6 @@ func (rt *_router) getBannedUsers(w http.ResponseWriter, r *http.Request, ps htt
 	bannerId := ps.ByName("bannerId")
 	if bannerId == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	// Get the Authorization header
-	authHeader := r.Header.Get("Authorization")
-	if authHeader == "" {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
-	// Validate the token
-	isValid, err := validateToken(authHeader)
-	if err != nil || !isValid {
-		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 

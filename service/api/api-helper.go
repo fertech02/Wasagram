@@ -5,8 +5,6 @@ import (
 	"strings"
 )
 
-var mySigningKey = []byte("your-secret-key")
-
 func CheckValidAuth(r *http.Request) bool {
 
 	// Get the Authorization header
