@@ -72,20 +72,8 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	// Check if uid is authorized to delete the comment
-	unauthorized, err := CheckAuthorizedId(r, uid)
-	if err != nil {
-		ctx.Logger.WithField("error", err).Error("Failed to check authorization")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	if unauthorized {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
 	// Delete the comment from the db
-	err = rt.db.Uncomment(pid, uid)
+	err := rt.db.Uncomment(pid, uid)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

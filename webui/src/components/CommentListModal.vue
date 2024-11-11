@@ -82,11 +82,11 @@ export default {
                     <ul class="list-group">
                         <li v-for="comment in comments" :key="comment.photoId" class="list-group-item">
                             <div>
-                                <strong>{{ comment.userId }}</strong>
+                                <strong>{{ comment.uid }}</strong>
                             </div>
                             <div>{{ comment.Message }}</div>
-                            <div v-if="comment.userId == this.token">
-                                <button @click="deleteComment(comment.photoId, comment.userId)" class="btn btn-danger btn-sm">Delete</button>
+                            <div v-if="comment.uid == this.token">
+                                <button @click="deleteComment(comment.photoId, comment.uid)" class="btn btn-danger btn-sm">Delete</button>
                             </div>
                         </li>
                     </ul>

@@ -14,7 +14,7 @@ func CheckValidAuth(r *http.Request) bool {
 	}
 
 	authParts := strings.Fields(authHeader)
-	if len(authParts) != 2 || strings.ToLower(authParts[0]) != "bearer" || authParts[1] == "null" {
+	if len(authParts) != 2 || authParts[0] != BEAR || authParts[1] == "null" {
 		return false
 	}
 
@@ -22,37 +22,32 @@ func CheckValidAuth(r *http.Request) bool {
 }
 
 // IsAuthorized checks if the user is authorized
-func CheckAuthorizedId(r *http.Request, id string) (bool, error) {
+func CheckIdAuthorized(r *http.Request, id string) int {
 
 	// Get the Authorization header
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {
-		return false, nil
+		return 1
 	}
 
 	authHeaderParts := strings.Fields(authHeader)
-	if len(authHeaderParts) != 2 || strings.ToLower(authHeaderParts[0]) != "bearer" {
-		return false, nil
+	if len(authHeaderParts) != 2 || authHeaderParts[0] != BEAR || authHeaderParts[1] == "null" {
+		return 1
 	}
 
 	token := authHeaderParts[1]
 	if token != id {
-		return false, nil
+		return 2
 	}
 
-	return true, nil
+	return 0
 }
 
 func GetIdFromBearer(r *http.Request) string {
 	authHeader := r.Header.Get("Authorization")
-	if authHeader == "" {
-		return ""
-	}
 
 	authHeaderParts := strings.Fields(authHeader)
-	if len(authHeaderParts) != 2 || strings.ToLower(authHeaderParts[0]) != "bearer" {
-		return ""
-	}
+	token := authHeaderParts[1]
 
-	return authHeaderParts[1]
+	return token
 }

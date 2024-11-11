@@ -26,20 +26,8 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 
-	// Check if user authorized
-	unauthorized, err := CheckAuthorizedId(r, uid)
-	if err != nil {
-		ctx.Logger.WithField("error", err).Error("Failed to check authorization")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	if unauthorized {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
 	// Like the photo
-	err = rt.db.Like(uid, pid)
+	err := rt.db.Like(uid, pid)
 	if err != nil {
 		ctx.Logger.WithField("error", err).Error("Failed to like photo")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -64,20 +52,8 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	// Check if user authorized
-	unauthorized, err := CheckAuthorizedId(r, uid)
-	if err != nil {
-		ctx.Logger.WithField("error", err).Error("Failed to check authorization")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	if unauthorized {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
 	// Unlike the photo
-	err = rt.db.Unlike(pid, uid)
+	err := rt.db.Unlike(pid, uid)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -139,18 +115,6 @@ func (rt *_router) getLikes(w http.ResponseWriter, r *http.Request, ps httproute
 	uid := ps.ByName("uid")
 	if uid != "" {
 		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	// Check if user authorized
-	unauthorized, err := CheckAuthorizedId(r, uid)
-	if err != nil {
-		ctx.Logger.WithField("error", err).Error("Failed to check authorization")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	if unauthorized {
-		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 

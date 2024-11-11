@@ -4,7 +4,7 @@ const token = sessionStorage.getItem('token');
 export default {
     props: {
         photoId: String,
-        userId: String,
+        uid: String,
     },
     data() {
         return {
@@ -23,7 +23,7 @@ export default {
                         'Authorization': `Bearer ${token}`,
                     },
                 };
-                const response = await this.$axios.post(`/photos/${this.photoId}/comments/${this.userId}`, { commentText: this.commentText }, config);
+                const response = await this.$axios.post(`/photos/${this.photoId}/comments/${this.uid}`, { commentText: this.commentText }, config);
                 this.Text = "Comment Posted!";
                 location.reload();
             }

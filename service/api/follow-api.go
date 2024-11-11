@@ -22,20 +22,8 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	}
 
-	// Check if followerId is authorized to follow followeeId
-	unauthorized, err := CheckAuthorizedId(r, followerId)
-	if err != nil {
-		ctx.Logger.WithField("error", err).Error("Failed to check authorization")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	if unauthorized {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
 	// Follow the user
-	err = rt.db.Follow(followeeId, followerId)
+	err := rt.db.Follow(followeeId, followerId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -56,20 +44,8 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 	}
 
-	// Check if followerId is authorized to unfollow followeeId
-	unauthorized, err := CheckAuthorizedId(r, followerId)
-	if err != nil {
-		ctx.Logger.WithField("error", err).Error("Failed to check authorization")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	if unauthorized {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
 	// Unfollow the user
-	err = rt.db.Unfollow(followeeId, followerId)
+	err := rt.db.Unfollow(followeeId, followerId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

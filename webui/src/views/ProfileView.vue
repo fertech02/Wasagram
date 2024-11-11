@@ -1,5 +1,5 @@
 <script>
-import PhotoCard from '@/components/Photo.vue';
+import Photo from '@/components/Photo.vue';
 const token = sessionStorage.getItem('token');
 
 export default {
@@ -45,8 +45,6 @@ export default {
         async fetchUserData() {
             const uid = this.$route.params.uid;
             const token = sessionStorage.getItem('token');
-            console.log("userId: ", uid);
-            console.log("token: ", token);
             try {
                 const response = await this.$axios.get(`/users/${uid}/profile`, {
                     headers: {
@@ -89,6 +87,10 @@ export default {
                             else {
                                 this.userName = "User not found";
                             }
+                            break;
+                        case 500:
+                            console.error('Internal Server Error:', error.response.data);
+                            this.userName = "Internal Server Error"
                             break;
                         default:
                             console.error(`Unhandled HTTP Error (${statusCode}):`, error.response.data);
@@ -154,7 +156,7 @@ export default {
         },
     },
     components: {
-        PhotoCard,
+        Photo,
     },
 };
 </script>
@@ -192,7 +194,7 @@ export default {
         <div class="photos">
         </div>
         <div class="photos">
-            <PhotoCard v-for="photo in photoList" :key="photo.Pid" :pid="photo.Pid" :Date="photo.Date"
+            <Photo v-for="photo in photoList" :key="photo.Pid" :pid="photo.Pid" :Date="photo.Date"
                 :authorName="userName" :likeCount="photo.likecount" :caption="photo.caption" />
         </div>
     </div>
