@@ -70,18 +70,11 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 		return
 	}
 
-	// Validate the token
-	isValid, err := validateToken(authHeader)
-	if err != nil || !isValid {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
 	var requestData struct {
 		Username string `json:"username"`
 	}
 
-	err = json.NewDecoder(r.Body).Decode(&requestData)
+	err := json.NewDecoder(r.Body).Decode(&requestData)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -212,13 +205,6 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	// Validate the token
-	isValid, err := validateToken(authHeader)
-	if err != nil || !isValid {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
 	uid := ps.ByName("uid")
 	photos, err := rt.db.GetMyStream(uid)
 	if err != nil {
@@ -240,13 +226,6 @@ func (rt *_router) searchUser(w http.ResponseWriter, r *http.Request, ps httprou
 	// Get the Authorization header
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
-	// Validate the token
-	isValid, err := validateToken(authHeader)
-	if err != nil || !isValid {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
