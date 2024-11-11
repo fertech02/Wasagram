@@ -111,7 +111,13 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	myId := r.Header.Get("Authorization")
+	if !CheckValidAuth(r) {
+		ctx.Logger.Error("Auth header invalid")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	myId := GetIdFromBearer(r)
 	hisId := uid
 
 	userName, err := rt.db.GetUsername(hisId)
@@ -190,9 +196,20 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		IsFollowed:    isFollowed,
 	}
 
+	profileJSON, err := json.Marshal(response)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("Error during json writing")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	_ = json.NewEncoder(w).Encode(response)
+	_, err = w.Write(profileJSON)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("Error during json sending")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 }
 
