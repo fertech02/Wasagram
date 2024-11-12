@@ -3,6 +3,7 @@ import Photo from '@/components/Photo.vue';
 const token = sessionStorage.getItem('token');
 
 export default {
+
     mounted() {
         if (localStorage.getItem('reloadedstream')) {
             localStorage.removeItem('reloadedstream');
@@ -11,20 +12,22 @@ export default {
             location.reload();
         }
     },
+
     data() {
         return {
-            userName: '',
+            username: '',
             found: false,
             followCount: 0,
             followedCount: 0,
             photoCount: 0,
-            isBanned: false,
-            isFollowed: false,
+            isbanned: false,
+            isfollowed: false,
             isItMe: false,
             photoList: [],
             reloadFlag: true,
         };
     },
+
     watch: {
         '$route.params.uid'(newParam, oldParam) {
             if (newParam !== oldParam) {
@@ -32,12 +35,14 @@ export default {
             }
         },
     },
+
     async created() {
         const uid= this.$route.params.uid;
         const token = sessionStorage.getItem('token');
         this.isItMe = (uid == token);
         this.fetchUserData();
     },
+
     methods: {
         refresh() {
             location.reload();
@@ -45,6 +50,7 @@ export default {
         async fetchUserData() {
             const uid = this.$route.params.uid;
             const token = sessionStorage.getItem('token');
+
             try {
                 const response = await this.$axios.get(`/users/${uid}/profile`, {
                     headers: {
@@ -53,13 +59,15 @@ export default {
                 });
 
                 this.found = true;
-                this.userName = response.data.Username;
-                this.followCount = response.data.FollowCount;
-                this.followedCount = response.data.FollowedCount;
-                this.photoCount = response.data.PhotoCount;
-                this.isBanned = response.data.IsBanned;
-                this.isFollowed = response.data.IsFollowed;
-                this.photoList = response.data.Photolist;
+                this.username = response.data.username;
+                this.followCount = response.data.followCount;
+                this.followedCount = response.data.followedCount;
+                this.photoCount = response.data.photoCount;
+                this.isbanned = response.data.isBanned;
+                this.isfollowed = response.data.isFollowed;
+                this.photoList = response.data.photolist;
+
+                console.log(response.data);
 
             } catch (error) {
                 if (error.response) {
@@ -88,10 +96,6 @@ export default {
                                 this.userName = "User not found";
                             }
                             break;
-                        case 500:
-                            console.error('Internal Server Error:', error.response);
-                            this.userName = "Internal Server Error"
-                            break;
                         default:
                             console.error(`Unhandled HTTP Error (${statusCode}):`, error.response.data);
                     }
@@ -100,14 +104,14 @@ export default {
                 }
             }
         },
+
         async Follow() {
-            
-            this.isFollowed = !this.isFollowed;
-            
+            this.isfollowed = !this.isfollowed;
             const uid = this.$route.params.uid;
             const token = sessionStorage.getItem('token');
+
             try {
-                if (this.isFollowed) {
+                if (this.isfollowed) {
                     this.followCount += 1;
                     await this.$axios.put(`/users/${token}/follows/${uid}`, {
                     }, {
@@ -128,14 +132,14 @@ export default {
             }
 
         },
-        async Ban() {
-           
-            this.isBanned = !this.isBanned;
-            
+
+        async Ban() {   
+            this.isbanned = !this.isbanned;
             const uid = this.$route.params.uid;
             const token = sessionStorage.getItem('token');
+            
             try {
-                if (this.isBanned) {
+                if (this.isbanned) {
                     await this.$axios.put(`/users/${token}/bans/${uid}`, {
                     }, {
                         headers: {
@@ -155,6 +159,7 @@ export default {
             }
         },
     },
+
     components: {
         Photo,
     },
@@ -169,12 +174,12 @@ export default {
                 <div v-if="!isItMe">
                     <div class="btn-group mt-1">
                         <button @click="Follow" class="btn btn-warning">
-                            {{ isFollowed ? 'Unfollow' : 'Follow' }} <svg class="feather">
+                            {{ isfollowed ? 'Unfollow' : 'Follow' }} <svg class="feather">
                                 <use href="/feather-sprite-v4.29.0.svg#user-plus" />
                             </svg>
                         </button>
                         <button @click="Ban" class="btn btn-danger">
-                            {{ isBanned ? 'Unban' : 'Ban' }} <svg class="feather">
+                            {{ isbanned ? 'Unban' : 'Ban' }} <svg class="feather">
                                 <use href="/feather-sprite-v4.29.0.svg#slash" />
                             </svg>
                         </button>
@@ -192,10 +197,29 @@ export default {
         </div>
         <hr />
         <div class="photos">
-        </div>
-        <div class="photos">
             <Photo v-for="photo in photoList" :key="photo.Pid" :pid="photo.Pid" :Date="photo.Date"
                 :authorName="userName" :likeCount="photo.likecount" :caption="photo.caption" />
         </div>
     </div>
 </template>
+
+<style scoped>
+.user-info {
+    text-align: center;
+    font-size: 20px;
+}
+
+hr {
+    margin: 20px 0;
+}
+
+.photos {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.photos .photo-card {
+    margin-bottom: 30px;
+}
+</style>

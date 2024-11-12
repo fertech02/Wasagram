@@ -32,7 +32,7 @@ export default {
         },
       };
       try {
-        const response = await this.$axios.post(`/photos/`, formData, config);
+        const response = await this.$axios.post(`/photos`, formData, config);
         console.log('Photo uploaded successfully', response.data);
         this.endText = "Photo uploaded!";
         this.uploadSuccess = true;

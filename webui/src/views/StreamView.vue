@@ -40,7 +40,7 @@ export default {
         async fetchUserData() {
             const userId = this.$route.params.uid;
             try {
-                const response = await this.$axios.get(`/users/${userId}/stream/`, {
+                const response = await this.$axios.get(`/users/${userId}/stream`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
