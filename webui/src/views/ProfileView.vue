@@ -89,7 +89,7 @@ export default {
                             }
                             break;
                         case 500:
-                            console.error('Internal Server Error:', error.response.data);
+                            console.error('Internal Server Error:', error.response);
                             this.userName = "Internal Server Error"
                             break;
                         default:
@@ -100,10 +100,10 @@ export default {
                 }
             }
         },
-        async toggleFollow() {
-            // frontend
+        async Follow() {
+            
             this.isFollowed = !this.isFollowed;
-            // backend
+            
             const uid = this.$route.params.uid;
             const token = sessionStorage.getItem('token');
             try {
@@ -128,10 +128,10 @@ export default {
             }
 
         },
-        async toggleBan() {
-            // frontend
+        async Ban() {
+           
             this.isBanned = !this.isBanned;
-            // backend
+            
             const uid = this.$route.params.uid;
             const token = sessionStorage.getItem('token');
             try {
@@ -168,12 +168,12 @@ export default {
             <div>
                 <div v-if="!isItMe">
                     <div class="btn-group mt-1">
-                        <button @click="toggleFollow" class="btn btn-warning">
+                        <button @click="Follow" class="btn btn-warning">
                             {{ isFollowed ? 'Unfollow' : 'Follow' }} <svg class="feather">
                                 <use href="/feather-sprite-v4.29.0.svg#user-plus" />
                             </svg>
                         </button>
-                        <button @click="toggleBan" class="btn btn-danger">
+                        <button @click="Ban" class="btn btn-danger">
                             {{ isBanned ? 'Unban' : 'Ban' }} <svg class="feather">
                                 <use href="/feather-sprite-v4.29.0.svg#slash" />
                             </svg>

@@ -69,9 +69,9 @@ type Ban struct {
 	BannedId string `json:"bannedId"`
 }
 
-type Response struct {
+type Profile struct {
 	PhotoList     []*Photo `json:"photoList"`
-	UserName      string   `json:"userName"`
+	Username      string   `json:"username"`
 	FollowCount   int      `json:"followCount"`
 	FollowedCount int      `json:"followedCount"`
 	PhotoCount    int      `json:"photoCount"`

@@ -18,7 +18,7 @@ func (db *appdbimpl) CreateUser(username string) (dbUser User, err error) {
 // Update Username
 func (db *appdbimpl) UpdateUsername(uid string, username string) error {
 
-	_, err := db.c.Exec("UPDATE User SET Username=? WHERE Uid=?", username, uid)
+	_, err := db.c.Exec("UPDATE Users SET Username=? WHERE Uid=?", username, uid)
 	if err != nil {
 		return err
 	}
@@ -29,7 +29,7 @@ func (db *appdbimpl) UpdateUsername(uid string, username string) error {
 func (db *appdbimpl) GetMyStream(uid string) ([]*Photo, error) {
 
 	var strm []*Photo
-	rows, err := db.c.Query("SELECT Pid, Uid, File, Date FROM Photo WHERE Uid IN (SELECT FollowerId From Follow WHERE FolloweeId=? AND FollowerId NOT IN (SELECT Uid FROM Ban where BannedID=?)) ORDER BY Date DESC LIMIT 20", uid, uid)
+	rows, err := db.c.Query("SELECT Pid, Uid, File, Date FROM Photos WHERE Uid IN (SELECT FollowerId From Follow WHERE FolloweeId=? AND FollowerId NOT IN (SELECT Uid FROM Ban where BannedID=?)) ORDER BY Date DESC LIMIT 20", uid, uid)
 	if err != nil {
 		return strm, err
 	}
@@ -55,7 +55,7 @@ func (db *appdbimpl) GetMyStream(uid string) ([]*Photo, error) {
 func (db *appdbimpl) GetProfilePhotos(uid string) ([]*Photo, error) {
 
 	var photos []*Photo
-	rows, err := db.c.Query("SELECT Pid, Uid, File, Date FROM Photo WHERE Uid=? ORDER BY Date DESC", uid)
+	rows, err := db.c.Query("SELECT Pid, Uid, File, Date FROM Photos WHERE Uid=? ORDER BY Date DESC", uid)
 	if err != nil {
 		return photos, err
 	}
@@ -111,7 +111,7 @@ func (db *appdbimpl) GetUserId(username string) (user string, err error) {
 func (db *appdbimpl) GetUsername(uid string) (string, error) {
 
 	var username string
-	err := db.c.QueryRow("SELECT Username FROM User WHERE Uid=?", uid).Scan(&username)
+	err := db.c.QueryRow("SELECT Username FROM Users WHERE Uid=?", uid).Scan(&username)
 	if err != nil {
 		return "", err
 	}

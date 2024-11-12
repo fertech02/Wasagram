@@ -97,6 +97,7 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 
 func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
+	// Get the user id from the URL
 	uid := ps.ByName("uid")
 	if uid == "" {
 		ctx.Logger.Error("No user id")
@@ -186,9 +187,9 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	response := database.Response{
+	response := database.Profile{
 		PhotoList:     photoStream,
-		UserName:      userName,
+		Username:      userName,
 		FollowCount:   followCount,
 		FollowedCount: followingCount,
 		PhotoCount:    photoCount,
