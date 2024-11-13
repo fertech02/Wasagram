@@ -44,7 +44,6 @@ type User struct {
 type Photo struct {
 	Pid  string `json:"pid"`
 	Uid  string `json:"uid"`
-	File []byte `json:"file"`
 	Date string `json:"date"`
 }
 
@@ -95,7 +94,7 @@ type AppDatabase interface {
 	GetProfilePhotos(uid string) ([]*Photo, error)
 
 	// Photo
-	PostPhoto(p *Photo) (*Photo, error)
+	PostPhoto(uid string) (string, error)
 	DeletePhoto(pid string) error
 	GetPhotos(uid string) ([]*Photo, error)
 	GetPhoto(pid string) (*Photo, error)
@@ -158,7 +157,6 @@ func New(db *sql.DB) (AppDatabase, error) {
 
 				Pid TEXT PRIMARY KEY,
 				Uid TEXT NOT NULL,
-				File BLOB NOT NULL,
 				Date TEXT NOT NULL,
 
 				FOREIGN KEY (Uid) REFERENCES Users(Uid) ON DELETE CASCADE

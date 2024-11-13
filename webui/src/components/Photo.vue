@@ -15,7 +15,6 @@ export default {
     pid: String,
     likeCount: Number,
     authorName: String,
-    caption: String,
     date: String,
   },
 
@@ -153,7 +152,6 @@ export default {
         <img :src="imgSrc" alt="Photo" class="card-img-top" />
         <div class="card-body photo-details">
           <div class="author">{{ authorName }}, {{ date }}</div>
-          <div class="card-text text-center bg-light fs-5">{{ caption }}</div>
           <div class="actions">
             <button @click="likePhoto" class="btn btn-sm btn-outline-primary ms-3">
               {{ isLiked ? 'Unlike' : 'Like' }}

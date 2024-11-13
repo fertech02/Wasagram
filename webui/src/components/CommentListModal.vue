@@ -2,7 +2,7 @@
 export default {
 
     props: {
-        photoId: String,
+        pid: String,
     },
 
     data() {
@@ -21,7 +21,7 @@ export default {
 
         async fetchComments() {
             try {
-                const response = await this.$axios.get(`/photos/${this.photoId}/comments/`, {
+                const response = await this.$axios.get(`/photos/${this.pid}/comments`, {
                     headers: {
                         Authorization: `Bearer ${this.token}`,
                     },
@@ -52,9 +52,9 @@ export default {
 
         },
 
-        async deleteComment(pId, uId) {
+        async deleteComment(pid, uid) {
             try {
-                const response = await this.$axios.delete(`/photos/${pId}/comments/${uId}`, {
+                const response = await this.$axios.delete(`/photos/${pid}/comments/${uid}`, {
                     headers: {
                         'Authorization': `Bearer ${this.token}`,
                     }
@@ -71,7 +71,7 @@ export default {
 </script>
 
 <template>
-    <div class="modal fade" tabindex="-1" :id="'listModal' + photoId" aria-labelledby="ModalLabel" aria-hidden="true">
+    <div class="modal fade" tabindex="-1" :id="'listModal' + pid" aria-labelledby="ModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -80,13 +80,13 @@ export default {
                 </div>
                 <div class="modal-body">
                     <ul class="list-group">
-                        <li v-for="comment in comments" :key="comment.photoId" class="list-group-item">
+                        <li v-for="comment in comments" :key="comment.pid" class="list-group-item">
                             <div>
                                 <strong>{{ comment.uid }}</strong>
                             </div>
                             <div>{{ comment.Message }}</div>
                             <div v-if="comment.uid == this.token">
-                                <button @click="deleteComment(comment.photoId, comment.uid)" class="btn btn-danger btn-sm">Delete</button>
+                                <button @click="deleteComment(comment.pid, comment.uid)" class="btn btn-danger btn-sm">Delete</button>
                             </div>
                         </li>
                     </ul>

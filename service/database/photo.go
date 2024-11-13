@@ -1,14 +1,27 @@
 package database
 
-// Post a Photo
-func (db *appdbimpl) PostPhoto(p *Photo) (*Photo, error) {
+import (
+	"time"
 
-	query := "INSERT INTO Photos (Pid, Uid, File, Date) VALUES (?, ?, ?, ?)"
-	_, err := db.c.Exec(query, p.Pid, p.Uid, p.File, p.Date)
+	"github.com/gofrs/uuid"
+)
+
+// Post a Photo
+func (db *appdbimpl) PostPhoto(uid string) (string, error) {
+
+	currentTime := time.Now().UTC()
+	uuid, err := uuid.NewV4()
 	if err != nil {
-		return p, err
+		return "", err
 	}
-	return p, nil
+	pid := uuid.String()
+	_, err = db.c.Exec(
+		"INSERT INTO Photos(Pid, Uid, Date) VALUES (?, ?, ?)",
+		pid, uid, currentTime.Format("2006-01-02 15:04:05"))
+	if err != nil {
+		return "", err
+	}
+	return pid, nil
 }
 
 // Delete a Photo
@@ -43,7 +56,7 @@ func (db *appdbimpl) GetPhoto(pid string) (*Photo, error) {
 	}
 
 	var p Photo
-	err := row.Scan(&p.Pid, &p.Uid, &p.File, &p.Date)
+	err := row.Scan(&p.Pid, &p.Uid, &p.Date)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +76,7 @@ func (db *appdbimpl) GetPhotos(uid string) ([]*Photo, error) {
 	photos := []*Photo{}
 	for rows.Next() {
 		var p Photo
-		err = rows.Scan(&p.Pid, &p.Uid, &p.File, &p.Date)
+		err = rows.Scan(&p.Pid, &p.Uid, &p.Date)
 		if err != nil {
 			return nil, err
 		}

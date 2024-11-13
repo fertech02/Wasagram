@@ -31,6 +31,7 @@ export default {
           'Authorization': `Bearer ${token}`,
         },
       };
+
       try {
         const response = await this.$axios.post(`/photos`, formData, config);
         console.log('Photo uploaded successfully', response.data);
@@ -49,7 +50,9 @@ export default {
             console.error(`Unhandled HTTP Error (${statusCode}):`, error.response.data);
         }
       }
+
     },
+    
   },
 
 };

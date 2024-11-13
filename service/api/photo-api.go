@@ -2,60 +2,65 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"os"
-	"time"
+	"path/filepath"
 
 	"github.com/fertech02/Wasa-repository/service/api/reqcontext"
-	"github.com/fertech02/Wasa-repository/service/database"
-	"github.com/google/uuid"
 	"github.com/julienschmidt/httprouter"
 )
 
 // Photo path
-const directory = "/tmp/photos"
+const directory = "/tmp/filesystem/"
+
+type FromFile struct {
+	File   multipart.File
+	Header multipart.FileHeader
+	Mime   string
+}
 
 func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	// Get the Authorization header
-	authHeader := r.Header.Get("Authorization")
-	if authHeader == "" {
+	if !CheckValidAuth(r) {
+		ctx.Logger.Error("Invalid Authorization")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	// Get the file path from the request
-	file, err := io.ReadAll(r.Body)
+	// Parse the multipart form
+	err := r.ParseMultipartForm(10 << 20)
 	if err != nil {
+		ctx.Logger.WithError(err).Error("Error parsing form")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	if len(file) == 0 {
+	// Get the photo from the form
+	file, _, err := r.FormFile("file")
+	if err != nil {
+		ctx.Logger.WithError(err).Error("Error getting file")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	defer file.Close()
 
-	// Create a new photo
-	uid := ps.ByName("uid")
-	photo := database.Photo{
-		Pid:  uuid.New().String(),
-		Uid:  uid,
-		File: file,
-		Date: time.Now().Format("2006-01-02 15:04:05"),
-	}
+	publisher := GetIdFromBearer(r)
 
-	// Post the photo
-	_, err = rt.db.PostPhoto(&photo)
+	// Add the photo in the db
+	pid, err := rt.db.PostPhoto(publisher)
 	if err != nil {
+		ctx.Logger.WithError(err).Error("Error posting photo")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	// Save Photo
-	err = rt.savePhoto(file, photo.Pid)
+	// Save the photo
+	err = rt.savePhoto(file, pid)
 	if err != nil {
+		ctx.Logger.WithError(err).Error("Error saving photo")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -64,17 +69,20 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 }
 
-func (rt *_router) savePhoto(file []byte, pid string) error {
+func (rt *_router) savePhoto(file multipart.File, pid string) error {
 
-	// Create a new file
-	f, err := os.Create(directory + "/" + pid + ".jpg")
+	// filename such that id.ext
+	fileName := filepath.Join(directory, fmt.Sprintf("%s%s", pid, ".jpg"))
+
+	// create file
+	out, err := os.Create(fileName)
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	defer out.Close()
 
-	// Write the file
-	_, err = f.Write(file)
+	// copy file content to new file
+	_, err = io.Copy(out, file)
 	if err != nil {
 		return err
 	}

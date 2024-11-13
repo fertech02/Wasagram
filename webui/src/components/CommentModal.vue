@@ -3,7 +3,7 @@ const token = sessionStorage.getItem('token');
 
 export default {
     props: {
-        photoId: String,
+        pid: String,
         uid: String,
     },
     data() {
@@ -23,7 +23,7 @@ export default {
                         'Authorization': `Bearer ${token}`,
                     },
                 };
-                const response = await this.$axios.post(`/photos/${this.photoId}/comments/${this.uid}`, { commentText: this.commentText }, config);
+                const response = await this.$axios.post(`/photos/${this.pid}/comments/${this.uid}`, { commentText: this.commentText }, config);
                 this.Text = "Comment Posted!";
                 location.reload();
             }
@@ -39,7 +39,7 @@ export default {
 
 
 <template>
-    <div class="modal fade" :id="'usersModal' + photoId" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
+    <div class="modal fade" :id="'usersModal' + pid" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">

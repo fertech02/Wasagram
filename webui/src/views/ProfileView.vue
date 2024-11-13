@@ -198,7 +198,7 @@ export default {
         <hr />
         <div class="photos">
             <Photo v-for="photo in photoList" :key="photo.Pid" :pid="photo.Pid" :Date="photo.Date"
-                :authorName="userName" :likeCount="photo.likecount" :caption="photo.caption" />
+                :authorName="username" :likeCount="photo.likecount"/>
         </div>
     </div>
 </template>
