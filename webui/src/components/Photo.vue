@@ -12,28 +12,28 @@ export default {
   },
 
   props: {
-    pid: String,
-    likeCount: Number,
-    authorName: String,
-    date: String,
+    Pid: String,
+    Uid: String,
+    Date: String,
   },
 
   data() {
     return {
       imgSrc: null,
       isLiked: false,
-      LikeCount: this.likeCount,
-      authorId: "",
+      LikeCount: 0,
+      Author: '',
       isMe: false,
       notBanned: true,
-      modalId: this.pid,
+      modalId: this.Pid,
     };
+    
   },
 
   async created() {
-    if (this.pid) {
+    if (this.Pid) {
       try {
-        const response = await this.$axios.get(`/photos/${this.pid}`, {
+        const response = await this.$axios.get(`/photos/${this.Pid}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -41,12 +41,21 @@ export default {
         });
         const imageUrl = URL.createObjectURL(response.data);
         this.imgSrc = imageUrl;
-        const isL = await this.$axios.get(`/photos/${this.pid}/likes/${token}`, {
+
+        const isL = await this.$axios.get(`/photos/${this.Pid}/likes/${token}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
         });
-        this.isLiked = isL.data.isLiked
+        this.isLiked = isL.data.isLiked;
+
+        const LikeCount = await this.$axios.get(`/photos/${this.Pid}/likes`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        this.LikeCount = LikeCount.data
+  
         this.findAuthorId();
       } 
       catch (error) {
@@ -94,7 +103,7 @@ export default {
 
     async deletePhoto() {
       try {
-        const response = await this.$axios.delete(`/photos/${this.pid}`, {
+        const response = await this.$axios.delete(`/photos/${this.Pid}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           }
@@ -114,7 +123,7 @@ export default {
         const token = sessionStorage.getItem('authToken');
         if (this.isLiked) {
           this.LikeCount += 1;
-          await this.$axios.put(`/photos/${this.pid}/likes/${token}`, {
+          await this.$axios.put(`/photos/${this.Pid}/likes/${token}`, {
           }, {
             headers: {
               Authorization: `Bearer ${token}`
@@ -122,7 +131,7 @@ export default {
           });
         } else {
           this.LikeCount -= 1;
-          await this.$axios.delete(`/photos/${this.pid}/likes/${token}`, {
+          await this.$axios.delete(`/photos/${this.Pid}/likes/${token}`, {
             headers: {
               Authorization: `Bearer ${token}`
             }
@@ -171,11 +180,50 @@ export default {
                 <use href="/feather-sprite-v4.29.0.svg#message-square" />
               </svg>
             </button>
-            <CommentModal :pid="this.modalId" />
-            <CommentListModal :pid="this.modalId" />
+            <CommentModal :Pid="this.modalId" />
+            <CommentListModal :Pid="this.modalId" />
           </div>
         </div>
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+.center-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.photo-card {
+  border: 3px solid #6d6969;
+  border-radius: 4px;
+  padding: 10px;
+  width: 500px;
+  text-align: center;
+  font-family: 'Arial', sans-serif;
+}
+
+.photo-details {
+  margin-top: 10px;
+}
+
+.author {
+  font-size: 20px;
+  margin-bottom: 5px;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  margin: 15px;
+}
+
+.like-counter {
+  margin-left: 2px;
+  border: 2px solid #d102027a;
+  border-radius: 4px;
+  padding: 8px;
+}
+</style>

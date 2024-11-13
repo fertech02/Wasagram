@@ -11,26 +11,13 @@ import (
 
 func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	var comment db.Comment
-	err := json.NewDecoder(r.Body).Decode(&comment)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
+	// Create a new comment
+	comment := db.Comment{}
 	// get the photo id from the request params
 	photoId := ps.ByName("pid")
-	if photoId == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
 
 	// get the user id from the request params
 	userId := ps.ByName("uid")
-	if userId == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
 
 	comment.Pid = photoId
 	comment.Uid = userId
@@ -40,7 +27,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		Message string `json:"message"`
 	}
 
-	err = json.NewDecoder(r.Body).Decode(&message)
+	err := json.NewDecoder(r.Body).Decode(&message)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return

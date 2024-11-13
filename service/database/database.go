@@ -97,7 +97,7 @@ type AppDatabase interface {
 	PostPhoto(uid string) (string, error)
 	DeletePhoto(pid string) error
 	GetPhotos(uid string) ([]*Photo, error)
-	GetPhoto(pid string) (*Photo, error)
+	GetPhotoAuthor(pid string) (string, error)
 	GetPhotoCount(uid string) (int, error)
 
 	// Like

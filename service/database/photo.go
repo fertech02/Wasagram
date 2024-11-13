@@ -47,21 +47,27 @@ func (db *appdbimpl) DeletePhoto(pid string) error {
 }
 
 // Get a Photo
-func (db *appdbimpl) GetPhoto(pid string) (*Photo, error) {
+func (db *appdbimpl) GetPhotoAuthor(pid string) (string, error) {
 
-	query := "SELECT * FROM Photos WHERE Pid = $1"
-	row := db.c.QueryRow(query, pid)
-	if row == nil {
-		return nil, nil
-	}
-
-	var p Photo
-	err := row.Scan(&p.Pid, &p.Uid, &p.Date)
+	query := "SELECT Uid FROM Photos WHERE Pid = $1"
+	rows, err := db.c.Query(query, pid)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	return &p, nil
+	var uid string
+	for rows.Next() {
+		err = rows.Scan(&uid)
+		if err != nil {
+			return "", err
+		}
+	}
+
+	if err = rows.Err(); err != nil {
+		return "", err
+	}
+
+	return uid, nil
 }
 
 // Get User's Photos

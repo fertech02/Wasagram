@@ -33,6 +33,7 @@ func (rt *_router) Handler() http.Handler {
 	// Like routes
 	rt.router.PUT("/photos/:pid/likes/:uid", rt.wrap(rt.likePhoto))
 	rt.router.DELETE("/photos/:pid/likes/:uid", rt.wrap(rt.unlikePhoto))
+	rt.router.GET("/photos/:pid/likes/:uid", rt.wrap(rt.checkLike))
 	rt.router.GET("/photos/:pid/likes", rt.wrap(rt.getLikes))
 
 	// Ban routes

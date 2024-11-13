@@ -179,15 +179,12 @@ paths:
               application/json:
                 schema:
                   type: object
-                  description: List of Likes
+                  description: NUMBER OF LIKES
                   properties:
                     likes:
-                      type: array
-                      description: List of likes
-                      minItems: 1
-                      maxItems: 100
-                      items:
-                        $ref: "#/components/schemas/Like"
+                      type: integer
+                      description: Number of likes
+                      example: 0
           "400" : { $ref: "#/components/responses/BadRequest" }
           "401" : { $ref: "#/components/responses/UnauthorizedError" }
           "500" : { $ref: "#/components/responses/InternalServerError" }
@@ -226,6 +223,29 @@ paths:
         "400" : { $ref: "#/components/responses/BadRequest" }
         "401" : { $ref: "#/components/responses/UnauthorizedError" }
         "500" : { $ref: "#/components/responses/InternalServerError" }
+    get:
+      tags: ["Likes"]
+      operationId: checkLike
+      summary: Get a Like
+      description: Get a Like
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Like Retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Object containing the like status.
+                properties:
+                  isLiked:
+                    type: boolean
+                    description: True if the user liked the photo
+                    example: true
+        "401": { $ref: "#/components/responses/UnauthorizedError" }
+        "404": { $ref: "#/components/responses/NotFoundError" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
          
   /photos/{pid}/comments:
     parameters:

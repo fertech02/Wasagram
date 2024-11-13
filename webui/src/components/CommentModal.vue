@@ -3,19 +3,22 @@ const token = sessionStorage.getItem('token');
 
 export default {
     props: {
-        pid: String,
-        uid: String,
+        Pid: String,
+        Uid: String,
+        Message: String,
     },
+
     data() {
         return {
+            commentPostTry: false,
             commentText: '',
             Text: '',
-            commentPostTry: false,
         };
     },
+
     methods: {
         async commentPhoto() {
-            console.log("Posting comment:", this.commentText);
+            console.log("Posting Comment: ", this.commentText);
             this.commentPostTry = true;
             try {
                 const config = {
@@ -23,7 +26,7 @@ export default {
                         'Authorization': `Bearer ${token}`,
                     },
                 };
-                const response = await this.$axios.post(`/photos/${this.pid}/comments/${this.uid}`, { commentText: this.commentText }, config);
+                const response = await this.$axios.post(`/photos/${this.pid}/comments/${this.uid}`, { Message: this.commentText }, config);
                 this.Text = "Comment Posted!";
                 location.reload();
             }

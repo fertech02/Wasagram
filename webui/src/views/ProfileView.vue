@@ -113,7 +113,7 @@ export default {
             try {
                 if (this.isfollowed) {
                     this.followCount += 1;
-                    await this.$axios.put(`/users/${token}/follows/${uid}`, {
+                    await this.$axios.put(`/users/${token}/follow/${uid}`, {
                     }, {
                         headers: {
                             Authorization: `Bearer ${token}`
@@ -121,7 +121,7 @@ export default {
                     });
                 } else {
                     this.followCount -= 1;
-                    await this.$axios.delete(`/users/${token}/follows/${uid}`, {
+                    await this.$axios.delete(`/users/${token}/follow/${uid}`, {
                         headers: {
                             Authorization: `Bearer ${token}`
                         }
@@ -140,14 +140,14 @@ export default {
             
             try {
                 if (this.isbanned) {
-                    await this.$axios.put(`/users/${token}/bans/${uid}`, {
+                    await this.$axios.put(`/users/${token}/ban/${uid}`, {
                     }, {
                         headers: {
                             Authorization: `Bearer ${token}`
                         }
                     });
                 } else {
-                    await this.$axios.delete(`/users/${token}/bans/${uid}`, {
+                    await this.$axios.delete(`/users/${token}/ban/${uid}`, {
                         headers: {
                             Authorization: `Bearer ${token}`
                         }
@@ -197,8 +197,7 @@ export default {
         </div>
         <hr />
         <div class="photos">
-            <Photo v-for="photo in photoList" :key="photo.Pid" :pid="photo.Pid" :Date="photo.Date"
-                :authorName="username" :likeCount="photo.likecount"/>
+            <Photo v-for="photo in photoList" :key="photo.Pid" :Pid="photo.Pid" :Uid="photo.Uid" :Date="photo.Date"/>
         </div>
     </div>
 </template>

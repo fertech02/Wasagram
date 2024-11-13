@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,6 +11,7 @@ import (
 	"path/filepath"
 
 	"github.com/fertech02/Wasa-repository/service/api/reqcontext"
+	filesystem "github.com/fertech02/Wasa-repository/service/filesystem"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -92,48 +94,38 @@ func (rt *_router) savePhoto(file multipart.File, pid string) error {
 
 func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	// Get the Authorization header
-	authHeader := r.Header.Get("Authorization")
-	if authHeader == "" {
+	pid := ps.ByName("pid")
+
+	uid, err := rt.db.GetPhotoAuthor(pid)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("Error getting photo author")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	ans := CheckIdAuthorized(r, uid)
+	if ans != 0 {
+		ctx.Logger.Error("Unauthorized")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	// Get the photo ID
-	pid := ps.ByName("pid")
-	if pid == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	// Get the photo
-	photo, err := rt.db.GetPhoto(pid)
+	// delete the photo in the filesystem
+	err = filesystem.RemovePhoto(pid)
 	if err != nil {
+		ctx.Logger.WithError(err).Error("Error removing photo")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	// Check if the photo exists
-	if photo == nil {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	// Check if the user is the owner of the photo
-	uid := ps.ByName("uid")
-	if photo.Uid != uid {
-		w.WriteHeader(http.StatusForbidden)
-		return
-	}
-
-	// Delete the photo
+	// delete the photo in the db
 	err = rt.db.DeletePhoto(pid)
 	if err != nil {
+		ctx.Logger.WithError(err).Error("Error deleting photo")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
 }
 
 func (rt *_router) getPhotos(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -170,38 +162,59 @@ func (rt *_router) getPhotos(w http.ResponseWriter, r *http.Request, ps httprout
 
 func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	// Get the Authorization header
-	authHeader := r.Header.Get("Authorization")
-	if authHeader == "" {
+	pid := ps.ByName("pid")
+
+	// Check Authorization
+	if !CheckValidAuth(r) {
+		ctx.Logger.Error("Invalid Authorization")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	// Get the photo ID
-	pid := ps.ByName("pid")
-	if pid == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
+	myId := GetIdFromBearer(r)
 
-	// Get the photo
-	photo, err := rt.db.GetPhoto(pid)
+	hisId, err := rt.db.GetPhotoAuthor(pid)
 	if err != nil {
+		ctx.Logger.WithError(err).Error("Error getting photo author")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	// Check if the photo exists
-	if photo == nil {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	// Return the photo
-	err = json.NewEncoder(w).Encode(photo)
+	isBan, err := rt.db.CheckBan(hisId, myId)
 	if err != nil {
+		ctx.Logger.WithError(err).Error("Error checking ban")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
+	if isBan {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	// get the photo
+	path := filepath.Join(directory, fmt.Sprintf("%s%s", pid, ".jpg"))
+	photoFile, err := os.Open(path)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("Error opening photo")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	} else {
+		w.Header().Set("Content-Type", "image/png")
+		buf := bytes.NewBuffer(nil)
+		_, err := io.Copy(buf, photoFile)
+		if err != nil {
+			ctx.Logger.WithError(err).Error("Error copying photo")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		} else {
+			w.WriteHeader(http.StatusOK)
+			_, err := w.Write(buf.Bytes())
+			if err != nil {
+				ctx.Logger.WithError(err).Error("Error writing photo")
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+		}
+	}
 }
