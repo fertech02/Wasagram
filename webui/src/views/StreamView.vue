@@ -1,5 +1,5 @@
 <script>
-import PhotoCard from '@/components/Photo.vue';
+import PhotoCard from '@/components/PhotoCard.vue';
 const token = sessionStorage.getItem('token');
 
 export default {

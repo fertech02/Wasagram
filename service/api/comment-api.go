@@ -69,24 +69,57 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 
 func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	// get the photo id from the request params
 	pid := ps.ByName("pid")
-	if pid == "" {
-		w.WriteHeader(http.StatusBadRequest)
+
+	if !CheckValidAuth(r) {
+		ctx.Logger.Error("Unauthorized")
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	// Get the comments from the db
-	comments, err := rt.db.GetComments(pid)
+	myId := GetIdFromBearer(r)
+
+	hisId, err := rt.db.GetPhotoAuthor(pid)
 	if err != nil {
+		ctx.Logger.Error("Error getting photo author")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	// Return the comments
-	err = json.NewEncoder(w).Encode(comments)
+	isBan, err := rt.db.CheckBan(hisId, myId)
 	if err != nil {
+		ctx.Logger.Error("Error checking ban status")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	if isBan {
+		ctx.Logger.Error("User is banned")
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	var comments []db.Comment
+	comments, err = rt.db.GetComments(pid)
+	if err != nil {
+		ctx.Logger.Error("Error getting comments")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	commentsJson, err := json.Marshal(comments)
+	if err != nil {
+		ctx.Logger.Error("Error marshalling comments")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	_, err = w.Write(commentsJson)
+	if err != nil {
+		ctx.Logger.Error("Error writing comments")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }

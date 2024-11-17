@@ -40,7 +40,6 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		w.WriteHeader(http.StatusOK)
 		return
 	}
 
@@ -104,7 +103,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	var photoStream []*database.Photo
+	var photoStream []database.Photo
 	photoStream, err := rt.db.GetProfilePhotos(uid)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -241,24 +240,36 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 
 func (rt *_router) searchUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	// Get the Authorization header
-	authHeader := r.Header.Get("Authorization")
-	if authHeader == "" {
+	queryParams := r.URL.Query()
+	username := queryParams.Get("username")
+
+	if !CheckValidAuth(r) {
+		ctx.Logger.Error("Auth header invalid")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	usernameToSearch := r.URL.Query().Get("username")
-	usersList, err := rt.db.SearchUser(usernameToSearch)
+	var usersList []database.User
+	usersList, err := rt.db.SearchUser(username)
 	if err != nil {
+		ctx.Logger.WithError(err).Error("Error during search")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	usersListJSON, err := json.Marshal(usersList)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("Error during json writing")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(usersList)
+	_, err = w.Write(usersListJSON)
 	if err != nil {
+		ctx.Logger.WithError(err).Error("Error during json sending")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
 }

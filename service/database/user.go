@@ -52,9 +52,9 @@ func (db *appdbimpl) GetMyStream(uid string) ([]*Photo, error) {
 }
 
 // Get Profile Photos
-func (db *appdbimpl) GetProfilePhotos(uid string) ([]*Photo, error) {
+func (db *appdbimpl) GetProfilePhotos(uid string) ([]Photo, error) {
 
-	var photos []*Photo
+	var photos []Photo
 	rows, err := db.c.Query("SELECT Pid, Uid, Date FROM Photos WHERE Uid=? ORDER BY Date DESC", uid)
 	if err != nil {
 		return photos, err
@@ -67,7 +67,7 @@ func (db *appdbimpl) GetProfilePhotos(uid string) ([]*Photo, error) {
 		if err != nil {
 			return photos, err
 		}
-		photos = append(photos, &p)
+		photos = append(photos, p)
 	}
 	return photos, nil
 }
@@ -75,11 +75,10 @@ func (db *appdbimpl) GetProfilePhotos(uid string) ([]*Photo, error) {
 // Search User
 func (db *appdbimpl) SearchUser(usernameToSearch string) (usersList []User, err error) {
 
-	query := "SELECT * FROM Users WHERE Username LIKE ?"
-
-	rows, err := db.c.Query(query, usernameToSearch+"%")
+	var userslist []User
+	rows, err := db.c.Query("SELECT Uid, Username FROM Users WHERE Username LIKE ?", "%"+usernameToSearch+"%")
 	if err != nil {
-		return
+		return userslist, err
 	}
 	defer rows.Close()
 
@@ -87,13 +86,16 @@ func (db *appdbimpl) SearchUser(usernameToSearch string) (usersList []User, err 
 		var user User
 		err = rows.Scan(&user.Uid, &user.Username)
 		if err != nil {
-			return
+			return userslist, err
 		}
-		usersList = append(usersList, user)
+		userslist = append(userslist, user)
+	}
+	if err = rows.Err(); err != nil {
+		return userslist, err
 	}
 
-	err = rows.Err()
-	return
+	return userslist, nil
+
 }
 
 // Get User Id

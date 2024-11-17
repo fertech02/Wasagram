@@ -3,9 +3,8 @@ const token = sessionStorage.getItem('token');
 
 export default {
     props: {
-        Pid: String,
-        Uid: String,
-        Message: String,
+        pid: String,
+        uid: String,
     },
 
     data() {

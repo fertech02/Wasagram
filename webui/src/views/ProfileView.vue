@@ -1,5 +1,5 @@
 <script>
-import Photo from '@/components/Photo.vue';
+import PhotoCard from '@/components/PhotoCard.vue';
 const token = sessionStorage.getItem('token');
 
 export default {
@@ -161,7 +161,7 @@ export default {
     },
 
     components: {
-        Photo,
+        PhotoCard,
     },
 };
 </script>
@@ -197,7 +197,7 @@ export default {
         </div>
         <hr />
         <div class="photos">
-            <Photo v-for="photo in photoList" :key="photo.Pid" :Pid="photo.Pid" :Uid="photo.Uid" :Date="photo.Date"/>
+            <PhotoCard v-for="photo in photoList" :pid="photo.pid" :uid="photo.uid" :date="photo.date"/>
         </div>
     </div>
 </template>

@@ -15,7 +15,7 @@ export default {
         async searchUsers() {
             try {
                 console.log("search started")
-                const response = await this.$axios.get(`/users/`, {
+                const response = await this.$axios.get(`/users`, {
                     params: { username: this.searchQuery },
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -24,7 +24,8 @@ export default {
                 });
                 console.log("search finished")
                 this.searchExecuted = true;
-                this.UserList = response.data.UList;
+                this.UserList = response.data;
+                console.log(this.UserList);
                 this.Text = this.UserList === null ? "No user found with that name." : "";
             }
             catch (error) {
@@ -74,11 +75,11 @@ export default {
         <p v-if="searchExecuted" class="mt-3" style="font-size: 25px;">
             {{ Text }}
         <ul class="list-group list-group-flush">
-            <li v-for="User in UserList" :key="User.userId" class="list-group-item">
+            <li v-for="User in UserList" :key="User.Uid" class="list-group-item">
                 <div class="container">
                     {{ User.Username }}
                     <button type="button" class="btn btn-secondary"
-                        @click="$router.push(`/users/${User.userId}/profile`)">Profile</button>
+                        @click="$router.push(`/users/${User.Uid}/profile`)">Profile</button>
                 </div>
             </li>
         </ul>

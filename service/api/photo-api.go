@@ -15,14 +15,13 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-// Photo path
-const directory = "/tmp/filesystem/"
-
 type FromFile struct {
 	File   multipart.File
 	Header multipart.FileHeader
 	Mime   string
 }
+
+const uploadDirectory = "/tmp/filesystem/"
 
 func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
@@ -73,8 +72,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 func (rt *_router) savePhoto(file multipart.File, pid string) error {
 
-	// filename such that id.ext
-	fileName := filepath.Join(directory, fmt.Sprintf("%s%s", pid, ".jpg"))
+	fileName := filepath.Join(uploadDirectory, fmt.Sprintf("%s%s", pid, ".jpg"))
 
 	// create file
 	out, err := os.Create(fileName)
@@ -193,7 +191,7 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 	}
 
 	// get the photo
-	path := filepath.Join(directory, fmt.Sprintf("%s%s", pid, ".jpg"))
+	path := "/tmp/filesystem/" + pid + ".jpg"
 	photoFile, err := os.Open(path)
 	if err != nil {
 		ctx.Logger.WithError(err).Error("Error opening photo")

@@ -69,13 +69,13 @@ type Ban struct {
 }
 
 type Profile struct {
-	PhotoList     []*Photo `json:"photoList"`
-	Username      string   `json:"username"`
-	FollowCount   int      `json:"followCount"`
-	FollowedCount int      `json:"followedCount"`
-	PhotoCount    int      `json:"photoCount"`
-	IsFollowed    bool     `json:"isFollowed"`
-	IsBanned      bool     `json:"isBanned"`
+	PhotoList     []Photo `json:"photoList"`
+	Username      string  `json:"username"`
+	FollowCount   int     `json:"followCount"`
+	FollowedCount int     `json:"followedCount"`
+	PhotoCount    int     `json:"photoCount"`
+	IsFollowed    bool    `json:"isFollowed"`
+	IsBanned      bool    `json:"isBanned"`
 }
 
 // AppDatabase is the high level interface for the DB
@@ -91,7 +91,7 @@ type AppDatabase interface {
 	SearchUser(username string) ([]User, error)
 
 	// Profile
-	GetProfilePhotos(uid string) ([]*Photo, error)
+	GetProfilePhotos(uid string) ([]Photo, error)
 
 	// Photo
 	PostPhoto(uid string) (string, error)

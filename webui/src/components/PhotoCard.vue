@@ -12,9 +12,9 @@ export default {
   },
 
   props: {
-    Pid: String,
-    Uid: String,
-    Date: String,
+    pid: String,
+    uid: String,
+    date: String,
   },
 
   data() {
@@ -25,7 +25,7 @@ export default {
       Author: '',
       isMe: false,
       notBanned: true,
-      modalId: this.Pid,
+      modalId: this.pid,
     };
     
   },
@@ -33,23 +33,24 @@ export default {
   async created() {
     if (this.Pid) {
       try {
-        const response = await this.$axios.get(`/photos/${this.Pid}`, {
+        const response = await this.$axios.get(`/photos/${this.pid}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
           responseType: 'blob',
         });
         const imageUrl = URL.createObjectURL(response.data);
+        console.log(imageUrl);
         this.imgSrc = imageUrl;
 
-        const isL = await this.$axios.get(`/photos/${this.Pid}/likes/${token}`, {
+        const isL = await this.$axios.get(`/photos/${this.pid}/likes/${token}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
         });
         this.isLiked = isL.data.isLiked;
 
-        const LikeCount = await this.$axios.get(`/photos/${this.Pid}/likes`, {
+        const LikeCount = await this.$axios.get(`/photos/${this.pid}/likes`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -103,7 +104,7 @@ export default {
 
     async deletePhoto() {
       try {
-        const response = await this.$axios.delete(`/photos/${this.Pid}`, {
+        const response = await this.$axios.delete(`/photos/${this.pid}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           }
@@ -123,7 +124,7 @@ export default {
         const token = sessionStorage.getItem('authToken');
         if (this.isLiked) {
           this.LikeCount += 1;
-          await this.$axios.put(`/photos/${this.Pid}/likes/${token}`, {
+          await this.$axios.put(`/photos/${this.pid}/likes/${token}`, {
           }, {
             headers: {
               Authorization: `Bearer ${token}`
@@ -131,7 +132,7 @@ export default {
           });
         } else {
           this.LikeCount -= 1;
-          await this.$axios.delete(`/photos/${this.Pid}/likes/${token}`, {
+          await this.$axios.delete(`/photos/${this.pid}/likes/${token}`, {
             headers: {
               Authorization: `Bearer ${token}`
             }
@@ -149,40 +150,21 @@ export default {
 </script>
 
 <template>
-  <div class="container mt-5" v-if="notBanned">
-    <div class="center-container">
-      <div class="card photo-card">
-        <button v-if="isMe" @click="deletePhoto" class="btn btn-danger delete-button mb-2">
-          Delete Photo <svg class="feather">
-            <use href="/feather-sprite-v4.29.0.svg#trash-2" />
-          </svg>
-        </button>
-
-        <img :src="imgSrc" alt="Photo" class="card-img-top" />
-        <div class="card-body photo-details">
-          <div class="author">{{ authorName }}, {{ date }}</div>
-          <div class="actions">
-            <button @click="likePhoto" class="btn btn-sm btn-outline-primary ms-3">
-              {{ isLiked ? 'Unlike' : 'Like' }}
-            </button>
-            <span class="like-counter">{{ LikeCount }} Likes <svg class="feather">
-                <use href="/feather-sprite-v4.29.0.svg#thumbs-up" />
-              </svg></span>
-            <button @click="commentPhoto" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
-              :data-bs-target="'#usersModal' + modalId">
-              Comment <svg class="feather">
-                <use href="/feather-sprite-v4.29.0.svg#message-circle" />
-              </svg>
-            </button>
-            <button @click="viewComments" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
-              :data-bs-target="'#listModal' + modalId">
-              View Comments <svg class="feather">
-                <use href="/feather-sprite-v4.29.0.svg#message-square" />
-              </svg>
-            </button>
-            <CommentModal :Pid="this.modalId" />
-            <CommentListModal :Pid="this.modalId" />
+  <div class="center-container">
+    <div class="photo-card">
+      <img :src="imgSrc" alt="Photo" width="400" height="400" />
+      <div class="photo-details">
+        <div class="author">
+          <span>Author: {{ Author }}</span>
+        </div>
+        <div class="actions">
+          <div>
+            <button v-if="isMe" @click="deletePhoto" class="btn btn-danger">Delete</button>
+            <button @click="likePhoto" class="btn btn-primary">{{ isLiked ? 'Unlike' : 'Like' }}</button>
+            <span class="like-counter">{{ LikeCount }}</span>
           </div>
+          <CommentModal :pid="pid" :uid="uid" />
+          <CommentListModal :pid="pid" />
         </div>
       </div>
     </div>
