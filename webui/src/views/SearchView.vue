@@ -75,11 +75,11 @@ export default {
         <p v-if="searchExecuted" class="mt-3" style="font-size: 25px;">
             {{ Text }}
         <ul class="list-group list-group-flush">
-            <li v-for="User in UserList" :key="User.Uid" class="list-group-item">
+            <li v-for="User in UserList" :key="User.uid" class="list-group-item">
                 <div class="container">
-                    {{ User.Username }}
+                    {{ User.username }}
                     <button type="button" class="btn btn-secondary"
-                        @click="$router.push(`/users/${User.Uid}/profile`)">Profile</button>
+                        @click="$router.push(`/users/${User.uid}/profile`)">Profile</button>
                 </div>
             </li>
         </ul>

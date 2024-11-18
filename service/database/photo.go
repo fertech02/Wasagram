@@ -1,27 +1,15 @@
 package database
 
-import (
-	"time"
-
-	"github.com/gofrs/uuid"
-)
+import "database/sql"
 
 // Post a Photo
-func (db *appdbimpl) PostPhoto(uid string) (string, error) {
+func (db *appdbimpl) PostPhoto(p Photo) (Photo, error) {
 
-	currentTime := time.Now().UTC()
-	uuid, err := uuid.NewV4()
+	_, err := db.c.Exec(`INSERT INTO Photos (Pid, Uid, File, Date) VALUES (?, ?, ?, ?)`, p.Pid, p.Uid, p.File, p.Date)
 	if err != nil {
-		return "", err
+		return p, err
 	}
-	pid := uuid.String()
-	_, err = db.c.Exec(
-		"INSERT INTO Photos(Pid, Uid, Date) VALUES (?, ?, ?)",
-		pid, uid, currentTime.Format("2006-01-02 15:04:05"))
-	if err != nil {
-		return "", err
-	}
-	return pid, nil
+	return p, nil
 }
 
 // Delete a Photo
@@ -46,6 +34,24 @@ func (db *appdbimpl) DeletePhoto(pid string) error {
 	return nil
 }
 
+func (db *appdbimpl) GetPhoto(pid string) (dbPhoto Photo, present bool, err error) {
+
+	query := "SELECT Pid, Uid, File, Date FROM Photos WHERE Pid = ?;"
+
+	row := db.c.QueryRow(query, pid)
+	err = row.Scan(&dbPhoto.Pid, &dbPhoto.Uid, &dbPhoto.File, &dbPhoto.Date)
+	if err != nil && err != sql.ErrNoRows {
+		return
+	} else if err == sql.ErrNoRows {
+		err = nil
+		return
+	} else {
+		err = nil
+		present = true
+		return
+	}
+}
+
 // Get a Photo
 func (db *appdbimpl) GetPhotoAuthor(pid string) (string, error) {
 
@@ -68,32 +74,6 @@ func (db *appdbimpl) GetPhotoAuthor(pid string) (string, error) {
 	}
 
 	return uid, nil
-}
-
-// Get User's Photos
-func (db *appdbimpl) GetPhotos(uid string) ([]*Photo, error) {
-
-	query := "SELECT * FROM Photos WHERE Uid = $1"
-	rows, err := db.c.Query(query, uid)
-	if err != nil {
-		return nil, err
-	}
-
-	photos := []*Photo{}
-	for rows.Next() {
-		var p Photo
-		err = rows.Scan(&p.Pid, &p.Uid, &p.Date)
-		if err != nil {
-			return nil, err
-		}
-		photos = append(photos, &p)
-	}
-
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-
-	return photos, nil
 }
 
 // Get Photo Count

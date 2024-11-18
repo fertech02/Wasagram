@@ -10,13 +10,13 @@ import (
 
 func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	followeeId := ps.ByName("followeeId")
+	followeeId := ps.ByName("uid")
 	if followeeId == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	followerId := ps.ByName("followerId")
+	followerId := ps.ByName("fid")
 	if followerId == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -32,13 +32,13 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 
 func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	followeeId := ps.ByName("followeeId")
+	followeeId := ps.ByName("uid")
 	if followeeId == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	followerId := ps.ByName("followerId")
+	followerId := ps.ByName("fid")
 	if followerId == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		return

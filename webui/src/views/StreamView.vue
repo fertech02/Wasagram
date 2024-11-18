@@ -38,14 +38,15 @@ export default {
         },
 
         async fetchUserData() {
-            const userId = this.$route.params.uid;
+            const uid = this.$route.params.uid;
             try {
-                const response = await this.$axios.get(`/users/${userId}/stream`, {
+                const response = await this.$axios.get(`/users/${uid}/stream`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
                 });
-                this.photoList = response.data.PList;
+                console.log('Response:', response.data);
+                this.photoList = response.data;
             } catch (error) {
                 if (error.response) {
                     const statusCode = error.response.status;
@@ -87,8 +88,7 @@ export default {
         <hr />
 
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            <PhotoCard v-for="photo in photoList" :key="photo.photoId" :photoId="photo.photoId" :date="photo.Date"
-                :authorName="photo.userId" :likeCount="photo.likecount" :caption="photo.caption" class="col mb-4" />
+            <PhotoCard v-for="photo in photoList" :key="photo.pid" :pid="photo.pid" :uid="photo.uid" :file="photo.file" :date="photo.date" />
         </div>
     </div>
 </template>

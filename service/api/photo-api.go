@@ -1,93 +1,48 @@
 package api
 
 import (
-	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
-	"mime/multipart"
 	"net/http"
-	"os"
-	"path/filepath"
+	"time"
 
 	"github.com/fertech02/Wasa-repository/service/api/reqcontext"
-	filesystem "github.com/fertech02/Wasa-repository/service/filesystem"
+	"github.com/google/uuid"
 	"github.com/julienschmidt/httprouter"
 )
 
-type FromFile struct {
-	File   multipart.File
-	Header multipart.FileHeader
-	Mime   string
-}
-
-const uploadDirectory = "/tmp/filesystem/"
-
 func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
+	// check auth
 	if !CheckValidAuth(r) {
-		ctx.Logger.Error("Invalid Authorization")
+		ctx.Logger.Error("Auth header invalid")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
+	var photo Photo
+	var err error
 
-	// Parse the multipart form
-	err := r.ParseMultipartForm(10 << 20)
+	photo.Uid = GetIdFromBearer(r)
+	photo.Pid = uuid.New().String()
+	photo.File, err = io.ReadAll(r.Body)
 	if err != nil {
-		ctx.Logger.WithError(err).Error("Error parsing form")
-		w.WriteHeader(http.StatusBadRequest)
+		ctx.Logger.Error("Error reading photo")
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	photo.Date = time.Now().Format("2006-01-02 15:04:05")
 
-	// Get the photo from the form
-	file, _, err := r.FormFile("file")
-	if err != nil {
-		ctx.Logger.WithError(err).Error("Error getting file")
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	defer file.Close()
-
-	publisher := GetIdFromBearer(r)
-
-	// Add the photo in the db
-	pid, err := rt.db.PostPhoto(publisher)
+	// add photo info to database
+	PhotoData, err := rt.db.PostPhoto(photo.PhotoToDatabase())
 	if err != nil {
 		ctx.Logger.WithError(err).Error("Error posting photo")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	// Save the photo
-	err = rt.savePhoto(file, pid)
-	if err != nil {
-		ctx.Logger.WithError(err).Error("Error saving photo")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
+	photo.PhotoFromDatabase(PhotoData)
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-
-}
-
-func (rt *_router) savePhoto(file multipart.File, pid string) error {
-
-	fileName := filepath.Join(uploadDirectory, fmt.Sprintf("%s%s", pid, ".jpg"))
-
-	// create file
-	out, err := os.Create(fileName)
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-
-	// copy file content to new file
-	_, err = io.Copy(out, file)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	_ = json.NewEncoder(w).Encode(photo)
 }
 
 func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -108,50 +63,10 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	// delete the photo in the filesystem
-	err = filesystem.RemovePhoto(pid)
-	if err != nil {
-		ctx.Logger.WithError(err).Error("Error removing photo")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
 	// delete the photo in the db
 	err = rt.db.DeletePhoto(pid)
 	if err != nil {
 		ctx.Logger.WithError(err).Error("Error deleting photo")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-}
-
-func (rt *_router) getPhotos(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-
-	// Get the Authorization header
-	authHeader := r.Header.Get("Authorization")
-	if authHeader == "" {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
-	// Get the user ID
-	userID := ps.ByName("uid")
-	if userID == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	// Get the user's photos
-	photos, err := rt.db.GetPhotos(userID)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	// Return the photos
-	err = json.NewEncoder(w).Encode(photos)
-	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -191,28 +106,26 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 	}
 
 	// get the photo
-	path := "/tmp/filesystem/" + pid + ".jpg"
-	photoFile, err := os.Open(path)
+	dbphoto, present, err := rt.db.GetPhoto(pid)
 	if err != nil {
-		ctx.Logger.WithError(err).Error("Error opening photo")
+		ctx.Logger.WithError(err).Error("Error getting photo")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
-	} else {
-		w.Header().Set("Content-Type", "image/png")
-		buf := bytes.NewBuffer(nil)
-		_, err := io.Copy(buf, photoFile)
-		if err != nil {
-			ctx.Logger.WithError(err).Error("Error copying photo")
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		} else {
-			w.WriteHeader(http.StatusOK)
-			_, err := w.Write(buf.Bytes())
-			if err != nil {
-				ctx.Logger.WithError(err).Error("Error writing photo")
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-		}
+	}
+	if !present {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	// Da aggiustare
+	var photo Photo
+	photo.PhotoFromDatabase(dbphoto)
+	mimeType := http.DetectContentType(photo.File)
+	w.Header().Set("Content-Type", mimeType)
+	_, err = w.Write(photo.File)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("Error writing photo")
+		http.Error(w, "Error writing photo", http.StatusInternalServerError)
+		return
 	}
 }

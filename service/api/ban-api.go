@@ -10,13 +10,13 @@ import (
 
 func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	bannerId := ps.ByName("bannerId")
+	bannerId := ps.ByName("uid")
 	if bannerId == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	bannedId := ps.ByName("bannedId")
+	bannedId := ps.ByName("bid")
 	if bannedId == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -35,13 +35,13 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	// Get the bannerId and bannedId
-	bannerId := ps.ByName("bannerId")
+	bannerId := ps.ByName("uid")
 	if bannerId == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	bannedId := ps.ByName("bannedId")
+	bannedId := ps.ByName("bid")
 	if bannedId == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -61,7 +61,7 @@ func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprout
 func (rt *_router) getBannedUsers(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	// Get the bannerId
-	bannerId := ps.ByName("bannerId")
+	bannerId := ps.ByName("uid")
 	if bannerId == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		return

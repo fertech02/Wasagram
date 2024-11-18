@@ -215,27 +215,42 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 
 func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	// Get the Authorization header
-	authHeader := r.Header.Get("Authorization")
-	if authHeader == "" {
-		w.WriteHeader(http.StatusUnauthorized)
+	uid := ps.ByName("uid")
+
+	ans := CheckIdAuthorized(r, uid)
+	if ans != 0 {
+		if ans == 2 {
+			ctx.Logger.WithField("uid", uid).Error("Unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+		} else {
+			ctx.Logger.WithField("uid", uid).Error("Auth header invalid")
+			w.WriteHeader(http.StatusUnauthorized)
+		}
 		return
 	}
 
-	uid := ps.ByName("uid")
-	photos, err := rt.db.GetMyStream(uid)
+	var photoStream []database.Photo
+	photoStream, err := rt.db.GetMyStream(uid)
 	if err != nil {
+		ctx.Logger.WithError(err).Error("Error during photo getting")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	photoStreamJSON, err := json.Marshal(photoStream)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("Error during json writing")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(photos)
+	_, err = w.Write(photoStreamJSON)
 	if err != nil {
+		ctx.Logger.WithError(err).Error("Error during json sending")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
 }
 
 func (rt *_router) searchUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {

@@ -27,7 +27,7 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	// Like the photo
-	err := rt.db.Like(uid, pid)
+	err := rt.db.Like(pid, uid)
 	if err != nil {
 		ctx.Logger.WithField("error", err).Error("Failed to like photo")
 		w.WriteHeader(http.StatusInternalServerError)

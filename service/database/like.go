@@ -10,7 +10,7 @@ func (db *appdbimpl) Like(pid string, uid string) error {
 // Unlike a Photo
 func (db *appdbimpl) Unlike(pid string, uid string) error {
 
-	_, err := db.c.Exec("DELETE FROM Likes WHERE Uid = $1 AND Pid = $2", uid, pid)
+	_, err := db.c.Exec("DELETE FROM Likes WHERE Pid = $1 AND Uid = $2", pid, uid)
 	return err
 }
 

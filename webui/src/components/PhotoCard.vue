@@ -14,18 +14,19 @@ export default {
   props: {
     pid: String,
     uid: String,
+    file: Array,
     date: String,
   },
 
   data() {
     return {
+
       imgSrc: null,
       isLiked: false,
       LikeCount: 0,
-      Author: '',
+      Author: this.uid,
       isMe: false,
       notBanned: true,
-      modalId: this.pid,
     };
     
   },
@@ -37,12 +38,16 @@ export default {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-          responseType: 'blob',
+          responseType: 'arraybuffer',
         });
-        const imageUrl = URL.createObjectURL(response.data);
-        console.log(imageUrl);
-        this.imgSrc = imageUrl;
-
+        // Convert byte array to base64
+        const base64 = btoa(
+          new Uint8Array(response.data).reduce(
+            (data, byte) => data + String.fromCharCode(byte), 
+            ''
+          )
+        );
+        this.imgSrc = `data:${response.headers['content-type']};base64,${base64}`;
         const isL = await this.$axios.get(`/photos/${this.pid}/likes/${token}`, {
           headers: {
             Authorization: `Bearer ${token}`
@@ -121,7 +126,7 @@ export default {
       this.isLiked = !this.isLiked;
       
       try {
-        const token = sessionStorage.getItem('authToken');
+        const token = sessionStorage.getItem('token');
         if (this.isLiked) {
           this.LikeCount += 1;
           await this.$axios.put(`/photos/${this.pid}/likes/${token}`, {
@@ -150,26 +155,32 @@ export default {
 </script>
 
 <template>
-  <div class="center-container">
-    <div class="photo-card">
-      <img :src="imgSrc" alt="Photo" width="400" height="400" />
-      <div class="photo-details">
-        <div class="author">
-          <span>Author: {{ Author }}</span>
-        </div>
-        <div class="actions">
-          <div>
-            <button v-if="isMe" @click="deletePhoto" class="btn btn-danger">Delete</button>
-            <button @click="likePhoto" class="btn btn-primary">{{ isLiked ? 'Unlike' : 'Like' }}</button>
-            <span class="like-counter">{{ LikeCount }}</span>
+  <div class="container mt-5" v-if="notBanned">
+    <div class="center-container">
+      <div class="card photo-card">
+        <button v-if="isMe" @click="deletePhoto" class="btn btn-danger delete-button mb-2">
+          Delete Photo <svg class="feather">
+            <use href="/feather-sprite-v4.29.0.svg#trash-2" />
+          </svg>
+        </button>
+
+        <img :src="imgSrc" alt="Photo" class="card-img-top" />
+        <div class="card-body photo-details">
+          <div class="author">{{ Author }}, {{ this.date }}</div>
+          <div class="actions">
+            <button @click="likePhoto" class="btn btn-sm btn-outline-primary ms-3">
+              {{ isLiked ? 'Unlike' : 'Like' }}
+            </button>
+            <span class="like-counter">{{ LikeCount }} Likes <svg class="feather">
+                <use href="/feather-sprite-v4.29.0.svg#thumbs-up" />
+              </svg></span>
           </div>
-          <CommentModal :pid="pid" :uid="uid" />
-          <CommentListModal :pid="pid" />
         </div>
       </div>
     </div>
   </div>
 </template>
+
 
 <style scoped>
 .center-container {

@@ -20,6 +20,7 @@ export default {
                     },
                 });
                 this.identifier = response.data
+                console.log(this.identifier.userId)
                 this.saveTokenToSessionStorage()
             } catch (error) {
                 console.error("Error while logging in!");

@@ -44,6 +44,7 @@ type User struct {
 type Photo struct {
 	Pid  string `json:"pid"`
 	Uid  string `json:"uid"`
+	File []byte `json:"file"`
 	Date string `json:"date"`
 }
 
@@ -87,16 +88,16 @@ type AppDatabase interface {
 	GetUserId(username string) (string, error)
 	GetUsername(uid string) (string, error)
 	UpdateUsername(userid string, username string) error
-	GetMyStream(uid string) ([]*Photo, error)
+	GetMyStream(uid string) ([]Photo, error)
 	SearchUser(username string) ([]User, error)
 
 	// Profile
 	GetProfilePhotos(uid string) ([]Photo, error)
 
 	// Photo
-	PostPhoto(uid string) (string, error)
+	PostPhoto(p Photo) (Photo, error)
 	DeletePhoto(pid string) error
-	GetPhotos(uid string) ([]*Photo, error)
+	GetPhoto(pid string) (Photo, bool, error)
 	GetPhotoAuthor(pid string) (string, error)
 	GetPhotoCount(uid string) (int, error)
 
@@ -157,10 +158,11 @@ func New(db *sql.DB) (AppDatabase, error) {
 
 				Pid TEXT PRIMARY KEY,
 				Uid TEXT NOT NULL,
+				File BLOB,
 				Date TEXT NOT NULL,
-
-				FOREIGN KEY (Uid) REFERENCES Users(Uid) ON DELETE CASCADE
-					
+				
+				PRIMARY KEY (Pid),
+				FOREIGN KEY (Uid) REFERENCES Users(Uid) ON DELETE CASCADE,
 		); `
 		_, err = db.Exec(sqlStmt)
 		if err != nil {
@@ -174,7 +176,9 @@ func New(db *sql.DB) (AppDatabase, error) {
 		sqlStmt := `CREATE TABLE Users (
 
 				Uid TEXT PRIMARY KEY,
-				Username TEXT NOT NULL
+				Username TEXT NOT NULL,
+
+				PRIMARY KEY (Uid),
 
 		); `
 		_, err = db.Exec(sqlStmt)
@@ -193,8 +197,8 @@ func New(db *sql.DB) (AppDatabase, error) {
 				Message TEXT NOT NULL,
 
 				PRIMARY KEY (Pid, Uid),
+				FOREIGN KEY (Uid) REFERENCES Users(Uid) ON DELETE CASCADE,
 				FOREIGN KEY (Pid) REFERENCES Photos(Pid) ON DELETE CASCADE,
-				FOREIGN KEY (Uid) REFERENCES Users(Uid) ON DELETE CASCADE
 
 		); `
 		_, err = db.Exec(sqlStmt)
@@ -213,7 +217,8 @@ func New(db *sql.DB) (AppDatabase, error) {
 
 				PRIMARY KEY (Pid, Uid),
 				FOREIGN KEY (Pid) REFERENCES Photos(Pid) ON DELETE CASCADE,
-				FOREIGN KEY (Uid) REFERENCES Users(Uid) ON DELETE CASCADE
+				FOREIGN KEY (Uid) REFERENCES Users(Uid) ON DELETE CASCADE,
+				
 
 		); `
 		_, err = db.Exec(sqlStmt)
@@ -232,7 +237,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 
 				PRIMARY KEY (FolloweeId, FollowerId),
 				FOREIGN KEY (FolloweeId) REFERENCES Users(Uid) ON DELETE CASCADE,
-				FOREIGN KEY (FollowerId) REFERENCES Users(Uid) ON DELETE CASCADE
+				FOREIGN KEY (FollowerId) REFERENCES Users(Uid) ON DELETE CASCADE,
 
 		); `
 		_, err = db.Exec(sqlStmt)
@@ -251,7 +256,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 
 				PRIMARY KEY (BannerId, BannedId),
 				FOREIGN KEY (BannerId) REFERENCES Users(Uid) ON DELETE CASCADE,
-				FOREIGN KEY (BannedId) REFERENCES Users(Uid) ON DELETE CASCADE
+				FOREIGN KEY (BannedId) REFERENCES Users(Uid) ON DELETE CASCADE,
 			
 		); `
 		_, err = db.Exec(sqlStmt)

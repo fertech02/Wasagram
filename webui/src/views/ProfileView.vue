@@ -197,7 +197,7 @@ export default {
         </div>
         <hr />
         <div class="photos">
-            <PhotoCard v-for="photo in photoList" :pid="photo.pid" :uid="photo.uid" :date="photo.date"/>
+            <PhotoCard v-for="photo in photoList" :key="photo.pid" :pid="photo.pid" :uid="photo.uid" :file="photo.file" :date="photo.date"/>
         </div>
     </div>
 </template>

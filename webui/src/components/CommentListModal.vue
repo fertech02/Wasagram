@@ -27,7 +27,7 @@ export default {
                     },
                 });
                 console.log('Response:', response.data);
-                this.comments = response.data.CList;
+                this.comments = response.data;
                 console.log('Comments:', this.comments);
             } catch (error) {
                 if (error.response) {
@@ -84,7 +84,7 @@ export default {
                             <div>
                                 <strong>{{ comment.uid }}</strong>
                             </div>
-                            <div>{{ comment.Message }}</div>
+                            <div>{{ comment.message }}</div>
                             <div v-if="comment.uid == this.token">
                                 <button @click="deleteComment(comment.pid, comment.uid)" class="btn btn-danger btn-sm">Delete</button>
                             </div>
