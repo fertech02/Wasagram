@@ -7,7 +7,6 @@ import (
 func (p *Photo) PhotoFromDatabase(photo database.Photo) {
 	p.Pid = photo.Pid
 	p.Uid = photo.Uid
-	p.File = photo.File
 	p.Date = photo.Date
 }
 
@@ -22,7 +21,6 @@ func (p *Photo) PhotoToDatabase() database.Photo {
 	return database.Photo{
 		Pid:  p.Pid,
 		Uid:  p.Uid,
-		File: p.File,
 		Date: p.Date,
 	}
 }

@@ -98,6 +98,23 @@ func run() error {
 		return fmt.Errorf("creating AppDatabase: %w", err)
 	}
 
+	// Check for the filesystem folder
+	directoryPath := "/tmp/filesystem/"
+	if _, err := os.Stat(directoryPath); os.IsNotExist(err) {
+		// Directory does not exist, create it
+		err := os.Mkdir(directoryPath, 0755)
+		if err != nil {
+			logger.WithError(err).Error("error creating directory")
+			return fmt.Errorf("creating directory: %w", err)
+		}
+	} else if err != nil {
+		return err
+	} else {
+		// Directory exists
+	}
+
+	// --- Start the API server ---
+
 	// Start (main) API server
 	logger.Info("initializing API server")
 

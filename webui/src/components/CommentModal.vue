@@ -2,10 +2,8 @@
 const token = sessionStorage.getItem('token');
 
 export default {
-    props: {
-        pid: String,
-        uid: String,
-    },
+
+    props: ['pid', 'uid'],
 
     data() {
         return {
@@ -25,12 +23,15 @@ export default {
                         'Authorization': `Bearer ${token}`,
                     },
                 };
-                const response = await this.$axios.post(`/photos/${this.pid}/comments/${this.uid}`, { Message: this.commentText }, config);
+                console.log(this.pid, this.uid);
+                console.log(this.uid == token)
+                const response = await this.$axios.post(`/photos/${this.pid}/comments/${this.uid}}`, { message: this.commentText }, config);
                 this.Text = "Comment Posted!";
+                
                 location.reload();
             }
-            catch {
-                console.error(error.response.data);
+            catch (error) {
+                console.error(error.response);
                 this.Text = "Error posting comment";
             }
         },
@@ -38,7 +39,6 @@ export default {
 };
 
 </script>
-
 
 <template>
     <div class="modal fade" :id="'usersModal' + pid" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">

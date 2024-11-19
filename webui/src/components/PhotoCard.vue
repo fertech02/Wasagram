@@ -12,55 +12,54 @@ export default {
   },
 
   props: {
-    pid: String,
-    uid: String,
-    file: Array,
+    photoId: String,
+    userId: String,
     date: String,
   },
 
   data() {
     return {
-
       imgSrc: null,
       isLiked: false,
       LikeCount: 0,
-      Author: this.uid,
+      Author: this.userId,
       isMe: false,
       notBanned: true,
+      Uid: this.userId,
+      Pid: this.photoId,
+      token: sessionStorage.getItem('token'),
     };
     
   },
 
   async created() {
-    if (this.Pid) {
+    if (this.photoId) {
       try {
-        const response = await this.$axios.get(`/photos/${this.pid}`, {
+        console.log(this.photoId);
+        const response = await this.$axios.get(`/photos/${this.photoId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-          responseType: 'arraybuffer',
+          responseType: 'blob',
         });
-        // Convert byte array to base64
-        const base64 = btoa(
-          new Uint8Array(response.data).reduce(
-            (data, byte) => data + String.fromCharCode(byte), 
-            ''
-          )
-        );
-        this.imgSrc = `data:${response.headers['content-type']};base64,${base64}`;
-        const isL = await this.$axios.get(`/photos/${this.pid}/likes/${token}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        this.isLiked = isL.data.isLiked;
+        const imageUrl = URL.createObjectURL(response.data);
+        this.imgSrc = imageUrl;
 
-        const LikeCount = await this.$axios.get(`/photos/${this.pid}/likes`, {
+        const isL = await this.$axios.get(`/photos/${this.photoId}/likes/${token}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
         });
-        this.LikeCount = LikeCount.data
+        this.isLiked = isL.data.is_liked;
+        console.log(this.isLiked);
+
+        const LikeCount = await this.$axios.get(`/photos/${this.photoId}/likes`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        this.LikeCount = LikeCount.data.like_count;
+        console.log(this.LikeCount);
   
         this.findAuthorId();
       } 
@@ -109,7 +108,7 @@ export default {
 
     async deletePhoto() {
       try {
-        const response = await this.$axios.delete(`/photos/${this.pid}`, {
+        const response = await this.$axios.delete(`/photos/${this.photoId}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           }
@@ -126,10 +125,9 @@ export default {
       this.isLiked = !this.isLiked;
       
       try {
-        const token = sessionStorage.getItem('token');
         if (this.isLiked) {
           this.LikeCount += 1;
-          await this.$axios.put(`/photos/${this.pid}/likes/${token}`, {
+          await this.$axios.put(`/photos/${this.photoId}/likes/${token}`, {
           }, {
             headers: {
               Authorization: `Bearer ${token}`
@@ -137,7 +135,7 @@ export default {
           });
         } else {
           this.LikeCount -= 1;
-          await this.$axios.delete(`/photos/${this.pid}/likes/${token}`, {
+          await this.$axios.delete(`/photos/${this.photoId}/likes/${token}`, {
             headers: {
               Authorization: `Bearer ${token}`
             }
@@ -175,6 +173,20 @@ export default {
                 <use href="/feather-sprite-v4.29.0.svg#thumbs-up" />
               </svg></span>
           </div>
+            <button @click="commentPhoto" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
+              :data-bs-target="'#usersModal' + this.photoId">
+              Comment <svg class="feather">
+                <use href="/feather-sprite-v4.29.0.svg#message-circle" />
+              </svg>
+            </button>
+            <button @click="viewComments" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
+              :data-bs-target="'#listModal' + this.photoId">
+              View Comments <svg class="feather">
+                <use href="/feather-sprite-v4.29.0.svg#message-square" />
+              </svg>
+            </button>
+            <CommentModal :pid="this.Pid" :uid="this.token"/>
+            <CommentListModal :pid="this.Pid" :uid="this.token"/>
         </div>
       </div>
     </div>

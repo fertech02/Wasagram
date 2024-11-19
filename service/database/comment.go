@@ -1,7 +1,7 @@
 package database
 
 // Comment a Photo
-func (db *appdbimpl) Comment(c *Comment) error {
+func (db *appdbimpl) Comment(c Comment) error {
 
 	query := "INSERT INTO Comments (Uid, Pid, Message) VALUES ($1, $2, $3)"
 	_, err := db.c.Exec(query, c.Uid, c.Pid, c.Message)

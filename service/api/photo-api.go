@@ -1,15 +1,30 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
+	"mime/multipart"
 	"net/http"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/fertech02/Wasa-repository/service/api/reqcontext"
+	"github.com/fertech02/Wasa-repository/service/database"
+	"github.com/fertech02/Wasa-repository/service/filesystem"
 	"github.com/google/uuid"
 	"github.com/julienschmidt/httprouter"
 )
+
+type FromFile struct {
+	File   []byte `json:"file"`
+	Header string `json:"header"`
+	Mime   string `json:"mime"`
+}
+
+const uploadDirectory = "/tmp/filesystem/"
 
 func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
@@ -19,30 +34,76 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-	var photo Photo
-	var err error
 
-	photo.Uid = GetIdFromBearer(r)
-	photo.Pid = uuid.New().String()
-	photo.File, err = io.ReadAll(r.Body)
+	// Parse the form data
+	err := r.ParseMultipartForm(10 << 20) // 10 MB
 	if err != nil {
-		ctx.Logger.Error("Error reading photo")
+		ctx.Logger.WithError(err).Error("Error parsing form")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	photo.Date = time.Now().Format("2006-01-02 15:04:05")
 
-	// add photo info to database
-	PhotoData, err := rt.db.PostPhoto(photo.PhotoToDatabase())
+	// get the photo from the form
+	file, handler, err := r.FormFile("file")
+	if err != nil {
+		ctx.Logger.WithError(err).Error("Error getting file")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer file.Close()
+
+	additionalData := r.FormValue("additionalData")
+	var photoData database.Caption
+	err = json.Unmarshal([]byte(additionalData), &photoData)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("Error unmarshalling additional data")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	uid := GetIdFromBearer(r)
+	pid := uuid.New().String()
+
+	var photo database.Photo
+	photo.Uid = uid
+	photo.Pid = pid
+	photo.Date = time.Now().String()
+
+	_, err = rt.db.PostPhoto(photo)
 	if err != nil {
 		ctx.Logger.WithError(err).Error("Error posting photo")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	photo.PhotoFromDatabase(PhotoData)
-	w.Header().Set("Content-Type", "application/json")
+
+	// save the photo in the file system
+	err = saveUploadedFile(file, handler, photo.Pid)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("Error saving photo")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	w.WriteHeader(http.StatusCreated)
-	_ = json.NewEncoder(w).Encode(photo)
+
+}
+
+// saveUploadedFile saves the uploaded file to the filesystem
+func saveUploadedFile(file multipart.File, handler *multipart.FileHeader, photoID string) error {
+
+	filename := filepath.Join(uploadDirectory, fmt.Sprintf("%s%s", photoID, ".jpg"))
+	out, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, file)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -60,6 +121,14 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	if ans != 0 {
 		ctx.Logger.Error("Unauthorized")
 		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	// delete the photo in the file system
+	err = filesystem.RemovePhoto(pid)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("Error deleting photo")
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
@@ -105,27 +174,30 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 		return
 	}
 
-	// get the photo
-	dbphoto, present, err := rt.db.GetPhoto(pid)
+	// get the photo from the file system
+	path := filepath.Join(uploadDirectory, fmt.Sprintf("%s%s", pid, ".jpg"))
+	photoFile, err := os.Open(path)
 	if err != nil {
-		ctx.Logger.WithError(err).Error("Error getting photo")
+		ctx.Logger.WithError(err).Error("Error opening photo file")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
-	}
-	if !present {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	// Da aggiustare
-	var photo Photo
-	photo.PhotoFromDatabase(dbphoto)
-	mimeType := http.DetectContentType(photo.File)
-	w.Header().Set("Content-Type", mimeType)
-	_, err = w.Write(photo.File)
-	if err != nil {
-		ctx.Logger.WithError(err).Error("Error writing photo")
-		http.Error(w, "Error writing photo", http.StatusInternalServerError)
-		return
+	} else {
+		w.Header().Set("Content-Type", "image/png")
+		buf := bytes.NewBuffer(nil)
+		_, err := io.Copy(buf, photoFile)
+		if err != nil {
+			ctx.Logger.WithError(err).Error("Error copying photo file")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		} else {
+			w.WriteHeader(http.StatusOK)
+			_, err = w.Write(buf.Bytes())
+			if err != nil {
+				ctx.Logger.WithError(err).Error("Error writing photo file")
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			return
+		}
 	}
 }

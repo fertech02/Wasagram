@@ -34,6 +34,9 @@ export default {
         saveTokenToSessionStorage() {
             const bearerToken = `${this.identifier.userId}`;
             sessionStorage.setItem('token', bearerToken);
+            sessionStorage.setItem('username', this.username);
+            console.log("Token saved to session storage: ", bearerToken);
+            console.log("Username saved to session storage: ", this.username);
         },
     },
 };

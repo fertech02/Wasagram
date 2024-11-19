@@ -88,7 +88,7 @@ export default {
         <hr />
 
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            <PhotoCard v-for="photo in photoList" :key="photo.pid" :pid="photo.pid" :uid="photo.uid" :file="photo.file" :date="photo.date" />
+            <PhotoCard v-for="photo in photoList" :key="photo.pid" :photoId="photo.pid" :userId="photo.uid" :date="photo.date" />
         </div>
     </div>
 </template>

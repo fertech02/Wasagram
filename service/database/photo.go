@@ -5,7 +5,7 @@ import "database/sql"
 // Post a Photo
 func (db *appdbimpl) PostPhoto(p Photo) (Photo, error) {
 
-	_, err := db.c.Exec(`INSERT INTO Photos (Pid, Uid, File, Date) VALUES (?, ?, ?, ?)`, p.Pid, p.Uid, p.File, p.Date)
+	_, err := db.c.Exec(`INSERT INTO Photos (Pid, Uid, Date) VALUES (?, ?, ?)`, p.Pid, p.Uid, p.Date)
 	if err != nil {
 		return p, err
 	}
@@ -36,10 +36,10 @@ func (db *appdbimpl) DeletePhoto(pid string) error {
 
 func (db *appdbimpl) GetPhoto(pid string) (dbPhoto Photo, present bool, err error) {
 
-	query := "SELECT Pid, Uid, File, Date FROM Photos WHERE Pid = ?;"
+	query := "SELECT Pid, Uid, Date FROM Photos WHERE Pid = ?;"
 
 	row := db.c.QueryRow(query, pid)
-	err = row.Scan(&dbPhoto.Pid, &dbPhoto.Uid, &dbPhoto.File, &dbPhoto.Date)
+	err = row.Scan(&dbPhoto.Pid, &dbPhoto.Uid, &dbPhoto.Date)
 	if err != nil && err != sql.ErrNoRows {
 		return
 	} else if err == sql.ErrNoRows {

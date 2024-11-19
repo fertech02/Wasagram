@@ -12,7 +12,11 @@ import (
 func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	// Create a new comment
-	comment := db.Comment{}
+	comment := db.Comment{
+		Uid:     "",
+		Pid:     "",
+		Message: "",
+	}
 	// get the photo id from the request params
 	photoId := ps.ByName("pid")
 
@@ -22,12 +26,26 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	comment.Pid = photoId
 	comment.Uid = userId
 
+	// Check if user exists
+	_, err := rt.db.GetUsername(userId)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	// Check if photo exists
+	_, err = rt.db.GetPhotoAuthor(photoId)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
 	// get the message from the request body
 	var message struct {
 		Message string `json:"message"`
 	}
 
-	err := json.NewDecoder(r.Body).Decode(&message)
+	err = json.NewDecoder(r.Body).Decode(&message)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -36,9 +54,10 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	comment.Message = message.Message
 
 	// Add the comment in the db
-	err = rt.db.Comment(&comment)
+	err = rt.db.Comment(comment)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.WithError(err).Error("Error commenting photo")
 		return
 	}
 }

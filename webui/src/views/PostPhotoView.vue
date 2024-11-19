@@ -7,6 +7,7 @@ export default {
       photo: null,
       uploadSuccess: false,
       endText: '',
+      caption : '',
     };
   },
 
@@ -24,7 +25,11 @@ export default {
 
       const formData = new FormData();
       formData.append('file', this.photo);
-      
+      const additionalData = {
+        caption: this.caption,
+      };
+
+      formData.append('additionalData', JSON.stringify(additionalData));
       const config = {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -67,6 +72,12 @@ export default {
           <input type="file" class="form-control-file" id="photo" @change="onFileChange" required />
           <div class="invalid-feedback" v-if="!photo">Photo is required</div>
         </div>
+      </div>
+
+
+      <div class="row" style="margin: 10px;">
+        <label for="caption">Caption:</label>
+        <textarea class="form-control" id="caption" v-model="caption"></textarea>
       </div>
 
       <button type="submit" class="btn btn-primary btn-lg" style="margin: 20px;">Upload</button>

@@ -49,8 +49,6 @@ export default {
         },
         async fetchUserData() {
             const uid = this.$route.params.uid;
-            const token = sessionStorage.getItem('token');
-
             try {
                 const response = await this.$axios.get(`/users/${uid}/profile`, {
                     headers: {
@@ -75,7 +73,7 @@ export default {
                     switch (statusCode) {
                         case 400:
                             console.error('Bad request');
-                            this.userName = "You have to login first"
+                            this.username = "You have to login first"
                         case 401:
                             console.error('Access Unauthorized:', error.response.data);
                             // unauthorized
@@ -84,16 +82,16 @@ export default {
                         case 403:
                             console.error('Access Forbidden:', error.response.data);
                             // forbidden
-                            this.userName = "You have been banned by the user"
+                            this.username = "You have been banned by the user"
                             break;
                         case 404:
                             console.error('Not Found:', error.response.data);
                             // not found
                             if (uid === "null") {
-                                this.userName = "You are not logged in";
+                                this.username = "You are not logged in";
                             }
                             else {
-                                this.userName = "User not found";
+                                this.username = "User not found";
                             }
                             break;
                         default:
@@ -108,8 +106,6 @@ export default {
         async Follow() {
             this.isfollowed = !this.isfollowed;
             const uid = this.$route.params.uid;
-            const token = sessionStorage.getItem('token');
-
             try {
                 if (this.isfollowed) {
                     this.followCount += 1;
@@ -136,8 +132,6 @@ export default {
         async Ban() {   
             this.isbanned = !this.isbanned;
             const uid = this.$route.params.uid;
-            const token = sessionStorage.getItem('token');
-            
             try {
                 if (this.isbanned) {
                     await this.$axios.put(`/users/${token}/ban/${uid}`, {
@@ -197,7 +191,7 @@ export default {
         </div>
         <hr />
         <div class="photos">
-            <PhotoCard v-for="photo in photoList" :key="photo.pid" :pid="photo.pid" :uid="photo.uid" :file="photo.file" :date="photo.date"/>
+            <PhotoCard v-for="photo in photoList" :key="photo.pid" :photoId="photo.pid" :userId="photo.uid" :date="photo.date"/>
         </div>
     </div>
 </template>
@@ -218,7 +212,4 @@ hr {
     justify-content: space-around;
 }
 
-.photos .photo-card {
-    margin-bottom: 30px;
-}
 </style>

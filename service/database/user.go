@@ -34,7 +34,7 @@ func (db *appdbimpl) UpdateUsername(uid string, username string) error {
 func (db *appdbimpl) GetMyStream(uid string) ([]Photo, error) {
 
 	var strm []Photo
-	rows, err := db.c.Query("SELECT Pid, Uid, File, Date FROM Photos WHERE Uid IN (SELECT FollowerId From Follows WHERE FolloweeId=? AND FollowerId NOT IN (SELECT Uid FROM Bans where BannedID=?)) ORDER BY Date DESC LIMIT 20", uid, uid)
+	rows, err := db.c.Query("SELECT Pid, Uid, Date FROM Photos WHERE Uid IN (SELECT FollowerId From Follows WHERE FolloweeId=? AND FollowerId NOT IN (SELECT Uid FROM Bans where BannedID=?)) ORDER BY Date DESC LIMIT 20", uid, uid)
 	if err != nil {
 		return strm, err
 	}
@@ -42,7 +42,7 @@ func (db *appdbimpl) GetMyStream(uid string) ([]Photo, error) {
 
 	for rows.Next() {
 		var p Photo
-		err = rows.Scan(&p.Pid, &p.Uid, &p.File, &p.Date)
+		err = rows.Scan(&p.Pid, &p.Uid, &p.Date)
 		if err != nil {
 			return strm, err
 		}
@@ -60,7 +60,7 @@ func (db *appdbimpl) GetMyStream(uid string) ([]Photo, error) {
 func (db *appdbimpl) GetProfilePhotos(uid string) ([]Photo, error) {
 
 	var photos []Photo
-	rows, err := db.c.Query("SELECT Pid, Uid, File, Date FROM Photos WHERE Uid=? ORDER BY Date DESC", uid)
+	rows, err := db.c.Query("SELECT Pid, Uid, Date FROM Photos WHERE Uid=? ORDER BY Date DESC", uid)
 	if err != nil {
 		return photos, err
 	}
@@ -68,7 +68,7 @@ func (db *appdbimpl) GetProfilePhotos(uid string) ([]Photo, error) {
 
 	for rows.Next() {
 		var p Photo
-		err = rows.Scan(&p.Pid, &p.Uid, &p.File, &p.Date)
+		err = rows.Scan(&p.Pid, &p.Uid, &p.Date)
 		if err != nil {
 			return photos, err
 		}

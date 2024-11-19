@@ -1,9 +1,8 @@
 <script>
+
 export default {
 
-    props: {
-        pid: String,
-    },
+    props: ['pid', 'uid'],
 
     data() {
         return {
@@ -71,7 +70,7 @@ export default {
 </script>
 
 <template>
-    <div class="modal fade" tabindex="-1" :id="'listModal' + pid" aria-labelledby="ModalLabel" aria-hidden="true">
+    <div class="modal fade" tabindex="-1" :id="'listModal' + this.pid" aria-labelledby="ModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -80,12 +79,12 @@ export default {
                 </div>
                 <div class="modal-body">
                     <ul class="list-group">
-                        <li v-for="comment in comments" :key="comment.pid" class="list-group-item">
+                        <li v-for="comment in comments" :key="comment.pid" :pid="comment.pid" :uid="comment.uid" class="list-group-item">
                             <div>
                                 <strong>{{ comment.uid }}</strong>
                             </div>
                             <div>{{ comment.message }}</div>
-                            <div v-if="comment.uid == this.token">
+                            <div v-if="comment.uid == token">
                                 <button @click="deleteComment(comment.pid, comment.uid)" class="btn btn-danger btn-sm">Delete</button>
                             </div>
                         </li>
