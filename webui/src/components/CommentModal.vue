@@ -16,6 +16,7 @@ export default {
     methods: {
         async commentPhoto() {
             console.log("Posting Comment: ", this.commentText);
+            console.log("Photo ID: ", this.photoId);
             this.commentPostTry = true;
             try {
                 const config = {

@@ -80,10 +80,13 @@ export default {
                 </div>
                 <div class="modal-body">
                     <ul class="list-group">
-                        <li v-for="comment in comments" :key="comment.pid" :pid="comment.pid" :uid="comment.uid" class="list-group-item">
+                        <li v-for="comment in comments" :key="comment.pid" class="list-group-item">
                             <div>
                                 <strong>{{ comment.uid }}</strong>
                             </div>
+                            <button>
+                                {{ comment.uid == this.token ? 'Yes' : 'No' }}
+                            </button>
                             <div>{{ comment.message }}</div>
                             <div v-if="comment.uid == this.token">
                                 <button @click="deleteComment(comment.pid, comment.uid)" class="btn btn-danger btn-sm">Delete</button>

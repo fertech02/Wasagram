@@ -134,6 +134,7 @@ export default {
           });
         } else {
           this.LikeCount -= 1;
+          console.log(this.photoId, token);
           await this.$axios.delete(`/photos/${this.photoId}/likes/${token}`, {
             headers: {
               Authorization: `Bearer ${token}`

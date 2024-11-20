@@ -40,14 +40,14 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 	// Parse the photo id from the request
 	pid := ps.ByName("pid")
-	if pid != "" {
+	if pid == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	// Parse the user id from the request
 	uid := ps.ByName("uid")
-	if uid != "" {
+	if uid == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
