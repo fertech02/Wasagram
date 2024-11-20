@@ -6,6 +6,7 @@ import (
 
 	"github.com/fertech02/Wasa-repository/service/api/reqcontext"
 	db "github.com/fertech02/Wasa-repository/service/database"
+	"github.com/google/uuid"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -18,7 +19,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 	}
 
-	userId := ps.ByName("uid")
+	userId := GetIdFromBearer(r)
 	photoId := ps.ByName("pid")
 	author, err := rt.db.GetPhotoAuthor(photoId)
 	if err != nil || author == "" {
@@ -39,8 +40,10 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 	}
 
+	commentId := uuid.New().String()
 	// Create the comment
 	comment := db.Comment{
+		Cid:     commentId,
 		Pid:     photoId,
 		Uid:     userId,
 		Message: message.Message,
@@ -57,22 +60,17 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 
 func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	// get the photo id from the request params
-	pid := ps.ByName("pid")
-	if pid == "" {
+	// get the comment id from the request params
+	cid := ps.ByName("cid")
+	if cid == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	// get the user id from the request params
-	uid := ps.ByName("uid")
-	if uid == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
+	// Get the comment author
 
 	// Delete the comment from the db
-	err := rt.db.Uncomment(pid, uid)
+	err := rt.db.Uncomment(cid)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

@@ -53,6 +53,7 @@ type Follow struct {
 }
 
 type Comment struct {
+	Cid     string `json:"cid"`
 	Uid     string `json:"uid"`
 	Pid     string `json:"pid"`
 	Message string `json:"message"`
@@ -128,7 +129,7 @@ type AppDatabase interface {
 
 	// Comment
 	Comment(c Comment) error
-	Uncomment(pid string, uid string) error
+	Uncomment(cid string) error
 	GetComments(photoId string) ([]Comment, error)
 }
 
@@ -163,7 +164,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 				Uid TEXT NOT NULL,
 				Date TEXT,
 				
-				FOREIGN KEY (Uid) REFERENCES Users(Uid) 
+				FOREIGN KEY (Uid) REFERENCES Users(Uid) ON DELETE CASCADE
 		); `
 		_, err = db.Exec(sqlStmt)
 		if err != nil {
@@ -191,13 +192,12 @@ func New(db *sql.DB) (AppDatabase, error) {
 	if errors.Is(err, sql.ErrNoRows) {
 		sqlStmt := `CREATE TABLE Comments (
 
+				Cid TEXT PRIMARY KEY,
 				Pid TEXT NOT NULL,
 				Uid TEXT NOT NULL,
 				Message TEXT NOT NULL,
-
-				PRIMARY KEY (Pid, Uid),
-				FOREIGN KEY (Pid) REFERENCES Photos(Pid),
-				FOREIGN KEY (Uid) REFERENCES Users(Uid)
+				FOREIGN KEY (Pid) REFERENCES Photos(Pid) ON DELETE CASCADE,
+				FOREIGN KEY (Uid) REFERENCES Users(Uid) ON DELETE CASCADE
 		); `
 		_, err = db.Exec(sqlStmt)
 		if err != nil {
@@ -214,8 +214,8 @@ func New(db *sql.DB) (AppDatabase, error) {
 				Uid TEXT NOT NULL,
 
 				PRIMARY KEY (Pid, Uid),
-				FOREIGN KEY (Pid) REFERENCES Photos(Pid),
-				FOREIGN KEY (Uid) REFERENCES Users(Uid)
+				FOREIGN KEY (Pid) REFERENCES Photos(Pid) ON DELETE CASCADE,
+				FOREIGN KEY (Uid) REFERENCES Users(Uid) ON DELETE CASCADE
 				
 
 		); `
@@ -234,8 +234,8 @@ func New(db *sql.DB) (AppDatabase, error) {
 				FollowerId TEXT NOT NULL,
 
 				PRIMARY KEY (FolloweeId, FollowerId),
-				FOREIGN KEY (FolloweeId) REFERENCES Users(Uid),
-				FOREIGN KEY (FollowerId) REFERENCES Users(Uid)
+				FOREIGN KEY (FolloweeId) REFERENCES Users(Uid) ON DELETE CASCADE,
+				FOREIGN KEY (FollowerId) REFERENCES Users(Uid) ON DELETE CASCADE
 
 		); `
 		_, err = db.Exec(sqlStmt)
@@ -253,8 +253,8 @@ func New(db *sql.DB) (AppDatabase, error) {
 				BannedId TEXT NOT NULL,
 
 				PRIMARY KEY (BannerId, BannedId),
-				FOREIGN KEY (BannerId) REFERENCES Users(Uid),
-				FOREIGN KEY (BannedId) REFERENCES Users(Uid)
+				FOREIGN KEY (BannerId) REFERENCES Users(Uid) ON DELETE CASCADE,
+				FOREIGN KEY (BannedId) REFERENCES Users(Uid) ON DELETE CASCADE
 			
 		); `
 		_, err = db.Exec(sqlStmt)

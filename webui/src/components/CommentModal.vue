@@ -25,7 +25,7 @@ export default {
                     },
                 };
                 console.log(this.photoId);
-                const response = await this.$axios.post(`/photos/${this.photoId}/comments/${token}`, { Message: this.commentText }, config);
+                const response = await this.$axios.post(`/photos/${this.photoId}/comments`, { Message: this.commentText }, config);
                 this.Text = "Comment Posted!";
                 
                 location.reload();

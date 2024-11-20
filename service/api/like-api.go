@@ -12,19 +12,9 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 
 	// Parse the photo id from the request
 	pid := ps.ByName("pid")
-	if pid == "" {
-		ctx.Logger.Error("Failed to parse photo id")
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
 
 	// Parse the user id from the request
 	uid := ps.ByName("uid")
-	if uid == "" {
-		ctx.Logger.Error("Failed to parse user id")
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
 
 	// Like the photo
 	err := rt.db.Like(pid, uid)
@@ -40,17 +30,9 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 	// Parse the photo id from the request
 	pid := ps.ByName("pid")
-	if pid == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
 
 	// Parse the user id from the request
 	uid := ps.ByName("uid")
-	if uid == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
 
 	// Unlike the photo
 	err := rt.db.Unlike(pid, uid)

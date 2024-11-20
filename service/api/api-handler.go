@@ -25,8 +25,8 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.GET("/users/:uid/follow", rt.wrap(rt.getFollowedUsers))
 
 	// Comment routes
-	rt.router.POST("/photos/:pid/comments/:uid", rt.wrap(rt.commentPhoto))
-	rt.router.DELETE("/photos/:pid/comments/:uid", rt.wrap(rt.uncommentPhoto))
+	rt.router.POST("/photos/:pid/comments", rt.wrap(rt.commentPhoto))
+	rt.router.DELETE("/photos/:pid/comments/:cid", rt.wrap(rt.uncommentPhoto))
 	rt.router.GET("/photos/:pid/comments", rt.wrap(rt.getComments))
 
 	// Like routes

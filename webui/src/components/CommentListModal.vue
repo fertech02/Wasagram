@@ -20,7 +20,6 @@ export default {
 
         async fetchComments() {
             try {
-                console.log(this.photoId);
                 const response = await this.$axios.get(`/photos/${this.photoId}/comments`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -52,9 +51,9 @@ export default {
 
         },
 
-        async deleteComment(pid, uid) {
+        async deleteComment(pid, cid) {
             try {
-                const response = await this.$axios.delete(`/photos/${pid}/comments/${uid}`, {
+                const response = await this.$axios.delete(`/photos/${pid}/comments/${cid}`, {
                     headers: {
                         'Authorization': `Bearer ${this.token}`,
                     }
@@ -84,12 +83,9 @@ export default {
                             <div>
                                 <strong>{{ comment.uid }}</strong>
                             </div>
-                            <button>
-                                {{ comment.uid == this.token ? 'Yes' : 'No' }}
-                            </button>
                             <div>{{ comment.message }}</div>
-                            <div v-if="comment.uid == this.token">
-                                <button @click="deleteComment(comment.pid, comment.uid)" class="btn btn-danger btn-sm">Delete</button>
+                            <div v-if="comment.uid == token">
+                                <button @click="deleteComment(comment.pid, comment.cid)" class="btn btn-danger btn-sm">Delete</button>
                             </div>
                         </li>
                     </ul>

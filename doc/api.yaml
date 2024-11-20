@@ -217,6 +217,23 @@ paths:
   /photos/{pid}/comments:
     parameters:
       - $ref: "#/components/parameters/pid"
+    post:
+      tags: ["Comments"]
+      operationId: commentPhoto
+      summary: Add a comment to a picture
+      description: Add a comment to a picture
+      security:
+        - bearerAuth: []
+      responses:
+        "201":
+          description: Comment added
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Comment"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/UnauthorizedError" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
     get:
       tags: ["Comments"]
       operationId: getComments
@@ -244,27 +261,10 @@ paths:
         "401" : { $ref: "#/components/responses/UnauthorizedError" }
         "500" : { $ref: "#/components/responses/InternalServerError" }
   
-  /photos/{pid}/comments/{uid}:
+  /photos/{pid}/comments/{cid}:
     parameters:
       - $ref: "#/components/parameters/pid"
-      - $ref: "#/components/parameters/uid"
-    post:
-      tags: ["Comments"]
-      operationId: commentPhoto
-      summary: Add a comment to a picture
-      description: Add a comment to a picture
-      security:
-        - bearerAuth: []
-      responses:
-        "201":
-          description: Comment added
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Comment"
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "401": { $ref: "#/components/responses/UnauthorizedError" }
-        "500": { $ref: "#/components/responses/InternalServerError" }
+      - $ref: "#/components/parameters/cid"
     delete:
       summary: Delete a Comment
       tags: ["Comments"]
@@ -725,6 +725,18 @@ components:
         minLength: 12
         maxLength: 12
       name: fid
+      in: path
+      required: true
+      allowEmptyValue: false
+    
+    cid:
+      description: The comment's identifier
+      schema:
+        type: string
+        pattern: '^[a-zA-Z0-9-_]+$'
+        minLength: 12
+        maxLength: 12
+      name: cid
       in: path
       required: true
       allowEmptyValue: false
