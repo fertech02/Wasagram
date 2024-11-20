@@ -55,7 +55,6 @@ export default {
                         Authorization: `Bearer ${token}`,
                     },
                 });
-
                 this.found = true;
                 this.username = response.data.username;
                 this.followCount = response.data.followCount;
@@ -63,9 +62,9 @@ export default {
                 this.photoCount = response.data.photoCount;
                 this.isbanned = response.data.isBanned;
                 this.isfollowed = response.data.isFollowed;
-                this.photoList = response.data.photolist;
+                this.photoList = response.data.photoList;
 
-                console.log(response.data);
+                console.log("PhotoList: ",this.photoList);
 
             } catch (error) {
                 if (error.response) {
@@ -160,6 +159,7 @@ export default {
 };
 </script>
 
+
 <template>
     <div class="container mt-5">
         <h1 class="display-4" style="font-size: 50px;">{{ username }}</h1>
@@ -191,7 +191,7 @@ export default {
         </div>
         <hr />
         <div class="photos">
-            <PhotoCard v-for="photo in photoList" :key="photo.pid" :photoId="photo.pid" :userId="photo.uid" :date="photo.date"/>
+            <PhotoCard v-for="photo in photoList" :key="photo.pid" :photoId="photo.pid" :userId="photo.uid" :date="photo.date"  />
         </div>
     </div>
 </template>
