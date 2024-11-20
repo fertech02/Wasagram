@@ -12,46 +12,39 @@ import (
 func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	// Create a new comment
-	comment := db.Comment{
-		Uid:     "",
-		Pid:     "",
-		Message: "",
-	}
-	// get the photo id from the request params
-	photoId := ps.ByName("pid")
-
-	// get the user id from the request params
-	userId := ps.ByName("uid")
-
-	comment.Pid = photoId
-	comment.Uid = userId
-
-	// Check if user exists
-	_, err := rt.db.GetUsername(userId)
-	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
+	if !CheckValidAuth(r) {
+		ctx.Logger.Error("Unauthorized")
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	// Check if photo exists
-	_, err = rt.db.GetPhotoAuthor(photoId)
-	if err != nil {
+	userId := ps.ByName("uid")
+	photoId := ps.ByName("pid")
+	author, err := rt.db.GetPhotoAuthor(photoId)
+	if err != nil || author == "" {
 		w.WriteHeader(http.StatusNotFound)
+		ctx.Logger.Error("Photo not found")
 		return
 	}
 
 	// get the message from the request body
 	var message struct {
-		Message string `json:"message"`
+		Message string `json:"Message"`
 	}
 
 	err = json.NewDecoder(r.Body).Decode(&message)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		ctx.Logger.WithError(err).Error("Error decoding message")
 		return
 	}
 
-	comment.Message = message.Message
+	// Create the comment
+	comment := db.Comment{
+		Pid:     photoId,
+		Uid:     userId,
+		Message: message.Message,
+	}
 
 	// Add the comment in the db
 	err = rt.db.Comment(comment)

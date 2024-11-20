@@ -25,9 +25,7 @@ export default {
       Author: this.userId,
       isMe: false,
       notBanned: true,
-      Uid: this.userId,
       Pid: this.photoId,
-      token: sessionStorage.getItem('token'),
     };
     
   },
@@ -127,6 +125,7 @@ export default {
       try {
         if (this.isLiked) {
           this.LikeCount += 1;
+          console.log(this.photoId, token);
           await this.$axios.put(`/photos/${this.photoId}/likes/${token}`, {
           }, {
             headers: {
@@ -185,8 +184,8 @@ export default {
                 <use href="/feather-sprite-v4.29.0.svg#message-square" />
               </svg>
             </button>
-            <CommentModal :pid="this.Pid" :uid="this.token"/>
-            <CommentListModal :pid="this.Pid" :uid="this.token"/>
+            <CommentModal :photoId="Pid"/>
+            <CommentListModal :photoId="Pid"/>
         </div>
       </div>
     </div>

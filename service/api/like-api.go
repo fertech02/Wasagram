@@ -56,6 +56,7 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	err := rt.db.Unlike(pid, uid)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.WithField("error", err).Error("Failed to unlike photo")
 		return
 	}
 

@@ -15,7 +15,7 @@ func (db *appdbimpl) PostPhoto(p Photo) (Photo, error) {
 // Delete a Photo
 func (db *appdbimpl) DeletePhoto(pid string) error {
 
-	_, err := db.c.Exec("DELETE FROM Like WHERE Pid=?", pid)
+	_, err := db.c.Exec("DELETE FROM Likes WHERE Pid=?", pid)
 	if err != nil {
 		return err
 	}

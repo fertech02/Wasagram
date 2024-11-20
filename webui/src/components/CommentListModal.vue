@@ -1,8 +1,8 @@
 <script>
-
+const token = sessionStorage.getItem('token');
 export default {
 
-    props: ['pid', 'uid'],
+    props: ['photoId'],
 
     data() {
         return {
@@ -20,9 +20,10 @@ export default {
 
         async fetchComments() {
             try {
-                const response = await this.$axios.get(`/photos/${this.pid}/comments`, {
+                console.log(this.photoId);
+                const response = await this.$axios.get(`/photos/${this.photoId}/comments`, {
                     headers: {
-                        Authorization: `Bearer ${this.token}`,
+                        Authorization: `Bearer ${token}`,
                     },
                 });
                 console.log('Response:', response.data);
@@ -70,7 +71,7 @@ export default {
 </script>
 
 <template>
-    <div class="modal fade" tabindex="-1" :id="'listModal' + this.pid" aria-labelledby="ModalLabel" aria-hidden="true">
+    <div class="modal fade" tabindex="-1" :id="'listModal' + this.photoId" aria-labelledby="ModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -84,7 +85,7 @@ export default {
                                 <strong>{{ comment.uid }}</strong>
                             </div>
                             <div>{{ comment.message }}</div>
-                            <div v-if="comment.uid == token">
+                            <div v-if="comment.uid == this.token">
                                 <button @click="deleteComment(comment.pid, comment.uid)" class="btn btn-danger btn-sm">Delete</button>
                             </div>
                         </li>

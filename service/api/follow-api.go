@@ -26,6 +26,7 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 	err := rt.db.Follow(followeeId, followerId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.WithError(err).Error("Error following user")
 		return
 	}
 }
