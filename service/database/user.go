@@ -74,6 +74,9 @@ func (db *appdbimpl) GetProfilePhotos(uid string) ([]Photo, error) {
 		}
 		photos = append(photos, p)
 	}
+	if err = rows.Err(); err != nil {
+		return photos, err
+	}
 	return photos, nil
 }
 
