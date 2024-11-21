@@ -34,7 +34,7 @@ func (db *appdbimpl) UpdateUsername(uid string, username string) error {
 func (db *appdbimpl) GetMyStream(uid string) ([]Photo, error) {
 
 	var strm []Photo
-	rows, err := db.c.Query("SELECT Pid, Uid, Date FROM Photos WHERE Uid IN (SELECT FolloweeId From Follows WHERE FollowerId=?) AND Uid NOT IN (SELECT BannerId FROM Bans where BannedId=?)) ORDER BY Date DESC LIMIT 20", uid, uid)
+	rows, err := db.c.Query("SELECT Pid, Uid, Date FROM Photos WHERE Uid IN (SELECT FolloweeId From Follows WHERE FollowerId=?) AND Uid NOT IN (SELECT BannerId FROM Bans where BannedId=?) ORDER BY Date DESC LIMIT 20", uid, uid)
 	if err != nil {
 		return strm, err
 	}
