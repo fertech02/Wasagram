@@ -22,7 +22,6 @@ func (rt *_router) Handler() http.Handler {
 	// Follow routes
 	rt.router.PUT("/users/:uid/follow/:fid", rt.wrap(rt.followUser))
 	rt.router.DELETE("/users/:uid/follow/:fid", rt.wrap(rt.unfollowUser))
-	rt.router.GET("/users/:uid/follow", rt.wrap(rt.getFollowedUsers))
 
 	// Comment routes
 	rt.router.POST("/photos/:pid/comments", rt.wrap(rt.commentPhoto))
@@ -38,7 +37,6 @@ func (rt *_router) Handler() http.Handler {
 	// Ban routes
 	rt.router.PUT("/users/:uid/ban/:bid", rt.wrap(rt.banUser))
 	rt.router.DELETE("/users/:uid/ban/:bid", rt.wrap(rt.unbanUser))
-	rt.router.GET("/users/:uid/ban", rt.wrap(rt.getBannedUsers))
 
 	// Special routes
 	rt.router.GET("/liveness", rt.liveness)

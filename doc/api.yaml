@@ -365,36 +365,6 @@ paths:
         "404": { $ref: "#/components/responses/NotFoundError" }
         "500": { $ref: "#/components/responses/InternalServerError" }
   
-  /users/{uid}/follow:
-    parameters:
-      - $ref: "#/components/parameters/uid"
-    get:
-      operationId: getFollowedUsers
-      tags: ["Follows"]
-      summary: Get Followed Users
-      description: Get Followed Users
-      security:
-        - bearerAuth: []
-      responses:
-        "200":
-          description: Followed Users
-          content:
-            application/json:
-              schema:
-                type: object
-                description: List of followed users
-                properties:
-                  followed_users:
-                    type: array
-                    description: List of followed users
-                    minItems: 1
-                    maxItems: 100
-                    items:
-                      $ref: "#/components/schemas/User"
-        "401": { $ref: "#/components/responses/UnauthorizedError" }
-        "404": { $ref: "#/components/responses/NotFoundError" }
-        "500": { $ref: "#/components/responses/InternalServerError" }
-  
   /users/{uid}/follow/{fid}:
     parameters:
       - $ref: "#/components/parameters/uid"
@@ -426,36 +396,6 @@ paths:
       responses:
         "204":
           description: User Unfollowed Successfully
-        "401": { $ref: "#/components/responses/UnauthorizedError" }
-        "404": { $ref: "#/components/responses/NotFoundError" }
-        "500": { $ref: "#/components/responses/InternalServerError" }
-  
-  /users/{uid}/ban:
-    parameters:
-      - $ref: "#/components/parameters/uid"
-    get:
-      operationId: getBannedUsers
-      tags: ["Bans"]
-      summary: Get Banned Users
-      description: Get Banned Users
-      security:
-        - bearerAuth: []
-      responses:
-        "200":
-          description: Banned Users
-          content:
-            application/json:
-              schema:
-                type: object
-                description: List of banned users
-                properties:
-                  banned_users:
-                    type: array
-                    description: List of banned users
-                    minItems: 1
-                    maxItems: 100
-                    items:
-                      $ref: "#/components/schemas/User"
         "401": { $ref: "#/components/responses/UnauthorizedError" }
         "404": { $ref: "#/components/responses/NotFoundError" }
         "500": { $ref: "#/components/responses/InternalServerError" }

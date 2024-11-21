@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/fertech02/Wasa-repository/service/api/reqcontext"
@@ -47,55 +46,6 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 
 	// Unfollow the user
 	err := rt.db.Unfollow(followeeId, followerId)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-}
-
-/*
-func (rt *_router) getFollowers(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-
-	uid := ps.ByName("uid")
-	if uid == "" {
-		w.WriteHeader(http.StatusBadRequest);
-		return
-	}
-
-	// Get the followers from the db
-	followers, err := rt.db.GetFollowers(uid)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError);
-		return
-	}
-
-	// Return the followers
-	err = json.NewEncoder(w).Encode(followers)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError);
-		return
-	}
-}
-*/
-
-func (rt *_router) getFollowedUsers(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-
-	uid := ps.ByName("uid")
-	if uid == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	// Get the followees from the db
-	// -- DA VEDERE
-	followees, err := rt.db.GetFollowees(uid)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	// Return the followees
-	err = json.NewEncoder(w).Encode(followees)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

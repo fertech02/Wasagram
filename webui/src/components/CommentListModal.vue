@@ -1,5 +1,6 @@
 <script>
 const token = sessionStorage.getItem('token');
+
 export default {
 
     props: ['photoId'],
@@ -25,6 +26,7 @@ export default {
                         Authorization: `Bearer ${token}`,
                     },
                 });
+                console.log(token);
                 console.log('Response:', response.data);
                 this.comments = response.data;
                 console.log('Comments:', this.comments);
@@ -81,10 +83,10 @@ export default {
                     <ul class="list-group">
                         <li v-for="comment in comments" :key="comment.pid" class="list-group-item">
                             <div>
-                                <strong>{{ comment.uid }}</strong>
+                                <strong>{{ comment.uid }} {{ this.userId }}</strong>
                             </div>
                             <div>{{ comment.message }}</div>
-                            <div v-if="comment.uid == token">
+                            <div v-if="comment.uid == this.userId">
                                 <button @click="deleteComment(comment.pid, comment.cid)" class="btn btn-danger btn-sm">Delete</button>
                             </div>
                         </li>

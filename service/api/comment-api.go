@@ -21,19 +21,13 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 
 	userId := GetIdFromBearer(r)
 	photoId := ps.ByName("pid")
-	author, err := rt.db.GetPhotoAuthor(photoId)
-	if err != nil || author == "" {
-		w.WriteHeader(http.StatusNotFound)
-		ctx.Logger.Error("Photo not found")
-		return
-	}
 
 	// get the message from the request body
 	var message struct {
 		Message string `json:"Message"`
 	}
 
-	err = json.NewDecoder(r.Body).Decode(&message)
+	err := json.NewDecoder(r.Body).Decode(&message)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.WithError(err).Error("Error decoding message")

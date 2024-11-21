@@ -17,15 +17,17 @@ export default {
         async commentPhoto() {
             console.log("Posting Comment: ", this.commentText);
             console.log("Photo ID: ", this.photoId);
+            console.log("Token: ", token);
             this.commentPostTry = true;
             try {
-                const config = {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                    },
-                };
+                
                 console.log(this.photoId);
-                const response = await this.$axios.post(`/photos/${this.photoId}/comments`, { Message: this.commentText }, config);
+                const response = await this.$axios.post(`/photos/${this.photoId}/comments`, { Message: this.commentText }, 
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
                 this.Text = "Comment Posted!";
                 
                 location.reload();
