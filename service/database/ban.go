@@ -33,29 +33,3 @@ func (db *appdbimpl) CheckBan(bannerId string, bannedId string) (bool, error) {
 
 	return count > 0, nil
 }
-
-// Get Banned Users
-func (db *appdbimpl) GetBannedUsers(bannerId string) ([]string, error) {
-
-	var bannedUsers []string
-	rows, err := db.c.Query("SELECT BannedId FROM Bans WHERE BannerId = ?", bannerId)
-	if err != nil {
-		return bannedUsers, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var bannedId string
-		err = rows.Scan(&bannedId)
-		if err != nil {
-			return bannedUsers, err
-		}
-		bannedUsers = append(bannedUsers, bannedId)
-	}
-
-	if err = rows.Err(); err != nil {
-		return bannedUsers, err
-	}
-
-	return bannedUsers, nil
-}

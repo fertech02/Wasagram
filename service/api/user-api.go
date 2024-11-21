@@ -133,7 +133,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 
 	}
 
-	isBan, err := rt.db.CheckBan(myId, hisId)
+	isBan, err := rt.db.CheckBan(hisId, myId)
 	if err != nil {
 		ctx.Logger.WithError(err).Error("Error during ban getting")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -163,7 +163,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	var isBanned bool
-	isBanned, err = rt.db.CheckBan(uid, myId)
+	isBanned, err = rt.db.CheckBan(myId, hisId)
 	if err != nil {
 		ctx.Logger.WithError(err).Error("Error during ban bool getting")
 		w.WriteHeader(http.StatusInternalServerError)

@@ -116,7 +116,6 @@ type AppDatabase interface {
 	Ban(bannerId string, bannedId string) error
 	Unban(bannerId string, bannedId string) error
 	CheckBan(bannerId string, bannedId string) (bool, error)
-	GetBannedUsers(bannerId string) ([]string, error)
 
 	// Follow
 	Follow(followeeId string, followerId string) error
@@ -124,8 +123,6 @@ type AppDatabase interface {
 	CheckFollow(followeeId string, followerId string) (bool, error)
 	GetFollowersCount(uid string) (int, error)
 	GetFolloweesCount(uid string) (int, error)
-	GetFollowers(uid string) ([]string, error)
-	GetFollowees(uid string) ([]string, error)
 
 	// Comment
 	Comment(c Comment) error
