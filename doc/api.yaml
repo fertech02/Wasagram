@@ -170,6 +170,10 @@ paths:
       responses:
         "201":
           description: Photo Liked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Like"
         "400" : { $ref: "#/components/responses/BadRequest" }
         "401" : { $ref: "#/components/responses/UnauthorizedError" }
         "500" : { $ref: "#/components/responses/InternalServerError" }
