@@ -44,9 +44,11 @@ export default {
     },
 
     methods: {
+
         refresh() {
             location.reload();
         },
+        
         async fetchUserData() {
             const uid = this.$route.params.uid;
             try {

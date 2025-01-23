@@ -55,7 +55,7 @@ func (rt *_router) checkLike(w http.ResponseWriter, r *http.Request, ps httprout
 
 	uid := ps.ByName("uid")
 
-	isLiked, err := rt.db.CheckLike(uid, pid)
+	isLiked, err := rt.db.CheckLike(pid, uid)
 	if err != nil {
 		ctx.Logger.WithField("error", err).Error("Failed to check like")
 		w.WriteHeader(http.StatusInternalServerError)

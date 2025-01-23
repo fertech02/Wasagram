@@ -49,7 +49,7 @@ export default {
           }
         });
         this.isLiked = isL.data.is_liked;
-        console.log(this.isLiked);
+        console.log(isL.data);
 
         const LikeCount = await this.$axios.get(`/photos/${this.photoId}/likes`, {
           headers: {

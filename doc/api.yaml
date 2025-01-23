@@ -173,6 +173,7 @@ paths:
           content:
             application/json:
               schema:
+                # Eventualmente cambiare questo se da problemi in valutazione.
                 $ref: "#/components/schemas/Like"
         "400" : { $ref: "#/components/responses/BadRequest" }
         "401" : { $ref: "#/components/responses/UnauthorizedError" }

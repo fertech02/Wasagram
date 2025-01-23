@@ -18,7 +18,7 @@ func (db *appdbimpl) Unlike(pid string, uid string) error {
 func (db *appdbimpl) CheckLike(pid string, uid string) (bool, error) {
 
 	var count int
-	err := db.c.QueryRow("SELECT COUNT(*) FROM Likes WHERE Uid = $1 AND Pid = $2", uid, pid).Scan(&count)
+	err := db.c.QueryRow("SELECT COUNT(*) FROM Likes WHERE Uid = ? AND Pid = ?", uid, pid).Scan(&count)
 	if err != nil {
 		return false, err
 	}
@@ -30,7 +30,7 @@ func (db *appdbimpl) CheckLike(pid string, uid string) (bool, error) {
 func (db *appdbimpl) GetLikeCount(pid string) (int, error) {
 
 	var count int
-	err := db.c.QueryRow("SELECT COUNT(*) FROM Likes WHERE pid = $1", pid).Scan(&count)
+	err := db.c.QueryRow("SELECT COUNT(*) FROM Likes WHERE pid = ?", pid).Scan(&count)
 	if err != nil {
 		return 0, err
 	}
@@ -41,7 +41,7 @@ func (db *appdbimpl) GetLikeCount(pid string) (int, error) {
 // Get Likes
 func (db *appdbimpl) GetLikes(pid string) ([]Like, error) {
 
-	rows, err := db.c.Query("SELECT Uid FROM Likes WHERE Pid = $1", pid)
+	rows, err := db.c.Query("SELECT Uid FROM Likes WHERE Pid = ?", pid)
 	if err != nil {
 		return nil, err
 	}

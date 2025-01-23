@@ -85,6 +85,17 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 	}
 
 	username := requestData.Username
+	userID, err := rt.db.GetUserId(username)
+	if err != nil {
+		ctx.Logger.WithError(err).WithField("username", username).Error("Can't operate database")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if userID != "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	uid := ps.ByName("uid")
 	err = rt.db.UpdateUsername(uid, username)
 	if err != nil {
